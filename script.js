@@ -141,12 +141,9 @@ window.handleLogout = function() {
 window.showLandingView = function() {
     const views = ['landing-view', 'auth-view', 'dashboard-view'];
     views.forEach(v => { const el = getEl(v); if (el) el.style.display = (v === 'landing-view' ? 'block' : 'none'); });
-    // Explicitly enable scroll so the homepage is fully scrollable
-    document.body.style.overflow = 'auto';
-    document.body.style.overflowX = 'hidden';
-    document.documentElement.style.overflow = 'auto';
-    document.documentElement.style.overflowX = 'hidden';
-    window.scrollTo(0, 0);
+    // Scroll the landing-view container (not window) to top
+    const landingView = getEl('landing-view');
+    if (landingView) landingView.scrollTop = 0;
     window.applyTheme('light', false); // Landing page is always light mode
 };
 
