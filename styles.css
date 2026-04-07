@@ -150,6 +150,30 @@ html, body {
     scroll-behavior: smooth;
 }
 
+/* Landing page gets its own scroll container */
+#landing-view {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    /* Custom scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+#landing-view::-webkit-scrollbar {
+    width: 6px;
+}
+#landing-view::-webkit-scrollbar-track {
+    background: transparent;
+}
+#landing-view::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+#landing-view::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: var(--text);

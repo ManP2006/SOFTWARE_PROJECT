@@ -21,14 +21,19 @@
         <!-- Header -->
         <header class="header no-print">
             <div class="container header-container">
+<<<<<<< HEAD
                 <a href="#" class="logo" id="landing-logo">
+=======
+                <a href="#" class="logo"
+                    onclick="event.preventDefault(); var lv=document.getElementById('landing-view'); if(lv) lv.scrollTop=0;">
+>>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
                     <img src="logo.jpg" alt="PPS Logo" class="logo-icon">
-                    <span>PPS</span>
+                    <span>Prime Payroll Solutions</span>
                 </a>
                 <nav class="main-nav">
                     <a href="#features" class="nav-link">Features</a>
                     <a href="#pricing" class="nav-link">Pricing</a>
-                    <a href="#about" class="nav-link">About</a>
+                    <a href="#about" class="nav-link">About us</a>
                 </nav>
                 <div class="header-actions">
                     <a href="#signin" class="nav-link open-modal">Sign In</a>
@@ -3080,7 +3085,11 @@
                     <span class="badge badge-blue ml-2">Annual Structure</span>
                 </div>
                 <div class="flex-align gap-3">
+<<<<<<< HEAD
                     <button class="btn btn-primary compact-btn" onclick="downloadCTCAsPDF()">
+=======
+                    <button class="btn btn-primary compact-btn" onclick="alert('Downloading Financial Report...')">
+>>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" style="margin-right: 6px;">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -3099,6 +3108,7 @@
                 </div>
             </div>
 
+<<<<<<< HEAD
             <div class="preview-modal-body"
                 style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
                 <div class="clean-preview-root">
@@ -3156,6 +3166,28 @@
                                     distribution is prohibited.</p>
                                 <p style="font-size: 0.6rem; color: #94a3b8; margin-top: 4px;">© 2026 PPS Software
                                     Solutions. All rights reserved.</p>
+=======
+            <div class="preview-modal-body" style="padding: 0 !important; background: #025cca; overflow: hidden;">
+                <div class="clean-preview-root">
+                    <div id="ctc-scaling-container" class="clean-scaling-container">
+                        <div class="clean-document-frame"
+                            style="width: 210mm; height: 297mm; background: rgb(147, 0, 0); padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                            <div class="ctc-table-container"
+                                style="border: none !important; box-shadow: none !important;">
+                                <table class="ctc-table" style="font-size: 0.95rem !important;">
+                                    <thead>
+                                        <tr>
+                                            <th>Component Name</th>
+                                            <th style="text-align: center;">Type</th>
+                                            <th style="text-align: right;">Monthly Amount</th>
+                                            <th style="text-align: right;">Yearly Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ctc-table-body">
+                                        <!-- Populated via script.js -->
+                                    </tbody>
+                                </table>
+>>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
                             </div>
                         </div>
                     </div>
@@ -3250,13 +3282,21 @@
                 </div>
             </div>
 
+<<<<<<< HEAD
             <div class="preview-modal-body"
                 style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
+=======
+            <div class="preview-modal-body" style="padding: 0 !important; background: #2f6db8; overflow: hidden;">
+>>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
                 <!-- Full-Fit Clean Document Preview (Zero-Border) -->
                 <div class="clean-preview-root">
                     <div id="payslip-scaling-container" class="clean-scaling-container">
                         <div class="clean-document-frame"
+<<<<<<< HEAD
                             style="width: 210mm; height: 297mm; background: white; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+=======
+                            style="width: 210mm; height: 297mm; background: rgb(209, 38, 38); padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+>>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
                             <iframe id="payslip-iframe" src="about:blank"
                                 style="width: 100%; height: 100%; border: none; display: block;"></iframe>
                         </div>
