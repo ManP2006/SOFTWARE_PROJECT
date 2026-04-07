@@ -67,6 +67,32 @@
     --premium-gradient-light: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
 }
 
+/* --- Global Modern Scrollbar --- */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Firefox Fallback */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
 /* --- Animation Classes --- */
 .animate-fade-in { animation: fadeIn 0.5s var(--ease) forwards; }
 .animate-slide-up { animation: slideUp 0.6s var(--ease-bounce) forwards; }
@@ -117,9 +143,11 @@
 html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
+    min-height: 100vh;
     width: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -769,7 +797,7 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
     background: rgba(255,255,255,0.85); backdrop-filter: blur(16px) saturate(180%);
     border-bottom: 1px solid rgba(226,232,240,0.6);
 }
-.header-container { display: flex; align-items: center; justify-content: space-between; height: 4rem; }
+.header-container { display: flex; align-items: center; justify-content: space-between; height: 3.5rem; }
 .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.25rem; color: var(--text); }
 .logo-icon { height: 32px; width: auto; object-fit: contain; border-radius: 6px; }
 
@@ -801,7 +829,7 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
    HERO SECTION
    ============================================= */
 .hero {
-    padding: 5rem 0 4rem; text-align: center;
+    padding: 3.5rem 0 2.5rem; text-align: center;
     position: relative; overflow: hidden;
 }
 .hero::before {
@@ -817,7 +845,7 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
 .hero-container { max-width: 800px; position: relative; z-index: 1; }
 .hero-title {
     font-size: 2.75rem; font-weight: 800; letter-spacing: -0.03em;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     background: linear-gradient(135deg, var(--text), var(--primary));
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -826,8 +854,10 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
 @media (min-width: 768px) { .hero-title { font-size: 4rem; line-height: 1.08; } }
 
 .hero-subtitle {
-    font-size: 1.125rem; margin-bottom: 2.5rem; max-width: 600px; margin-inline: auto;
+    font-size: 1.125rem;
+    max-width: 600px; margin-inline: auto;
     color: var(--text-secondary); animation: slideUp 0.8s var(--ease) 0.1s both;
+    margin-bottom: 1.75rem;
 }
 @media (min-width: 768px) { .hero-subtitle { font-size: 1.2rem; } }
 
@@ -840,12 +870,12 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
 /* =============================================
    FEATURES SECTION
    ============================================= */
-.features { padding: 5rem 0; }
+.features { padding: 4rem 0; }
 .section-title {
     text-align: center; font-size: 2rem; font-weight: 800; margin-bottom: 1rem;
     letter-spacing: -0.02em;
 }
-.section-subtitle { text-align: center; color: var(--text-muted); max-width: 550px; margin: 0 auto 3rem; }
+.section-subtitle { text-align: center; color: var(--text-muted); max-width: 550px; margin: 0 auto 2.25rem; }
 @media (min-width: 768px) { .section-title { font-size: 2.5rem; } }
 
 .features-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
@@ -930,7 +960,7 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
    STANDARDIZED PREVIEW MODALS
    ============================================= */
 .preview-modal-overlay {
-    background: rgba(15, 23, 42, 0.6) !important;
+    background: rgba(15, 23, 42, 0.4) !important; /* Lighter backdrop to reduce grey-space feel */
     backdrop-filter: blur(8px) !important;
     z-index: 2000 !important;
 }
@@ -963,12 +993,12 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
 
 .preview-modal-body {
     flex: 1 !important;
-    overflow-y: auto !important;
-    padding: 1.5rem !important;
+    overflow: hidden !important; /* Strictly remove all scrollbars */
+    padding: 8px !important; /* Minimal padding for fit */
     display: flex !important;
+    align-items: center !important; /* Force vertical center */
     justify-content: center !important;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    background: white !important; /* Pure white instead of slate-50 */
 }
 
 .document-viewer-frame {
@@ -987,13 +1017,13 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
 /* High-Fidelity Clean Document Preview (Zero-Border) */
 .clean-preview-root {
     width: 100% !important;
-    height: 100% !important;
+    height: 100% !important; /* Fill parent for clientHeight calculation */
     display: flex !important;
-    align-items: center !important;
+    align-items: center !important; /* CENTER the content */
     justify-content: center !important;
-    overflow: hidden !important;
-    padding: 0 2px !important; /* Strict 2px left/right padding */
-    background: #cbd5e1 !important; /* Standard Slate-300 backdrop */
+    overflow: visible !important;
+    padding: 1rem !important;
+    background: transparent !important; /* Remove grey backdrop */
 }
 
 .clean-scaling-container {
@@ -1009,9 +1039,94 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
 
 .clean-document-frame {
     background: #fff !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0,0,0,0.05) !important;
-    border-radius: 4px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 12px !important;
     overflow: hidden !important;
+    position: relative !important;
+}
+
+/* --- NEW CTC BRANDING CLASSES --- */
+.ctc-card {
+    width: 100% !important;
+    max-width: 850px !important; /* Slightly larger prominence */
+    margin: 0 auto !important;
+    background: white !important;
+    position: relative !important;
+}
+
+.ctc-branding-header {
+    background: linear-gradient(135deg, #1e40af, #2563eb) !important; /* PPS Corporate Blue */
+    color: white !important;
+    padding: 1.5rem 2rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    border-bottom: 4px solid #fbbf24 !important; /* PPS Accent (Amber-400) */
+}
+
+.ctc-branding-logo-box {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+}
+
+.ctc-branding-logo {
+    height: 40px !important;
+    width: 40px !important;
+    object-fit: contain !important;
+    border-radius: 8px !important;
+    background: white !important;
+    padding: 4px !important;
+}
+
+.ctc-branding-text h2 {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.ctc-branding-text p {
+    font-size: 0.75rem !important;
+    opacity: 0.9 !important;
+    margin: 0 !important;
+}
+
+.ctc-watermark-container {
+    position: relative !important;
+    z-index: 1 !important;
+    padding: 2rem !important;
+}
+
+.ctc-watermark-bg {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) rotate(-15deg) !important;
+    width: 300px !important;
+    height: 300px !important;
+    background-image: url('logo.jpg') !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    opacity: 0.04 !important; /* Ultra-subtle watermark */
+    z-index: -1 !important;
+    pointer-events: none !important;
+}
+
+.ctc-confidential-footer {
+    padding: 1.25rem 2rem !important;
+    border-top: 1px dashed #e2e8f0 !important;
+    background: #f8fafc !important;
+    text-align: center !important;
+}
+
+.ctc-confidential-text {
+    font-size: 0.7rem !important;
+    color: #64748b !important; /* Slate-500 */
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin: 0 !important;
 }
 
 .iframe-viewer-frame {
@@ -1385,7 +1500,7 @@ button, .sidebar-link, .card, .form-input, .form-select, .badge {
     flex-direction: column; 
     min-height: 0;
     position: relative;
-    padding: 1.25rem 1.5rem; /* Padding moved here to ensure total height is 100% of parent */
+    padding: 1.25rem 1.5rem;
     box-sizing: border-box;
 }
 
@@ -2701,8 +2816,6 @@ select.form-input { cursor: pointer; appearance: auto; }
 .form16-modal-content {
     max-width: 900px !important;
     width: 95%;
-    max-height: 90vh;
-    overflow-y: auto;
     padding: 30px;
     margin: 20px auto;
 }

@@ -150,6 +150,27 @@ window.showLandingView = function() {
     window.applyTheme('light', false); // Landing page is always light mode
 };
 
+// Global Dashboard Root Navigation
+// Global Dashboard Root Navigation
+window.handleDashboardLogoClick = function(e) {
+    if (e) e.preventDefault();
+    
+    const dashboardView = getEl('dashboard-view');
+    const isDashboardVisible = dashboardView && dashboardView.style.display !== 'none';
+    
+    if (isDashboardVisible) {
+        const role = localStorage.getItem('pps-role');
+        if (role) {
+            window.showView(role === 'admin' ? 'admin-overview' : 'employee-overview');
+            window.scrollTo(0, 0);
+            return;
+        }
+    }
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!isDashboardVisible) window.showLandingView();
+};
+
 window.showDashboardView = function(role, userName) {
     const views = ['landing-view', 'auth-view', 'dashboard-view'];
     views.forEach(v => { const el = getEl(v); if (el) el.style.display = (v === 'dashboard-view' ? 'flex' : 'none'); });
@@ -158,6 +179,8 @@ window.showDashboardView = function(role, userName) {
     document.documentElement.style.overflow = 'auto';
 
     window.currentUser = { role: role, displayName: userName };
+    localStorage.setItem('pps-role', role);
+    localStorage.setItem('pps-user-display', userName);
     const userNameEl = getEl('user-name');
     const userAvatarEl = getEl('user-avatar');
     if (userNameEl) userNameEl.textContent = userName;
@@ -872,6 +895,7 @@ function initApp() {
 
         window.loadEmployees();
         window.loadPayrolls();
+        localStorage.setItem('pps-role', role);
         window.showDashboardView(role, name);
         // Clear password for security
         if (getEl('password')) getEl('password').value = '';
@@ -1046,7 +1070,11 @@ function initApp() {
         });
     }
     
-    // Initial renders
+    // --- LOGOTYPE NAVIGATION FIX ---
+    document.querySelectorAll('.logo').forEach(logo => {
+        logo.addEventListener('click', (e) => window.handleDashboardLogoClick(e));
+    });
+
     window.refreshAllTables();
     window.updateDashboardStats();
     window.updatePayrollAnalytics();
@@ -1952,23 +1980,31 @@ window.autoScaleViewer = function(containerId, modalId) {
     if (!root || !container || !modalWindow) return;
 
     // 'Breathing Room' Buffer: ensures document is comfortably 'reduced' in size
-    const margin = 32; 
-    const availableW = root.clientWidth - (margin * 2);
-    const availableH = root.clientHeight - (margin * 2);
+    const margin = 8; 
+    const availableW = root.getBoundingClientRect().width - (margin * 2);
+    const availableH = root.getBoundingClientRect().height - (margin * 2);
     
-    // Fixed natural A4 dimensions in px (approx 96 DPI)
-    const docW = 794;
-    const docH = 1123;
-
-    // Scaling ratio logic: MIN(ratioW, ratioH) ensures full visibility
-    const scale = Math.min(availableW / docW, availableH / docH);
+    // Dynamic Document Dimensions: detect natural size of content (card/frame)
+    const card = container.querySelector('.clean-document-frame');
     
-    // Apply transform with smooth transition
+    // Fallback logic for hidden elements or slow rendering
+    const docW = card?.offsetWidth || 800; 
+    const docH = card?.offsetHeight || 900; 
+    
+    // Scaling ratio logic: ensure full visibility without scroll
+    // Multiply available height by 0.95 to give a small safety buffer
+    let scale = Math.min(availableW / docW, (availableH * 0.95) / docH);
+    
+    // Safety Fallback: Don't let it get microscopically small or over-scale
+    scale = Math.min(Math.max(scale, 0.4), 1.0);
+    
+    // Apply transform and ensure it's centered in its own layout box
     container.style.transform = `scale(${scale})`;
+    container.style.transformOrigin = 'center center';
 
-    // Tight-fit Modal Width: scaled document width + 4px (exactly 2px per side)
-    const tightWidth = Math.floor(docW * scale) + 4;
-    modalWindow.style.width = `${tightWidth}px`;
+    // Tight-fit Modal Width: ensure the modal isn't unnecessarily wide
+    const tightWidth = Math.floor(docW * scale) + 40;
+    modalWindow.style.width = `min(90vw, ${tightWidth}px)`;
 };
 
 // Global Resize Listener for all Previews
@@ -2605,7 +2641,7 @@ window.showCTCBreakdown = function(empId) {
 
     // Populate Modal Header
     if (getEl('ctc-modal-name')) getEl('ctc-modal-name').textContent = emp.name;
-    if (getEl('ctc-modal-id')) getEl('ctc-modal-id').textContent = emp.id;
+    if (getEl('ctc-modal-id-new')) getEl('ctc-modal-id-new').textContent = `Employee ID: ${emp.id}`;
 
     // Render Table Rows
     const tbody = getEl('ctc-table-body');
@@ -2637,6 +2673,53 @@ window.showCTCBreakdown = function(empId) {
 window.closeCTCBreakdownModal = function() {
     const modal = getEl('ctc-breakdown-modal');
     if (modal) modal.classList.add('hidden');
+};
+
+// --- PDF Export Logic ---
+window.downloadCTCAsPDF = function() {
+    const element = document.querySelector('.ctc-card');
+    const empName = getEl('ctc-modal-name')?.textContent || 'Employee';
+    const logoImg = element?.querySelector('.ctc-branding-header img');
+    
+    if (!element) {
+        showToast('Error: Document not found', 'error');
+        return;
+    }
+
+    // High-Resolution Export Options
+    const opt = {
+        margin:       [0.5, 0.5],
+        filename:     `CTC_Breakdown_${empName.replace(/\s+/g, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Show loading state
+    const btn = document.querySelector('.compact-btn');
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = 'Generating...';
+    btn.disabled = true;
+
+    // Security Fix: Temporarily use Base64 for the logo to avoid Tainted Canvas errors (file:// restriction)
+    const originalSrc = logoImg ? logoImg.src : null;
+    const base64Logo = "BASE64_LOGO_PLACEHOLDER";
+    if (logoImg && base64Logo !== "BASE64_LOGO_PLACEHOLDER") {
+        logoImg.src = "data:image/jpeg;base64," + base64Logo;
+    }
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        if (logoImg) logoImg.src = originalSrc;
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+        showToast('PDF Exported successfully!', 'success');
+    }).catch(err => {
+        if (logoImg) logoImg.src = originalSrc;
+        console.error('PDF Export Error:', err);
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+        showToast('Failed to export PDF', 'error');
+    });
 };
 
 function updateAttSummary() {
