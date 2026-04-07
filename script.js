@@ -223,7 +223,13 @@ window.initEmployeePortal = function(userName) {
 
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${emp.monthlySalary.toLocaleString()}`;
     if (getEl('dash-emp-leave')) getEl('dash-emp-leave').textContent = `${emp.paidLeave + emp.sickLeave + 12} Days`; // Simulated
-    if (getEl('dash-emp-att')) getEl('dash-emp-att').textContent = `${((emp.present / 26) * 100).toFixed(1)}%`;
+    // Calculate Rating
+    const assignedTasks = emp.assignedTasks || 0;
+    const completedTasks = emp.completedTasks || 0;
+    const ratingPct = assignedTasks > 0 ? ((completedTasks / assignedTasks) * 100).toFixed(1) : '0.0';
+    
+    if (getEl('dash-emp-rating')) getEl('dash-emp-rating').textContent = `${ratingPct}%`;
+    if (getEl('dash-emp-task-counts')) getEl('dash-emp-task-counts').textContent = `${completedTasks} / ${assignedTasks} Tasks Completed`;
 
     // 2. Profile Details
     if (getEl('prof-name')) getEl('prof-name').textContent = emp.name;
@@ -310,6 +316,92 @@ window.initEmployeePortal = function(userName) {
         salary: breakdown
     };
     localStorage.setItem('pps-current-payslip', JSON.stringify(payslipData));
+    
+    // 7. Render dynamic tasks
+    window.renderEmployeeTasks(emp.id);
+};
+
+window.renderEmployeeTasks = function(empId) {
+    const container = getEl('emp-tasks-container');
+    if (!container) return;
+    
+    const emp = employees.find(e => e.id === empId);
+    if (!emp || !emp.taskList) {
+        container.innerHTML = '<div class="p-6 text-center text-muted">No tasks found.</div>';
+        return;
+    }
+    
+    const pendingTasks = emp.taskList.filter(t => !t.completed);
+    
+    if (pendingTasks.length === 0) {
+        container.innerHTML = `
+            <div class="p-6 text-center">
+                <div class="stat-icon mx-auto mb-3" style="width: 48px; height: 48px; background: var(--success-light); color: var(--success);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="font-medium text-success">All caught up!</div>
+                <div class="text-xs text-muted mt-1">You have no pending tasks.</div>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    pendingTasks.forEach(task => {
+        const badgeColor = task.priority === 'High' ? 'badge-blue' : (task.priority === 'Medium' ? 'badge-orange' : 'badge-green');
+        html += `
+            <div class="flex-align p-4 border-b hover:bg-gray-50 transition-colors animate-fade-in" id="task-row-${task.id}">
+                <div class="flex-1">
+                    <div class="font-medium text-sm">${task.title}</div>
+                    <div class="text-xs text-muted mt-1">Priority: <span class="badge ${badgeColor}" style="padding: 2px 6px; font-size: 0.65rem;">${task.priority}</span></div>
+                </div>
+                <button class="btn btn-primary compact-btn text-xs" onclick="window.completeTask('${emp.id}', '${task.id}')" style="margin-left: 1rem;">
+                    Completed
+                </button>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+};
+
+window.completeTask = function(empId, taskId) {
+    const emp = employees.find(e => e.id === empId);
+    if (!emp) return;
+    
+    const task = emp.taskList.find(t => t.id === taskId);
+    if (task && !task.completed) {
+        task.completed = true;
+        emp.completedTasks++;
+        
+        window.saveEmployees();
+        
+        // Update Dashboard Stats dynamically
+        const assignedTasks = emp.assignedTasks || 0;
+        const completedTasks = emp.completedTasks || 0;
+        const ratingPct = assignedTasks > 0 ? ((completedTasks / assignedTasks) * 100).toFixed(1) : '0.0';
+        
+        if (getEl('dash-emp-rating')) getEl('dash-emp-rating').textContent = `${ratingPct}%`;
+        if (getEl('dash-emp-task-counts')) getEl('dash-emp-task-counts').textContent = `${completedTasks} / ${assignedTasks} Tasks Completed`;
+        
+        // Remove task with animation
+        const taskRow = getEl(`task-row-${taskId}`);
+        if (taskRow) {
+            taskRow.style.opacity = '0';
+            taskRow.style.transform = 'translateY(10px)';
+            taskRow.style.transition = 'all 0.3s ease';
+            setTimeout(() => {
+                window.renderEmployeeTasks(empId);
+            }, 300);
+        } else {
+            window.renderEmployeeTasks(empId);
+        }
+        
+        window.showToast('Task marked as completed!', 'success');
+        
+        if (window.renderEmployeeTable) window.renderEmployeeTable();
+        if (window.updateDashboardStats) window.updateDashboardStats();
+    }
 };
 
 window.showPayslipFromDashboard = function() {
@@ -558,6 +650,8 @@ window.showView = function(viewId) {
         if (window.initAttendanceModule) window.initAttendanceModule();
     } else if (viewId === 'admin-payroll') {
         if (window.renderPayrollTable) window.renderPayrollTable();
+    } else if (viewId === 'admin-leave') {
+        if (window.renderAdminLeaveTypes) window.renderAdminLeaveTypes();
     }
     
     if (viewId === 'shared-settings') {
@@ -2224,9 +2318,24 @@ window.loadEmployees = function() {
         employees.forEach(emp => {
             const def = defaultEmployees.find(d => d.id === emp.id) || defaultEmployees[0];
             
-            if (emp.assignedTasks === undefined) emp.assignedTasks = def.assignedTasks;
-            if (emp.completedTasks === undefined) emp.completedTasks = def.completedTasks;
+            if (emp.assignedTasks === undefined) emp.assignedTasks = def.assignedTasks || 5;
+            if (emp.completedTasks === undefined) emp.completedTasks = def.completedTasks || 0;
             
+            // Generate TaskList dynamically if not present
+            if (!emp.taskList) {
+                emp.taskList = [];
+                const pendingCount = Math.max(0, emp.assignedTasks - emp.completedTasks);
+                // Create mock tasks
+                for (let i = 0; i < pendingCount; i++) {
+                    emp.taskList.push({
+                        id: 'TASK_' + emp.id + '_' + i,
+                        title: 'Pending Task #' + (i + 1) + ' for ' + emp.name,
+                        completed: false,
+                        priority: ['High', 'Medium', 'Low'][i % 3]
+                    });
+                }
+            }
+
             // Attendance fields migration
             if (emp.present === undefined) emp.present = def.present || 22;
             if (emp.absent === undefined) emp.absent = def.absent || 0;
@@ -4411,6 +4520,101 @@ window.downloadReport = function(empId, reportType, format) {
         document.body.removeChild(link);
     }
 };
+
+window.renderAdminLeaveTypes = function() {
+    const tbody = getEl('admin-leave-types-body');
+    const dropdown = getEl('emp-leave-type-select');
+    
+    if (!tbody) return;
+    
+    if (leaveTypes.length === 0) {
+        // Pre-populate with some default leave types for demonstration
+        leaveTypes.push({ id: 'LT001', name: 'Sick Leave', code: 'SL', category: 'Paid', desc: 'For medical emergencies' });
+        leaveTypes.push({ id: 'LT002', name: 'Casual Leave', code: 'CL', category: 'Paid', desc: 'For personal contingencies' });
+        leaveTypes.push({ id: 'LT003', name: 'Loss of Pay', code: 'LOP', category: 'Unpaid', desc: 'Leave without pay' });
+    }
+    
+    let html = '';
+    let dropHtml = '';
+    
+    leaveTypes.forEach(lt => {
+        const badgeColor = lt.category === 'Paid' ? 'badge-blue' : 'badge-orange';
+        html += `
+            <tr>
+                <td>
+                    <div class="font-bold">${lt.name}</div>
+                    <div class="text-xs text-muted">${lt.code} - ${lt.desc || 'No description'}</div>
+                </td>
+                <td style="text-align: center;"><span class="badge ${badgeColor}">${lt.category}</span></td>
+                <td style="text-align: right;">
+                    <button class="icon-btn text-red delete-btn" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                </td>
+            </tr>
+        `;
+        dropHtml += `<option value="${lt.name}">${lt.name} (${lt.category})</option>`;
+    });
+    
+    tbody.innerHTML = html;
+    if (dropdown) dropdown.innerHTML = dropHtml;
+};
+
+window.showAddLeaveTypeModal = function() {
+    const form = getEl('leave-type-form');
+    if (form) form.reset();
+    
+    const idDisplay = getEl('leave-type-id-display');
+    if (idDisplay) idDisplay.textContent = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
+    
+    getEl('leave-type-modal')?.classList.remove('hidden');
+};
+
+window.closeLeaveTypeModal = function() {
+    getEl('leave-type-modal')?.classList.add('hidden');
+};
+
+// Event listener setup for Leave Type Form submission
+document.addEventListener('DOMContentLoaded', () => {
+    const leaveForm = getEl('leave-type-form');
+    if (leaveForm) {
+        leaveForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = leaveForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Saving...';
+            submitBtn.disabled = true;
+            
+            const newType = {
+                id: 'LT' + String(leaveTypes.length + 1).padStart(3, '0'),
+                name: getEl('leave-type-name').value,
+                code: getEl('leave-type-code').value,
+                category: getEl('leave-type-category').value,
+                desc: getEl('leave-type-desc').value
+            };
+            
+            // Mock backend validation and assignment request
+            new Promise(resolve => {
+                setTimeout(() => {
+                    leaveTypes.push(newType);
+                    resolve();
+                }, 500); // simulate network delay
+            }).then(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+                leaveForm.reset();
+                window.closeLeaveTypeModal();
+                window.renderAdminLeaveTypes();
+                
+                if (window.showToast) window.showToast('Leave Type added successfully!', 'success');
+            }).catch(err => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                if (window.showToast) window.showToast('Failed to add Leave Type.', 'error');
+            });
+        });
+    }
+});
 
 // Final Safety wrapper for initialization - moved to bottom to ensure all functions are defined
 if (document.readyState === 'loading') {

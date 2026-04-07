@@ -2118,11 +2118,11 @@
                                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                         </svg>
                                     </div>
-                                    <span class="badge badge-blue">Present</span>
+                                    <span class="badge badge-blue">Performance</span>
                                 </div>
-                                <span class="text-muted text-sm">Attendance Rate</span>
-                                <h2 class="mb-0 mt-1" id="dash-emp-att">98.2%</h2>
-                                <p class="text-xs text-muted mt-2">Above average (95%)</p>
+                                <span class="text-muted text-sm">Rating (%)</span>
+                                <h2 class="mb-0 mt-1" id="dash-emp-rating">0.0%</h2>
+                                <p class="text-xs text-muted mt-2" id="dash-emp-task-counts">0 / 0 Tasks Completed</p>
                             </div>
 
                             <div class="premium-card p-6 animate-slide-up delay-400">
@@ -2151,34 +2151,8 @@
                                         <h3 class="mb-0">Upcoming Tasks</h3>
                                         <button class="btn btn-ghost compact-btn text-primary">View All</button>
                                     </div>
-                                    <div class="p-0">
-                                        <div class="flex-align p-4 border-b hover:bg-gray-50 transition-colors">
-                                            <div class="stat-icon mr-3"
-                                                style="width: 32px; height: 32px; font-size: 0.8rem;">🚀</div>
-                                            <div class="flex-1">
-                                                <div class="font-medium text-sm">Finish UI redesign for Dashboard</div>
-                                                <div class="text-xs text-muted">Engineering • Due in 2 days</div>
-                                            </div>
-                                            <span class="badge badge-blue">High</span>
-                                        </div>
-                                        <div class="flex-align p-4 border-b hover:bg-gray-50 transition-colors">
-                                            <div class="stat-icon mr-3"
-                                                style="width: 32px; height: 32px; font-size: 0.8rem;">📝</div>
-                                            <div class="flex-1">
-                                                <div class="font-medium text-sm">Submit monthly progress report</div>
-                                                <div class="text-xs text-muted">Administration • Due today</div>
-                                            </div>
-                                            <span class="badge badge-orange">Medium</span>
-                                        </div>
-                                        <div class="flex-align p-4 hover:bg-gray-50 transition-colors">
-                                            <div class="stat-icon mr-3"
-                                                style="width: 32px; height: 32px; font-size: 0.8rem;">🎨</div>
-                                            <div class="flex-1">
-                                                <div class="font-medium text-sm">Review design system updates</div>
-                                                <div class="text-xs text-muted">Design • Completed</div>
-                                            </div>
-                                            <span class="badge badge-green">Done</span>
-                                        </div>
+                                    <div class="p-0" id="emp-tasks-container">
+                                        <div class="p-6 text-center text-muted text-sm" id="emp-tasks-loading">Loading assigned tasks...</div>
                                     </div>
                                 </div>
                             </div>
