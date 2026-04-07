@@ -3513,3 +3513,353 @@ select.form-input { cursor: pointer; appearance: auto; }
     }
 }
 
+/* =============================================
+   MODERN DASHBOARD HEADER REDESIGN
+   ============================================= */
+.modern-dashboard-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 2rem 2.5rem;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.modern-dashboard-header:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-light);
+}
+
+.header-content-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.header-welcome-text {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.header-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.header-title #welcome-user, 
+.header-title #welcome-employee-name {
+    color: var(--primary);
+    position: relative;
+}
+
+.header-subtitle {
+    margin-top: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    max-width: 600px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.header-content-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+/* Compact Date Card */
+.compact-date-display {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: var(--transition);
+}
+
+.compact-date-display:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+}
+
+.date-icon-box {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.date-info-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-day-text {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+}
+
+.date-month-year {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .modern-dashboard-header {
+        padding: 1.5rem 2rem;
+    }
+    .header-title {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .modern-dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+    .header-content-right {
+        align-items: flex-start;
+        width: 100%;
+    }
+    .compact-date-display {
+        width: 100%;
+    }
+    .header-actions {
+        width: 100%;
+    }
+    .header-actions .btn {
+        flex: 1;
+    }
+}
+
+[data-theme="dark"] .modern-dashboard-header {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .compact-date-display {
+    background: var(--bg-alt);
+}
+
+/* =============================================
+   PAYSLIP MODULE REDESIGN (FULL WIDTH)
+   ============================================= */
+.payslip-container-full {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 0.5rem;
+}
+
+.payslip-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.payslip-table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.payslip-table-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.payslip-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.payslip-table th {
+    background: var(--bg-alt);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.payslip-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.875rem;
+    color: var(--text);
+    vertical-align: middle;
+}
+
+.payslip-table tr:last-child td {
+    border-bottom: none;
+}
+
+.payslip-table tr:hover td {
+    background: var(--surface-hover);
+}
+
+/* Balanced Column Widths (20% each) */
+.col-month { width: 20%; }
+.col-date  { width: 20%; }
+.col-amount{ width: 20%; text-align: right; }
+.col-status{ width: 20%; text-align: center; }
+.col-action{ width: 20%; text-align: right; }
+
+.payslip-table .text-right { text-align: right; }
+.payslip-table .text-center { text-align: center; }
+
+/* Status Badge Alignment Fix */
+.payslip-table .badge {
+    display: inline-flex;
+    justify-content: center;
+    min-width: 80px;
+}
+
+/* Action Button */
+.payslip-view-btn {
+    background: transparent;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    transition: all 0.2s var(--ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.payslip-view-btn:hover {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 10px var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.payslip-view-btn:focus {
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+    .payslip-header-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .payslip-header-flex .flex {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .payslip-table th, .payslip-table td {
+        padding: 1rem;
+    }
+    
+    /* Horizontal scroll for table on small screens */
+    .payslip-table-wrapper {
+        overflow-x: auto;
+    }
+    
+    .payslip-table {
+        min-width: 800px;
+    }
+}
+
+/* Modal Payslip Preview Summary */
+.modal-stat-card {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
+}
+
+.modal-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.modal-stat-card.highlight-card {
+    background: var(--primary);
+    color: white !important;
+    border: none;
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+.modal-stat-card.highlight-card .text-muted {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.modal-stat-card.highlight-card * {
+    color: white !important;
+}
+
+.modal-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .modal-summary-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+.clean-preview-root {
+    background: #e2e8f0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-summary-section {
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+}

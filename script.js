@@ -218,8 +218,15 @@ window.initEmployeePortal = function(userName) {
     const now = new Date();
     const dayNums = getEl('dash-day-num');
     const monthYears = getEl('dash-month-year');
+    const dayNumsModern = getEl('dash-day-num-modern');
+    const monthYearsModern = getEl('dash-month-year-modern');
+
     if (dayNums) dayNums.textContent = now.getDate();
-    if (monthYears) monthYears.textContent = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
+    if (dayNumsModern) dayNumsModern.textContent = now.getDate();
+    
+    const monthYearText = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
+    if (monthYears) monthYears.textContent = monthYearText;
+    if (monthYearsModern) monthYearsModern.textContent = monthYearText;
 
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${emp.monthlySalary.toLocaleString()}`;
     if (getEl('dash-emp-leave')) getEl('dash-emp-leave').textContent = `${emp.paidLeave + emp.sickLeave + 12} Days`; // Simulated
@@ -273,25 +280,29 @@ window.initEmployeePortal = function(userName) {
     // Update main dashboard net salary card to be consistent
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${breakdown.net.toLocaleString()}`;
     
-    // 5. Payslip History Table Sync
+    // 5. Payslip History Table Sync (Refined for Modern Redesign)
     const tableBody = getEl('emp-payslips-table-body');
     if (tableBody) {
-        tableBody.innerHTML = `
+        const months = ["February 2026", "January 2026"];
+        const dates = ["Mar 01, 2026", "Feb 01, 2026"];
+        
+        tableBody.innerHTML = months.map((month, i) => `
             <tr>
-                <td class="font-medium">February 2026</td>
-                <td>Mar 01, 2026</td>
-                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
-                <td><span class="badge badge-green">Paid</span></td>
-                <td><button class="btn btn-outline compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'February 2026')">View</button></td>
+                <td class="font-medium">${month}</td>
+                <td>${dates[i]}</td>
+                <td class="font-bold text-primary text-right">₹ ${breakdown.net.toLocaleString()}</td>
+                <td class="text-center"><span class="badge badge-green">Paid</span></td>
+                <td class="text-right">
+                    <button class="payslip-view-btn" onclick="window.showPayslip('${emp.id}', '${month}')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        View
+                    </button>
+                </td>
             </tr>
-            <tr>
-                <td class="font-medium">January 2026</td>
-                <td>Feb 01, 2026</td>
-                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
-                <td><span class="badge badge-green">Paid</span></td>
-                <td><button class="btn btn-outline compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'January 2026')">View</button></td>
-            </tr>
-        `;
+        `).join('');
     }
 
     // 6. Persist for Standalone View
@@ -310,6 +321,38 @@ window.initEmployeePortal = function(userName) {
         salary: breakdown
     };
     localStorage.setItem('pps-current-payslip', JSON.stringify(payslipData));
+};
+
+window.showPayslip = function(empId, month) {
+    const emp = employees.find(e => String(e.id) === String(empId)) || employees[0];
+    const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
+    
+    // Update Modal Summary Preview Cards
+    if (getEl('modal-pre-base')) getEl('modal-pre-base').textContent = `₹ ${(breakdown.basic + breakdown.hra).toLocaleString()}`;
+    if (getEl('modal-pre-allow')) getEl('modal-pre-allow').textContent = `₹ ${(breakdown.edu + breakdown.lta + breakdown.special).toLocaleString()}`;
+    if (getEl('modal-pre-gross')) getEl('modal-pre-gross').textContent = `₹ ${breakdown.gross.toLocaleString()}`;
+    
+    if (getEl('modal-pre-pf')) getEl('modal-pre-pf').textContent = `₹ ${breakdown.pf.toLocaleString()}`;
+    if (getEl('modal-pre-pt')) getEl('modal-pre-pt').textContent = `₹ ${breakdown.pt.toLocaleString()}`;
+    if (getEl('modal-pre-ded')) getEl('modal-pre-ded').textContent = `₹ ${(breakdown.pf + breakdown.pt).toLocaleString()}`;
+    
+    if (getEl('modal-pre-net')) getEl('modal-pre-net').textContent = `₹ ${breakdown.net.toLocaleString()}`;
+
+    // Update Iframe for detailed view
+    const iframe = getEl('payslip-iframe');
+    if (iframe) {
+        // Cache management for iframe
+        iframe.src = 'payslip.html?emp=' + empId + '&month=' + encodeURIComponent(month) + '&t=' + Date.now();
+    }
+    
+    getEl('payslip-modal')?.classList.remove('hidden');
+    
+    // Trigger scaling with a slight delay for modal transition
+    setTimeout(() => {
+        if (window.autoScaleViewer) {
+            window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
+        }
+    }, 100);
 };
 
 window.showPayslipFromDashboard = function() {

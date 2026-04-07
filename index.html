@@ -529,22 +529,27 @@
                 <!-- Admin: Overview Section -->
                 <section id="admin-overview" class="view-section scroll-mode-content" style="display: block;">
                     <div class="page-module-container">
-                        <div class="welcome-section">
-                            <div class="welcome-text"
-                                style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
-                                <div>
-                                    <h1 class="welcome-title">Welcome back, <span id="welcome-user">Admin</span>!</h1>
-                                    <p class="text-muted">Here's what's happening with your payroll today.</p>
-                                </div>
-                                <div id="dashboard-date-admin" class="welcome-date">
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" />
-                                        <line x1="16" y1="2" x2="16" y2="6" />
-                                        <line x1="8" y1="2" x2="8" y2="6" />
-                                        <line x1="3" y1="10" x2="21" y2="10" />
-                                    </svg>
-                                    <span id="dashboard-date-admin-text"></span>
+                        <div class="modern-dashboard-header">
+                            <div class="header-content-left">
+                                <span class="header-welcome-text">Welcome back</span>
+                                <h1 class="header-title"><span id="welcome-user">Admin</span>!</h1>
+                                <p class="header-subtitle">Here's what's happening with your payroll today.</p>
+                            </div>
+                            <div class="header-content-right">
+                                <div id="dashboard-date-admin" class="compact-date-display">
+                                    <div class="date-icon-box">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                                            <line x1="16" y1="2" x2="16" y2="6" />
+                                            <line x1="8" y1="2" x2="8" y2="6" />
+                                            <line x1="3" y1="10" x2="21" y2="10" />
+                                        </svg>
+                                    </div>
+                                    <div class="date-info-box">
+                                        <span id="dashboard-date-admin-text" class="date-day-text"></span>
+                                        <span class="date-month-year">Today</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2023,50 +2028,43 @@
                 <section id="employee-overview" class="view-section scroll-mode-content" style="display: none;">
                     <div class="page-module-container animate-fade-in">
                         <!-- Welcome Hero -->
-                        <div class="premium-card welcome-banner p-8 mb-8"
-                            style="background: var(--premium-gradient); color: white; border: none; position: relative; overflow: hidden; display: flex; align-items: center; min-height: 220px;">
-                            <div
-                                style="position: absolute; top: -40px; right: -40px; opacity: 0.15; transform: rotate(-15deg);">
-                                <svg width="300" height="300" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-between w-full relative z-10 welcome-banner-content">
-                                <div class="welcome-text-group">
-                                    <h1 class="text-4xl font-bold mb-3 welcome-title"
-                                        style="text-shadow: 0 2px 10px rgba(0,0,0,0.2);">
-                                        Welcome Back, <span id="welcome-employee-name" style="color: #fff;">Team
-                                            Member</span>!
-                                    </h1>
-                                    <p class="welcome-subtitle"
-                                        style="opacity: 0.95; font-size: 1.15rem; font-weight: 500; max-width: 500px; line-height: 1.5;">
-                                        Manage your payroll, attendance, and leave requests from one professional
-                                        dashboard.
-                                    </p>
-                                    <div class="mt-8 flex gap-4 banner-actions">
-                                        <button class="btn btn-primary premium-action-btn"
-                                            onclick="showView('employee-attendance')"
-                                            style="background: white; color: var(--primary); border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2.5" class="mr-2">
-                                                <path
-                                                    d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
-                                            </svg>
-                                            Punch In Now
-                                        </button>
-                                        <button class="btn btn-outline banner-secondary-btn"
-                                            onclick="showView('employee-leave')"
-                                            style="color: white; border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);">
-                                            Request Leave
-                                        </button>
-                                    </div>
+                        <div class="modern-dashboard-header">
+                            <div class="header-content-left">
+                                <span class="header-welcome-text">Overview</span>
+                                <h1 class="header-title">Welcome Back, <span id="welcome-employee-name">Team
+                                        Member</span>!</h1>
+                                <p class="header-subtitle">Manage your payroll, attendance, and leave requests from one
+                                    professional dashboard.</p>
+                                <div class="header-actions">
+                                    <button class="btn btn-primary compact-btn"
+                                        onclick="showView('employee-attendance')">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+                                            <path
+                                                d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                                        </svg>
+                                        Punch In
+                                    </button>
+                                    <button class="btn btn-outline compact-btn" onclick="showView('employee-leave')">
+                                        Request Leave
+                                    </button>
                                 </div>
-                                <div class="welcome-date-card glass-card p-4 rounded-2xl text-center"
-                                    style="min-width: 140px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.2); box-shadow: var(--shadow-xl);">
-                                    <div class="text-xs font-bold uppercase tracking-widest opacity-90 mb-2"
-                                        id="dash-month-year" style="color: white;">MARCH 2026</div>
-                                    <div class="text-4xl font-black" id="dash-day-num" style="color: white;">24</div>
-                                    <div class="text-xs font-medium mt-1 opacity-80" style="color: white;">Tuesday</div>
+                            </div>
+                            <div class="header-content-right">
+                                <div class="compact-date-display">
+                                    <div class="date-icon-box">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                                            <line x1="16" y1="2" x2="16" y2="6" />
+                                            <line x1="8" y1="2" x2="8" y2="6" />
+                                            <line x1="3" y1="10" x2="21" y2="10" />
+                                        </svg>
+                                    </div>
+                                    <div class="date-info-box">
+                                        <span id="dash-day-num-modern" class="date-day-text">24</span>
+                                        <span id="dash-month-year-modern" class="date-month-year">MARCH 2026</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2474,165 +2472,78 @@
                 <!-- Employee: Payslips Section -->
                 <section id="employee-payslips" class="view-section scroll-mode-content" style="display: none;">
                     <div class="page-module-container animate-fade-in">
-                        <div class="section-header mb-6">
-                            <h2 class="text-3xl gradient-text">My Payslips</h2>
-                            <p class="text-muted">View and download your monthly salary statements</p>
-                        </div>
-
-                        <div class="content-grid">
-                            <div class="flex-column gap-6">
-                                <div class="premium-card p-0 overflow-hidden">
-                                    <div class="p-4 border-b bg-gray-50 flex-between">
-                                        <h3 class="mb-0">Payment History</h3>
-                                        <div class="flex gap-2">
-                                            <select class="form-select"
-                                                style="width: auto; height: 32px; font-size: 0.8rem;">
-                                                <option>FY 2025-26</option>
-                                                <option>FY 2024-25</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="table-container" style="max-height: 500px;">
-                                        <table class="data-table w-full">
-                                            <thead>
-                                                <tr>
-                                                    <th>Month</th>
-                                                    <th>Date Paid</th>
-                                                    <th>Net Amount</th>
-                                                    <th>Status</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="emp-payslips-table-body">
-                                                <!-- Sample Data -->
-                                                <tr>
-                                                    <td class="font-medium">February 2026</td>
-                                                    <td>Mar 01, 2026</td>
-                                                    <td class="font-bold text-primary">₹ 65,000</td>
-                                                    <td><span class="badge badge-green">Paid</span></td>
-                                                    <td><button
-                                                            class="btn btn-outline compact-btn text-xs">Download</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-medium">January 2026</td>
-                                                    <td>Feb 01, 2026</td>
-                                                    <td class="font-bold text-primary">₹ 65,000</td>
-                                                    <td><span class="badge badge-green">Paid</span></td>
-                                                    <td><button
-                                                            class="btn btn-outline compact-btn text-xs">Download</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                        <div class="payslip-container-full">
+                            <div class="payslip-header-flex">
+                                <div class="section-header">
+                                    <h2 class="text-3xl gradient-text mb-1">My Payslips</h2>
+                                    <p class="text-muted">View and download your monthly salary statements</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <select class="form-select"
+                                        style="width: auto; height: 40px; font-size: 0.875rem; min-width: 140px;">
+                                        <option>FY 2025-26</option>
+                                        <option>FY 2024-25</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div class="flex-column gap-6">
-                                <div class="premium-card p-0 overflow-hidden glass-card animate-fade-in delay-200"
-                                    style="border: 1px solid var(--primary-light); min-width: 320px;">
-                                    <div class="p-4 border-b bg-sky-50 flex-between">
-                                        <h3 class="mb-0 text-sky-900 flex-align text-sm">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2" class="mr-2">
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z">
-                                                </path>
-                                                <polyline points="14 2 14 8 20 8"></polyline>
-                                            </svg>
-                                            Monthly Payslip Preview
-                                        </h3>
-                                        <span class="badge badge-blue" style="font-size: 0.6rem;">OFFICIAL</span>
-                                    </div>
-                                    <div class="p-5">
-                                        <div class="flex-column gap-4">
-                                            <!-- Earnings -->
-                                            <div>
-                                                <div class="flex-between mb-2 pb-1 border-b"
-                                                    style="border-color: var(--border);">
-                                                    <span
-                                                        class="text-[10px] uppercase font-bold text-muted">Earnings</span>
-                                                    <span
-                                                        class="text-[10px] uppercase font-bold text-muted">Amount</span>
-                                                </div>
-                                                <div class="flex-column gap-2 text-sm">
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">Basic Salary</span>
-                                                        <span class="font-medium" id="pre-basic">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">HRA</span>
-                                                        <span class="font-medium" id="pre-hra">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">Education Allowance</span>
-                                                        <span class="font-medium" id="pre-edu">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">L.T.A</span>
-                                                        <span class="font-medium" id="pre-lta">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">Special Allowance</span>
-                                                        <span class="font-medium" id="pre-special">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between font-bold pt-2 mt-1 border-t"
-                                                        style="border-style: dashed; border-color: var(--border);">
-                                                        <span>Gross Total</span>
-                                                        <span class="text-primary" id="pre-gross">₹ 0</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Deductions -->
-                                            <div>
-                                                <div class="flex-between mb-2 pb-1 border-b"
-                                                    style="border-color: var(--border);">
-                                                    <span
-                                                        class="text-[10px] uppercase font-bold text-muted">Deductions</span>
-                                                    <span
-                                                        class="text-[10px] uppercase font-bold text-muted">Amount</span>
-                                                </div>
-                                                <div class="flex-column gap-2 text-sm">
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">PF Contribution</span>
-                                                        <span class="text-red" id="pre-pf">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">Professional Tax</span>
-                                                        <span class="text-red" id="pre-pt">₹ 200</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Net Salary -->
-                                            <div
-                                                class="mt-2 p-4 rounded-xl bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-lg shadow-sky-100 flex-between transform transition hover:scale-[1.02]">
-                                                <div>
-                                                    <div
-                                                        class="text-[9px] uppercase font-bold opacity-80 tracking-wider">
-                                                        Net Take Home</div>
-                                                    <div class="text-xl font-black" id="pre-net">₹ 0</div>
-                                                </div>
-                                                <div
-                                                    class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="3">
-                                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button class="btn btn-primary w-full mt-6"
-                                            onclick="window.showPayslipFromDashboard()">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2" class="mr-2">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                            View Detailed Payslip
-                                        </button>
-                                    </div>
+                            <div class="payslip-table-card animate-slide-up delay-100">
+                                <div class="p-5 border-b bg-gray-50/50 flex-between">
+                                    <h3 class="mb-0 text-sm font-bold uppercase tracking-wider text-muted">Payment
+                                        History</h3>
+                                    <span class="text-xs text-muted">Showing last 12 months</span>
+                                </div>
+                                <div class="payslip-table-wrapper">
+                                    <table class="payslip-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="col-month">Month</th>
+                                                <th class="col-date">Date Paid</th>
+                                                <th class="col-amount">Net Amount</th>
+                                                <th class="col-status">Status</th>
+                                                <th class="col-action">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="emp-payslips-table-body">
+                                            <!-- Dynamic Content from script.js -->
+                                            <tr>
+                                                <td class="font-medium">February 2026</td>
+                                                <td>Mar 01, 2026</td>
+                                                <td class="font-bold text-primary text-right">₹ 65,000</td>
+                                                <td class="text-center"><span class="badge badge-green">Paid</span></td>
+                                                <td class="text-right">
+                                                    <button class="payslip-view-btn"
+                                                        onclick="window.showPayslipFromDashboard()">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2.5">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                                                            </path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                        View
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-medium">January 2026</td>
+                                                <td>Feb 01, 2026</td>
+                                                <td class="font-bold text-primary text-right">₹ 65,000</td>
+                                                <td class="text-center"><span class="badge badge-green">Paid</span></td>
+                                                <td class="text-right">
+                                                    <button class="payslip-view-btn"
+                                                        onclick="window.showPayslipFromDashboard()">
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2.5">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                                                            </path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                        View
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -3286,27 +3197,93 @@
                                     </div>
                                 </div>
 
-                                <<<<<<< HEAD <div class="preview-modal-body"
-                                    style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
-                                    =======
-                                    <div class="preview-modal-body"
-                                        style="padding: 0 !important; background: #2f6db8; overflow: hidden;">
-                                        >>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
-                                        <!-- Full-Fit Clean Document Preview (Zero-Border) -->
+                                <div class="preview-modal-body"
+                                    style="padding: 0 !important; overflow: hidden !important;">
+                                    <div class="payslip-modal-content-wrapper">
+                                        <!-- Modern Monthly Summary Section -->
+                                        <div class="modal-summary-section p-6 border-b bg-gray-50/50">
+                                            <div class="modal-summary-grid">
+                                                <!-- Earnings Card -->
+                                                <div class="modal-stat-card border-l-4 border-primary">
+                                                    <div class="flex-between mb-3">
+                                                        <span
+                                                            class="text-xs font-bold uppercase tracking-wider text-muted">Fixed
+                                                            Earnings</span>
+                                                        <div
+                                                            class="p-1 px-2 rounded-full bg-blue-50 text-primary text-[10px] font-bold">
+                                                            BASE</div>
+                                                    </div>
+                                                    <div class="flex-column gap-1 text-sm">
+                                                        <div class="flex-between"><span class="text-muted">Basic +
+                                                                HRA</span> <span class="font-bold" id="modal-pre-base">₹
+                                                                0</span></div>
+                                                        <div class="flex-between"><span
+                                                                class="text-muted">Allowances</span> <span
+                                                                class="font-bold" id="modal-pre-allow">₹ 0</span></div>
+                                                        <div class="flex-between font-black pt-1 mt-1 border-t border-dashed"
+                                                            style="color: var(--primary);">
+                                                            <span>Gross Total</span> <span id="modal-pre-gross">₹
+                                                                0</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Deductions Card -->
+                                                <div class="modal-stat-card border-l-4 border-red">
+                                                    <div class="flex-between mb-3">
+                                                        <span
+                                                            class="text-xs font-bold uppercase tracking-wider text-muted">Statutory
+                                                            Deductions</span>
+                                                        <div
+                                                            class="p-1 px-2 rounded-full bg-red-50 text-red text-[10px] font-bold">
+                                                            TAX/PF</div>
+                                                    </div>
+                                                    <div class="flex-column gap-1 text-sm">
+                                                        <div class="flex-between"><span class="text-muted">PF
+                                                                Contribution</span> <span class="font-bold text-red"
+                                                                id="modal-pre-pf">₹ 0</span></div>
+                                                        <div class="flex-between"><span class="text-muted">Professional
+                                                                Tax</span> <span class="font-bold text-red"
+                                                                id="modal-pre-pt">₹ 0</span></div>
+                                                        <div
+                                                            class="flex-between font-black pt-1 mt-1 border-t border-dashed text-red">
+                                                            <span>Total Deductions</span> <span id="modal-pre-ded">₹
+                                                                0</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Net Take Home Card -->
+                                                <div class="modal-stat-card highlight-card">
+                                                    <div class="flex-between mb-2">
+                                                        <span
+                                                            class="text-xs font-bold uppercase tracking-wider opacity-80">Final
+                                                            Take Home</span>
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="3">
+                                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="text-2xl font-black mb-1" id="modal-pre-net">₹ 0</div>
+                                                    <div class="text-[10px] opacity-80 font-medium">Safe to transfer to
+                                                        account</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Full-Fit Clean Document Preview -->
                                         <div class="clean-preview-root">
-                                            <div id="payslip-scaling-container" class="clean-scaling-container">
-                                                <div class="clean-document-frame" <<<<<<< HEAD
-                                                    style="width: 210mm; height: 297mm; background: white; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                                                    =======
-                                                    style="width: 210mm; height: 297mm; background: rgb(209, 38, 38);
-                                                    padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                                                    >>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
+                                            <div id="payslip-scaling-container" class="clean-scaling-container p-6">
+                                                <div class="clean-document-frame"
+                                                    style="width: 210mm; height: 297mm; background: white; padding: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.12); margin: 0 auto; border: 1px solid var(--border);">
                                                     <iframe id="payslip-iframe" src="about:blank"
                                                         style="width: 100%; height: 100%; border: none; display: block;"></iframe>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
                             </div>
                         </div>
                         <div id="form16-modal" class="modal-overlay preview-modal-overlay hidden">
