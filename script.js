@@ -227,7 +227,7 @@ window.initEmployeePortal = function (userName) {
     const assignedTasks = emp.assignedTasks || 0;
     const completedTasks = emp.completedTasks || 0;
     const ratingPct = assignedTasks > 0 ? ((completedTasks / assignedTasks) * 100).toFixed(1) : '0.0';
-    
+
     if (getEl('dash-emp-rating')) getEl('dash-emp-rating').textContent = `${ratingPct}%`;
     if (getEl('dash-emp-task-counts')) getEl('dash-emp-task-counts').textContent = `${completedTasks} / ${assignedTasks} Tasks Completed`;
 
@@ -316,23 +316,23 @@ window.initEmployeePortal = function (userName) {
         salary: breakdown
     };
     localStorage.setItem('pps-current-payslip', JSON.stringify(payslipData));
-    
+
     // 7. Render dynamic tasks
     window.renderEmployeeTasks(emp.id);
 };
 
-window.renderEmployeeTasks = function(empId) {
+window.renderEmployeeTasks = function (empId) {
     const container = getEl('emp-tasks-container');
     if (!container) return;
-    
+
     const emp = employees.find(e => e.id === empId);
     if (!emp || !emp.taskList) {
         container.innerHTML = '<div class="p-6 text-center text-muted">No tasks found.</div>';
         return;
     }
-    
+
     const pendingTasks = emp.taskList.filter(t => !t.completed);
-    
+
     if (pendingTasks.length === 0) {
         container.innerHTML = `
             <div class="p-6 text-center">
@@ -345,7 +345,7 @@ window.renderEmployeeTasks = function(empId) {
         `;
         return;
     }
-    
+
     let html = '';
     pendingTasks.forEach(task => {
         const badgeColor = task.priority === 'High' ? 'badge-blue' : (task.priority === 'Medium' ? 'badge-orange' : 'badge-green');
@@ -361,29 +361,29 @@ window.renderEmployeeTasks = function(empId) {
             </div>
         `;
     });
-    
+
     container.innerHTML = html;
 };
 
-window.completeTask = function(empId, taskId) {
+window.completeTask = function (empId, taskId) {
     const emp = employees.find(e => e.id === empId);
     if (!emp) return;
-    
+
     const task = emp.taskList.find(t => t.id === taskId);
     if (task && !task.completed) {
         task.completed = true;
         emp.completedTasks++;
-        
+
         window.saveEmployees();
-        
+
         // Update Dashboard Stats dynamically
         const assignedTasks = emp.assignedTasks || 0;
         const completedTasks = emp.completedTasks || 0;
         const ratingPct = assignedTasks > 0 ? ((completedTasks / assignedTasks) * 100).toFixed(1) : '0.0';
-        
+
         if (getEl('dash-emp-rating')) getEl('dash-emp-rating').textContent = `${ratingPct}%`;
         if (getEl('dash-emp-task-counts')) getEl('dash-emp-task-counts').textContent = `${completedTasks} / ${assignedTasks} Tasks Completed`;
-        
+
         // Remove task with animation
         const taskRow = getEl(`task-row-${taskId}`);
         if (taskRow) {
@@ -396,9 +396,9 @@ window.completeTask = function(empId, taskId) {
         } else {
             window.renderEmployeeTasks(empId);
         }
-        
+
         window.showToast('Task marked as completed!', 'success');
-        
+
         if (window.renderEmployeeTable) window.renderEmployeeTable();
         if (window.updateDashboardStats) window.updateDashboardStats();
     }
@@ -2317,11 +2317,10 @@ window.loadEmployees = function () {
         // Migration: ensure tasks and attendance fields exist
         employees.forEach(emp => {
             const def = defaultEmployees.find(d => d.id === emp.id) || defaultEmployees[0];
-<<<<<<< HEAD
-            
+
             if (emp.assignedTasks === undefined) emp.assignedTasks = def.assignedTasks || 5;
             if (emp.completedTasks === undefined) emp.completedTasks = def.completedTasks || 0;
-            
+
             // Generate TaskList dynamically if not present
             if (!emp.taskList) {
                 emp.taskList = [];
@@ -2336,11 +2335,6 @@ window.loadEmployees = function () {
                     });
                 }
             }
-=======
-
-            if (emp.assignedTasks === undefined) emp.assignedTasks = def.assignedTasks;
-            if (emp.completedTasks === undefined) emp.completedTasks = def.completedTasks;
->>>>>>> 9c76cb5b6934da9060844f904341098054dd7d78
 
             // Attendance fields migration
             if (emp.present === undefined) emp.present = def.present || 22;
@@ -4551,22 +4545,22 @@ window.downloadReport = function (empId, reportType, format) {
     }
 };
 
-window.renderAdminLeaveTypes = function() {
+window.renderAdminLeaveTypes = function () {
     const tbody = getEl('admin-leave-types-body');
     const dropdown = getEl('emp-leave-type-select');
-    
+
     if (!tbody) return;
-    
+
     if (leaveTypes.length === 0) {
         // Pre-populate with some default leave types for demonstration
         leaveTypes.push({ id: 'LT001', name: 'Sick Leave', code: 'SL', category: 'Paid', desc: 'For medical emergencies' });
         leaveTypes.push({ id: 'LT002', name: 'Casual Leave', code: 'CL', category: 'Paid', desc: 'For personal contingencies' });
         leaveTypes.push({ id: 'LT003', name: 'Loss of Pay', code: 'LOP', category: 'Unpaid', desc: 'Leave without pay' });
     }
-    
+
     let html = '';
     let dropHtml = '';
-    
+
     leaveTypes.forEach(lt => {
         const badgeColor = lt.category === 'Paid' ? 'badge-blue' : 'badge-orange';
         html += `
@@ -4583,22 +4577,22 @@ window.renderAdminLeaveTypes = function() {
         `;
         dropHtml += `<option value="${lt.name}">${lt.name} (${lt.category})</option>`;
     });
-    
+
     tbody.innerHTML = html;
     if (dropdown) dropdown.innerHTML = dropHtml;
 };
 
-window.showAddLeaveTypeModal = function() {
+window.showAddLeaveTypeModal = function () {
     const form = getEl('leave-type-form');
     if (form) form.reset();
-    
+
     const idDisplay = getEl('leave-type-id-display');
     if (idDisplay) idDisplay.textContent = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
-    
+
     getEl('leave-type-modal')?.classList.remove('hidden');
 };
 
-window.closeLeaveTypeModal = function() {
+window.closeLeaveTypeModal = function () {
     getEl('leave-type-modal')?.classList.add('hidden');
 };
 
@@ -4606,14 +4600,14 @@ window.closeLeaveTypeModal = function() {
 document.addEventListener('DOMContentLoaded', () => {
     const leaveForm = getEl('leave-type-form');
     if (leaveForm) {
-        leaveForm.addEventListener('submit', function(e) {
+        leaveForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            
+
             const submitBtn = leaveForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = 'Saving...';
             submitBtn.disabled = true;
-            
+
             const newType = {
                 id: 'LT' + String(leaveTypes.length + 1).padStart(3, '0'),
                 name: getEl('leave-type-name').value,
@@ -4621,7 +4615,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 category: getEl('leave-type-category').value,
                 desc: getEl('leave-type-desc').value
             };
-            
+
             // Mock backend validation and assignment request
             new Promise(resolve => {
                 setTimeout(() => {
@@ -4631,11 +4625,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }).then(() => {
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
-                
+
                 leaveForm.reset();
                 window.closeLeaveTypeModal();
                 window.renderAdminLeaveTypes();
-                
+
                 if (window.showToast) window.showToast('Leave Type added successfully!', 'success');
             }).catch(err => {
                 submitBtn.textContent = originalText;
