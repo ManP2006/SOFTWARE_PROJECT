@@ -8,9 +8,7 @@
 .theme-transitioning * {
     transition: background-color 0.3s ease,
         color 0.3s ease,
-        border-color 0.3s ease,
-        box-shadow 0.3s ease,
-        background 0.3s ease !important;
+        border-color 0.3s ease !important;
 }
 
 :root {
@@ -56,8 +54,8 @@
 
     --ease: cubic-bezier(0.4, 0, 0.2, 1);
     --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --transition: all 0.2s var(--ease);
-    --transition-slow: all 0.4s var(--ease);
+    --transition: transform 0.3s ease, width 0.3s ease, max-width 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    --transition-slow: transform 0.4s ease, width 0.4s ease, max-width 0.4s ease, opacity 0.4s ease, background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 
     /* --- Premium Glassmorphism & Effects --- */
     --glass-bg: rgba(255, 255, 255, 0.7);
@@ -676,7 +674,7 @@ textarea {
 
 /* Animations & Transitions */
 .smooth-transition {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s ease, width 0.3s ease, max-width 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 button,
@@ -685,7 +683,7 @@ button,
 .form-input,
 .form-select,
 .badge {
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s ease, width 0.3s ease, max-width 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 .hover-lift:hover {
@@ -760,7 +758,7 @@ button,
     height: 40px;
     border-radius: var(--radius-md);
     border: 1px solid transparent;
-    transition: all 0.2s var(--ease);
+    transition: transform 0.2s var(--ease), width 0.2s var(--ease), max-width 0.2s var(--ease), opacity 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
     outline: none;
     white-space: nowrap;
 }
@@ -1485,7 +1483,7 @@ button,
    HERO SECTION
    ============================================= */
 .hero {
-    padding: 5rem 0 4rem;
+    padding: 4rem 0 2rem;
     text-align: center;
     position: relative;
     overflow: visible;
@@ -1600,7 +1598,7 @@ button,
 /* =============================================
    FEATURES SECTION
    ============================================= */
-.features { padding: 5rem 0; }
+.features { padding: 3rem 0; }
 .section-title {
     text-align: center;
     font-size: 1.875rem;
@@ -1646,7 +1644,7 @@ button,
 
 .feature-card {
     background: var(--surface); padding: 2rem 1.75rem; border-radius: var(--radius-xl);
-    border: 1px solid var(--border); transition: all 0.35s var(--ease);
+    border: 1px solid var(--border); transition: transform 0.35s var(--ease), width 0.35s var(--ease), max-width 0.35s var(--ease), opacity 0.35s var(--ease), background-color 0.35s var(--ease), color 0.35s var(--ease), border-color 0.35s var(--ease);
     display: flex; flex-direction: column; align-items: flex-start; position: relative; overflow: hidden;
 }
 
@@ -1670,7 +1668,7 @@ button,
 .feature-icon {
     width: 3rem; height: 3rem; background: var(--primary-light); color: var(--primary);
     border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
-    margin-bottom: 1.5rem; transition: all 0.3s var(--ease);
+    margin-bottom: 1.5rem; transition: transform 0.3s var(--ease), width 0.3s var(--ease), max-width 0.3s var(--ease), opacity 0.3s var(--ease), background-color 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 .feature-card:hover .feature-icon {
     background: var(--primary); color: #fff; transform: scale(1.08);
@@ -1777,7 +1775,7 @@ button,
     flex-direction: column;
     align-items: center;
     cursor: pointer;
-    transition: all 0.25s var(--ease);
+    transition: transform 0.25s var(--ease), width 0.25s var(--ease), max-width 0.25s var(--ease), opacity 0.25s var(--ease), background-color 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
     background: var(--surface);
     box-shadow: var(--shadow-sm);
 }
@@ -2391,7 +2389,7 @@ body.auth-active html {
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s var(--ease);
+    transition: transform 0.2s var(--ease), width 0.2s var(--ease), max-width 0.2s var(--ease), opacity 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
     width: 100%;
 }
 
@@ -2606,7 +2604,7 @@ body.auth-active html {
     border-radius: var(--radius-md);
     font-size: 0.875rem;
     font-weight: 500;
-    transition: all 0.2s var(--ease);
+    transition: transform 0.2s var(--ease), width 0.2s var(--ease), max-width 0.2s var(--ease), opacity 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
     margin-bottom: 2px;
     position: relative;
 }
@@ -2956,7 +2954,7 @@ body.auth-active html {
 }
 
 .report-card {
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, width 0.2s ease, max-width 0.2s ease, opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .report-card:hover {
@@ -3224,7 +3222,7 @@ body.auth-active html {
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all 0.2s var(--ease);
+    transition: transform 0.2s var(--ease), width 0.2s var(--ease), max-width 0.2s var(--ease), opacity 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
     padding: 0.5rem 0;
 }
 
@@ -3837,7 +3835,7 @@ input:checked+.slider:before {
     opacity: 0;
     visibility: hidden;
     transform: translateY(10px);
-    transition: all 0.2s var(--ease);
+    transition: transform 0.2s var(--ease), width 0.2s var(--ease), max-width 0.2s var(--ease), opacity 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
 .dropdown.show .dropdown-menu {
@@ -4259,7 +4257,7 @@ input:checked+.slider:before {
     font-size: 0.8125rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: transform 0.2s, width 0.2s, max-width 0.2s, opacity 0.2s, background-color 0.2s, color 0.2s, border-color 0.2s;
     color: var(--text-muted);
 }
 
@@ -4290,7 +4288,7 @@ input:checked+.slider:before {
     z-index: 90;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s var(--ease);
+    transition: transform 0.3s var(--ease), width 0.3s var(--ease), max-width 0.3s var(--ease), opacity 0.3s var(--ease), background-color 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 
 .sidebar-overlay.active {
@@ -4369,8 +4367,8 @@ input:checked+.slider:before {
     }
 
     .hero {
-        padding: 2.5rem 0;
-        margin-bottom: 0.5rem;
+        padding: 2.5rem 0 1.5rem;
+        margin-bottom: 0;
     }
 
     .hero-title {
@@ -4384,7 +4382,7 @@ input:checked+.slider:before {
     }
 
     .features {
-        padding: 2.5rem 0;
+        padding: 1.5rem 0;
     }
 
     .section-title {
@@ -4838,7 +4836,7 @@ input:checked+.slider:before {
     justify-content: center;
     cursor: pointer;
     color: var(--text-secondary);
-    transition: all 0.2s var(--ease);
+    transition: transform 0.2s var(--ease), width 0.2s var(--ease), max-width 0.2s var(--ease), opacity 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
 .theme-toggle:hover {
@@ -4944,7 +4942,7 @@ input:checked+.slider:before {
     border-radius: var(--radius-md);
     background: var(--bg-alt);
     border: 1.5px solid transparent;
-    transition: all 0.2s var(--ease);
+    transition: transform 0.2s var(--ease), width 0.2s var(--ease), max-width 0.2s var(--ease), opacity 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
 .work-item:hover {
@@ -4983,7 +4981,7 @@ input:checked+.slider:before {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s var(--ease);
+    transition: transform 0.2s var(--ease), width 0.2s var(--ease), max-width 0.2s var(--ease), opacity 0.2s var(--ease), background-color 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
     background: var(--surface);
 }
 
