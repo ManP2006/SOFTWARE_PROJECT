@@ -2,8 +2,9 @@ $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:8080/")
 $listener.Start()
 Write-Host "Server running at http://localhost:8080/"
+Write-Host "Open http://localhost:8080/public/index.html in your browser"
 
-$root = "d:\SOFTWARE PROJECT"
+$root = Split-Path -Parent $PSScriptRoot
 $mimeTypes = @{
     ".html" = "text/html"
     ".css"  = "text/css"
@@ -18,6 +19,8 @@ $mimeTypes = @{
     ".ttf"  = "font/ttf"
     ".json" = "application/json"
     ".webp" = "image/webp"
+    ".jsx"  = "text/plain"
+    ".txt"  = "text/plain"
 }
 
 while ($listener.IsListening) {
@@ -26,7 +29,7 @@ while ($listener.IsListening) {
     $response = $context.Response
 
     $localPath = $request.Url.LocalPath
-    if ($localPath -eq "/") { $localPath = "/index.html" }
+    if ($localPath -eq "/") { $localPath = "/public/index.html" }
     $filePath = Join-Path $root $localPath.TrimStart("/")
 
     if (Test-Path $filePath -PathType Leaf) {
@@ -38,7 +41,7 @@ while ($listener.IsListening) {
         $response.OutputStream.Write($bytes, 0, $bytes.Length)
     } else {
         $response.StatusCode = 404
-        $msg = [System.Text.Encoding]::UTF8.GetBytes("Not Found")
+        $msg = [System.Text.Encoding]::UTF8.GetBytes("Not Found: $localPath")
         $response.OutputStream.Write($msg, 0, $msg.Length)
     }
     $response.OutputStream.Close()
