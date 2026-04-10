@@ -31,7 +31,7 @@ let leaveTypes = [];
 let currentSalaryType = 'monthly';
 
 // --- Toast Notification System ---
-window.showToast = function(message, type = 'info') {
+window.showToast = function (message, type = 'info') {
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
@@ -64,8 +64,20 @@ window.showToast = function(message, type = 'info') {
     }, 4000);
 };
 
+// --- Attendance Live Timer System ---
+// simulateCheckIn, simulateCheckOut, and startLiveTimer are defined further below
+// after the employees array is available.
+
+window.formatTime = function (ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds].map(v => v < 10 ? '0' + v : v).join(':');
+};
+
 // --- Logout System ---
-window.handleLogout = function() {
+window.handleLogout = function () {
     // Show custom confirmation modal
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay logout-confirm-overlay';
@@ -138,7 +150,7 @@ window.handleLogout = function() {
 };
 
 // Expose these immediately for inline onclick handlers
-window.showLandingView = function() {
+window.showLandingView = function () {
     const views = ['landing-view', 'auth-view', 'dashboard-view'];
     views.forEach(v => { const el = getEl(v); if (el) el.style.display = (v === 'landing-view' ? 'block' : 'none'); });
     // Scroll the landing-view container (not window) to top
@@ -149,12 +161,12 @@ window.showLandingView = function() {
 
 // Global Dashboard Root Navigation
 // Global Dashboard Root Navigation
-window.handleDashboardLogoClick = function(e) {
+window.handleDashboardLogoClick = function (e) {
     if (e) e.preventDefault();
-    
+
     const dashboardView = getEl('dashboard-view');
     const isDashboardVisible = dashboardView && dashboardView.style.display !== 'none';
-    
+
     if (isDashboardVisible) {
         const role = localStorage.getItem('pps-role');
         if (role) {
@@ -163,16 +175,16 @@ window.handleDashboardLogoClick = function(e) {
             return;
         }
     }
-    
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (!isDashboardVisible) window.showLandingView();
 };
 
-window.showDashboardView = function(role, userName) {
+window.showDashboardView = function (role, userName) {
     const views = ['landing-view', 'auth-view', 'dashboard-view'];
     views.forEach(v => { const el = getEl(v); if (el) el.style.display = (v === 'dashboard-view' ? 'flex' : 'none'); });
-    
-    document.body.style.overflow = 'auto'; 
+
+    document.body.style.overflow = 'auto';
     document.documentElement.style.overflow = 'auto';
 
     window.currentUser = { role: role, displayName: userName };
@@ -199,14 +211,14 @@ window.showDashboardView = function(role, userName) {
         window.initEmployeePortal(userName);
         window.showView('employee-overview');
     }
-    
+
     // Apply saved user theme only when entering dashboard
     const savedTheme = localStorage.getItem('pps-theme') || 'light';
     window.applyTheme(savedTheme, false);
 };
 
 // --- Employee Portal Logic ---
-window.initEmployeePortal = function(userName) {
+window.initEmployeePortal = function (userName) {
     // Find employee or use default
     const emp = employees.find(e => e.name === userName) || employees[0];
     if (!emp) return;
@@ -214,7 +226,7 @@ window.initEmployeePortal = function(userName) {
     // 1. Dashboard & General
     const welcomeName = getEl('welcome-employee-name');
     if (welcomeName) welcomeName.textContent = emp.name;
-    
+
     const now = new Date();
     const dayNums = getEl('dash-day-num');
     const monthYears = getEl('dash-month-year');
@@ -223,14 +235,20 @@ window.initEmployeePortal = function(userName) {
 
     if (dayNums) dayNums.textContent = now.getDate();
     if (dayNumsModern) dayNumsModern.textContent = now.getDate();
-    
+
     const monthYearText = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
     if (monthYears) monthYears.textContent = monthYearText;
     if (monthYearsModern) monthYearsModern.textContent = monthYearText;
 
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${emp.monthlySalary.toLocaleString()}`;
     if (getEl('dash-emp-leave')) getEl('dash-emp-leave').textContent = `${emp.paidLeave + emp.sickLeave + 12} Days`; // Simulated
-    if (getEl('dash-emp-att')) getEl('dash-emp-att').textContent = `${((emp.present / 26) * 100).toFixed(1)}%`;
+    // Calculate Rating
+    const assignedTasks = emp.assignedTasks || 0;
+    const completedTasks = emp.completedTasks || 0;
+    const ratingPct = assignedTasks > 0 ? ((completedTasks / assignedTasks) * 100).toFixed(1) : '0.0';
+
+    if (getEl('dash-emp-rating')) getEl('dash-emp-rating').textContent = `${ratingPct}%`;
+    if (getEl('dash-emp-task-counts')) getEl('dash-emp-task-counts').textContent = `${completedTasks} / ${assignedTasks} Tasks Completed`;
 
     // 2. Profile Details
     if (getEl('prof-name')) getEl('prof-name').textContent = emp.name;
@@ -247,16 +265,22 @@ window.initEmployeePortal = function(userName) {
         getEl('prof-avatar-large').style.borderRadius = '50%';
     }
 
-    // 3. Attendance Simulation State
-    const isCheckedIn = localStorage.getItem(`pps-checkin-${emp.id}`);
+    // 3. Attendance Simulation State — uses CHECKIN_KEY set by simulateCheckIn
+    const savedTimestamp = localStorage.getItem('pps-active-checkin');
     const checkinBtn = getEl('btn-checkin');
     const checkoutBtn = getEl('btn-checkout');
     const timerEl = getEl('live-timer');
 
-    if (isCheckedIn) {
+    if (savedTimestamp) {
+        // Parse stored ms timestamp → show as readable punch-in time
+        const punchInDate = new Date(parseInt(savedTimestamp, 10));
+        const punchInTimeStr = punchInDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
         if (checkinBtn) checkinBtn.disabled = true;
         if (checkoutBtn) checkoutBtn.disabled = false;
-        if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = isCheckedIn;
+        if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = punchInTimeStr;
+
+        // Resume the live elapsed timer from actual punch-in moment
         window.startLiveTimer();
     } else {
         if (checkinBtn) checkinBtn.disabled = false;
@@ -276,16 +300,16 @@ window.initEmployeePortal = function(userName) {
     if (getEl('pre-pf')) getEl('pre-pf').textContent = `₹ ${breakdown.pf.toLocaleString()}`;
     if (getEl('pre-pt')) getEl('pre-pt').textContent = `₹ ${breakdown.pt.toLocaleString()}`;
     if (getEl('pre-net')) getEl('pre-net').textContent = `₹ ${breakdown.net.toLocaleString()}`;
-    
+
     // Update main dashboard net salary card to be consistent
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${breakdown.net.toLocaleString()}`;
-    
+
     // 5. Payslip History Table Sync (Refined for Modern Redesign)
     const tableBody = getEl('emp-payslips-table-body');
     if (tableBody) {
         const months = ["February 2026", "January 2026"];
         const dates = ["Mar 01, 2026", "Feb 01, 2026"];
-        
+
         tableBody.innerHTML = months.map((month, i) => `
             <tr>
                 <td class="font-medium">${month}</td>
@@ -308,7 +332,7 @@ window.initEmployeePortal = function(userName) {
     // 6. Persist for Standalone View
     const companyName = localStorage.getItem('pps-company-name') || 'XYZ Private Limited';
     const companyAddress = localStorage.getItem('pps-company-address') || '123 Tech Hub, HITEC City, Hyderabad, 500081';
-    
+
     const payslipData = {
         name: emp.name,
         id: emp.id,
@@ -321,41 +345,135 @@ window.initEmployeePortal = function(userName) {
         salary: breakdown
     };
     localStorage.setItem('pps-current-payslip', JSON.stringify(payslipData));
+
+    // 7. Render dynamic tasks
+    window.renderEmployeeTasks(emp.id);
 };
 
-window.showPayslip = function(empId, month) {
+window.showPayslip = function (empId, month) {
     const emp = employees.find(e => String(e.id) === String(empId)) || employees[0];
     const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
     
-    // Update Modal Summary Preview Cards
-    if (getEl('modal-pre-base')) getEl('modal-pre-base').textContent = `₹ ${(breakdown.basic + breakdown.hra).toLocaleString()}`;
-    if (getEl('modal-pre-allow')) getEl('modal-pre-allow').textContent = `₹ ${(breakdown.edu + breakdown.lta + breakdown.special).toLocaleString()}`;
-    if (getEl('modal-pre-gross')) getEl('modal-pre-gross').textContent = `₹ ${breakdown.gross.toLocaleString()}`;
-    
-    if (getEl('modal-pre-pf')) getEl('modal-pre-pf').textContent = `₹ ${breakdown.pf.toLocaleString()}`;
-    if (getEl('modal-pre-pt')) getEl('modal-pre-pt').textContent = `₹ ${breakdown.pt.toLocaleString()}`;
-    if (getEl('modal-pre-ded')) getEl('modal-pre-ded').textContent = `₹ ${(breakdown.pf + breakdown.pt).toLocaleString()}`;
-    
-    if (getEl('modal-pre-net')) getEl('modal-pre-net').textContent = `₹ ${breakdown.net.toLocaleString()}`;
+    // Prepare data for the iframe
+    const payload = {
+        name: emp.name,
+        id: emp.id,
+        dept: emp.dept || 'Operations',
+        position: emp.position || 'Employee',
+        period: month,
+        date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
+        salary: breakdown,
+        companyName: 'Prime Payroll Solutions',
+        companyAddress: '123 Tech Hub, HITEC City, Hyderabad, 500081'
+    };
 
-    // Update Iframe for detailed view
+    // Store in localStorage as backup
+    localStorage.setItem('pps-current-payslip', JSON.stringify(payload));
+
+    // Update Iframe
     const iframe = getEl('payslip-iframe');
     if (iframe) {
-        // Cache management for iframe
-        iframe.src = 'payslip.html?emp=' + empId + '&month=' + encodeURIComponent(month) + '&t=' + Date.now();
+        iframe.src = 'payslip.html?t=' + Date.now();
+        iframe.onload = () => {
+            iframe.contentWindow.postMessage({ type: 'POPULATE_PAYSLIP', payload }, '*');
+            // Trigger scaling after a small delay to ensure rendering
+            setTimeout(() => {
+                window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
+            }, 100);
+        };
     }
     
     getEl('payslip-modal')?.classList.remove('hidden');
-    
-    // Trigger scaling with a slight delay for modal transition
+    // Also scale immediately in case iframe was already loaded
     setTimeout(() => {
-        if (window.autoScaleViewer) {
-            window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
-        }
-    }, 100);
+        window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
+    }, 50);
 };
 
-window.showPayslipFromDashboard = function() {
+window.renderEmployeeTasks = function (empId) {
+    const container = getEl('emp-tasks-container');
+    if (!container) return;
+
+    const emp = employees.find(e => e.id === empId);
+    if (!emp || !emp.taskList) {
+        container.innerHTML = '<div class="p-6 text-center text-muted">No tasks found.</div>';
+        return;
+    }
+
+    const pendingTasks = emp.taskList.filter(t => !t.completed);
+
+    if (pendingTasks.length === 0) {
+        container.innerHTML = `
+            <div class="p-6 text-center">
+                <div class="stat-icon mx-auto mb-3" style="width: 48px; height: 48px; background: var(--success-light); color: var(--success);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="font-medium text-success">All caught up!</div>
+                <div class="text-xs text-muted mt-1">You have no pending tasks.</div>
+            </div>
+        `;
+        return;
+    }
+
+    let html = '';
+    pendingTasks.forEach(task => {
+        const badgeColor = task.priority === 'High' ? 'badge-blue' : (task.priority === 'Medium' ? 'badge-orange' : 'badge-green');
+        html += `
+            <div class="flex-align p-4 border-b hover:bg-gray-50 transition-colors animate-fade-in" id="task-row-${task.id}">
+                <div class="flex-1">
+                    <div class="font-medium text-sm">${task.title}</div>
+                    <div class="text-xs text-muted mt-1">Priority: <span class="badge ${badgeColor}" style="padding: 2px 6px; font-size: 0.65rem;">${task.priority}</span></div>
+                </div>
+                <button class="btn btn-primary compact-btn text-xs" onclick="window.completeTask('${emp.id}', '${task.id}')" style="margin-left: 1rem;">
+                    Completed
+                </button>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+};
+
+window.completeTask = function (empId, taskId) {
+    const emp = employees.find(e => e.id === empId);
+    if (!emp) return;
+
+    const task = emp.taskList.find(t => t.id === taskId);
+    if (task && !task.completed) {
+        task.completed = true;
+        emp.completedTasks++;
+
+        window.saveEmployees();
+
+        // Update Dashboard Stats dynamically
+        const assignedTasks = emp.assignedTasks || 0;
+        const completedTasks = emp.completedTasks || 0;
+        const ratingPct = assignedTasks > 0 ? ((completedTasks / assignedTasks) * 100).toFixed(1) : '0.0';
+
+        if (getEl('dash-emp-rating')) getEl('dash-emp-rating').textContent = `${ratingPct}%`;
+        if (getEl('dash-emp-task-counts')) getEl('dash-emp-task-counts').textContent = `${completedTasks} / ${assignedTasks} Tasks Completed`;
+
+        // Remove task with animation
+        const taskRow = getEl(`task-row-${taskId}`);
+        if (taskRow) {
+            taskRow.style.opacity = '0';
+            taskRow.style.transform = 'translateY(10px)';
+            taskRow.style.transition = 'all 0.3s ease';
+            setTimeout(() => {
+                window.renderEmployeeTasks(empId);
+            }, 300);
+        } else {
+            window.renderEmployeeTasks(empId);
+        }
+
+        window.showToast('Task marked as completed!', 'success');
+
+        if (window.renderEmployeeTable) window.renderEmployeeTable();
+        if (window.updateDashboardStats) window.updateDashboardStats();
+    }
+};
+
+window.showPayslipFromDashboard = function () {
     // This assumes the data is already in localStorage via initEmployeePortal
     const iframe = getEl('payslip-iframe');
     if (iframe) {
@@ -366,16 +484,16 @@ window.showPayslipFromDashboard = function() {
     setTimeout(() => window.autoScaleViewer('payslip-scaling-container', 'payslip-modal'), 50);
 };
 
-window.calculateSalaryBreakdown = function(gross) {
+window.calculateSalaryBreakdown = function (gross) {
     const basic = Math.round(gross * 0.5);
     const hra = Math.round(gross * 0.2);
     const edu = 2500;
     const lta = 5000;
     const special = gross - (basic + hra + edu + lta);
-    const pf = Math.min(Math.round(basic * 0.12), 1800); 
+    const pf = Math.min(Math.round(basic * 0.12), 1800);
     const pt = 200;
     const net = gross - (pf + pt);
-    
+
     return {
         gross: gross,
         basic: basic,
@@ -401,7 +519,7 @@ window.holidays = [
     { date: '2026-12-25', name: 'Christmas Day', type: 'Public' }
 ];
 
-window.showHolidayCalendar = function() {
+window.showHolidayCalendar = function () {
     const modal = getEl('holiday-modal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -409,33 +527,33 @@ window.showHolidayCalendar = function() {
     }
 };
 
-window.changeCalendarMonth = function(delta) {
+window.changeCalendarMonth = function (delta) {
     window.currentCalendarDate.setMonth(window.currentCalendarDate.getMonth() + delta);
     window.renderCalendar(window.currentCalendarDate);
 };
 
-window.renderCalendar = function(date) {
+window.renderCalendar = function (date) {
     const month = date.getMonth();
     const year = date.getFullYear();
-    
+
     // Update Header
     const monthName = date.toLocaleString('default', { month: 'long' });
     if (getEl('calendar-month-year')) getEl('calendar-month-year').textContent = `${monthName} ${year}`;
-    
+
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     const grid = getEl('calendar-days-grid');
     if (!grid) return;
     grid.innerHTML = '';
-    
+
     // Empty cells for previous month
     for (let i = 0; i < firstDay; i++) {
         const div = document.createElement('div');
         div.className = 'calendar-day empty';
         grid.appendChild(div);
     }
-    
+
     const today = new Date();
     const holidayListGroup = getEl('holiday-list-details');
     if (holidayListGroup) holidayListGroup.innerHTML = '';
@@ -444,14 +562,14 @@ window.renderCalendar = function(date) {
         const div = document.createElement('div');
         div.className = 'calendar-day current-month';
         div.textContent = d;
-        
+
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const holiday = window.holidays.find(h => h.date === dateStr);
-        
+
         if (holiday) {
             div.classList.add('is-holiday');
             div.title = holiday.name;
-            
+
             // Add to side list
             if (holidayListGroup) {
                 const item = document.createElement('div');
@@ -463,62 +581,102 @@ window.renderCalendar = function(date) {
                 holidayListGroup.appendChild(item);
             }
         }
-        
+
         if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === d) {
             div.classList.add('is-today');
         }
-        
+
         grid.appendChild(div);
     }
-    
+
     if (holidayListGroup && holidayListGroup.innerHTML === '') {
         holidayListGroup.innerHTML = '<p class="text-xs text-muted">No holidays this month.</p>';
     }
 };
 
-window.closeModal = function(modalId) {
+window.closeModal = function (modalId) {
     const modal = getEl(modalId);
     if (modal) modal.classList.add('hidden');
 };
 
-window.simulateCheckIn = function() {
-    const emp = employees.find(e => e.name === window.currentUser.displayName) || employees[0];
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    localStorage.setItem(`pps-checkin-${emp.id}`, time);
-    
+// KEY used to persist the punch-in timestamp across page reloads
+const CHECKIN_KEY = 'pps-active-checkin';
+
+window.simulateCheckIn = function () {
+    const now = Date.now();
+    const timeStr = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Persist the exact punch-in moment
+    localStorage.setItem(CHECKIN_KEY, now.toString());
+
+    // Update UI
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = true;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = false;
-    if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = time;
-    
+    if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = timeStr;
+
+    // Show 00:00:00 immediately, then start counting
+    const timerEl = getEl('live-timer');
+    if (timerEl) timerEl.textContent = '00:00:00';
+
     window.startLiveTimer();
-    alert('Punched in successfully at ' + time);
+    window.showToast('Punched in at ' + timeStr, 'success');
 };
 
-window.simulateCheckOut = function() {
-    const emp = employees.find(e => e.name === window.currentUser.displayName) || employees[0];
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    localStorage.removeItem(`pps-checkin-${emp.id}`);
-    
+window.simulateCheckOut = function () {
+    const now = Date.now();
+    const timeStr = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Stop the running interval first
+    if (window.timerInterval) {
+        clearInterval(window.timerInterval);
+        window.timerInterval = null;
+    }
+
+    // Calculate total work time from stored punch-in
+    const savedTimestamp = localStorage.getItem(CHECKIN_KEY);
+    let totalTimeStr = '00:00:00';
+    if (savedTimestamp) {
+        const elapsed = now - parseInt(savedTimestamp, 10);
+        const h = Math.floor(elapsed / 3600000);
+        const m = Math.floor((elapsed % 3600000) / 60000);
+        const s = Math.floor((elapsed % 60000) / 1000);
+        totalTimeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // Clear persisted state
+    localStorage.removeItem(CHECKIN_KEY);
+
+    // Update UI
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = false;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = true;
-    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = time;
-    
-    if (window.timerInterval) clearInterval(window.timerInterval);
-    alert('Punched out successfully at ' + time);
+    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = timeStr;
+
+    // Show the final total worked time on the timer display
+    const timerEl = getEl('live-timer');
+    if (timerEl) timerEl.textContent = totalTimeStr;
+
+    window.showToast(`Punched out at ${timeStr}  |  Total work time: ${totalTimeStr}`, 'info');
 };
 
-window.startLiveTimer = function() {
-    if (window.timerInterval) clearInterval(window.timerInterval);
-    const startTime = new Date();
-    startTime.setHours(9, 0, 0); // Assume they started at 9 AM for effect
+window.startLiveTimer = function () {
+    // Clear any previous interval
+    if (window.timerInterval) {
+        clearInterval(window.timerInterval);
+        window.timerInterval = null;
+    }
+
+    // Read the punch-in time from localStorage
+    const savedTimestamp = localStorage.getItem(CHECKIN_KEY);
+    if (!savedTimestamp) return; // Nothing to count if not punched in
+
+    const punchInTime = parseInt(savedTimestamp, 10);
 
     window.timerInterval = setInterval(() => {
-        const now = new Date();
-        const diff = now - startTime;
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-        
+        const elapsed = Date.now() - punchInTime;
+        const h = Math.floor(elapsed / 3600000);
+        const m = Math.floor((elapsed % 3600000) / 60000);
+        const s = Math.floor((elapsed % 60000) / 1000);
+
         const timerEl = getEl('live-timer');
         if (timerEl) {
             timerEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
@@ -526,12 +684,12 @@ window.startLiveTimer = function() {
     }, 1000);
 };
 
-window.simulateLeaveSubmit = function(event) {
+window.simulateLeaveSubmit = function (event) {
     if (event) event.preventDefault();
     const type = document.querySelector('#employee-leave select')?.value || 'Casual';
     const start = document.querySelectorAll('#employee-leave input[type="date"]')[0]?.value;
     const end = document.querySelectorAll('#employee-leave input[type="date"]')[1]?.value;
-    
+
     if (!start || !end) {
         alert('Please select both start and end dates.');
         return;
@@ -547,7 +705,7 @@ window.simulateLeaveSubmit = function(event) {
         `;
         tbody.prepend(tr);
     }
-    
+
     alert(`Leave request for ${type} (${start} to ${end}) submitted successfully!`);
 };
 
@@ -559,14 +717,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-window.showView = function(viewId) {
+window.showView = function (viewId) {
     // 1. Basic Visibility Toggle
     queryAll('.view-section').forEach(s => s.style.display = 'none');
-    
+
     // 2. Global Modal & Dropdown Cleanup (Fixes overlapping)
     queryAll('.modal-overlay').forEach(m => m.classList.add('hidden'));
     queryAll('.dropdown-menu').forEach(d => d.classList.add('hidden'));
-    
+
     const target = getEl(viewId);
     if (target) {
         target.style.display = 'flex';
@@ -584,31 +742,33 @@ window.showView = function(viewId) {
     if (viewId === 'admin-overview') {
         const welcome = getEl('welcome-user');
         if (welcome) welcome.textContent = (window.currentUser && window.currentUser.displayName) || 'Admin';
-        
+
         // Update Dashboard Stats
         const dashTotalEmp = getEl('dash-total-emp');
         const dashPresent = getEl('dash-present-today');
         const dashPresenceTotal = document.querySelector('.stat-presence-total');
-        
+
         if (dashTotalEmp) dashTotalEmp.textContent = employees.length;
         if (dashPresent) dashPresent.textContent = employees.length; // Assume all present for now
         if (dashPresenceTotal) dashPresenceTotal.textContent = `/ ${employees.length} total`;
-        
+
         setTimeout(() => { if (window.initPayrollChart) window.initPayrollChart(); }, 50);
     }
-    
+
     if (viewId === 'admin-attendance') {
         if (window.initAttendanceModule) window.initAttendanceModule();
     } else if (viewId === 'admin-payroll') {
         if (window.renderPayrollTable) window.renderPayrollTable();
+    } else if (viewId === 'admin-leave') {
+        if (window.renderAdminLeaveTypes) window.renderAdminLeaveTypes();
     }
-    
+
     if (viewId === 'shared-settings') {
         const profileName = getEl('profile-name-input');
         const profileEmail = getEl('profile-email-input');
         const companyName = getEl('setting-company-name');
         const companyAddress = getEl('setting-company-address');
-        
+
         if (profileName) profileName.value = localStorage.getItem('pps-profile-name') || (window.currentUser?.displayName || 'Admin User');
         if (profileEmail) profileEmail.value = localStorage.getItem('pps-profile-email') || 'admin@pps.com';
         if (companyName) companyName.value = localStorage.getItem('pps-company-name') || 'XYZ Private Limited';
@@ -622,7 +782,7 @@ window.showView = function(viewId) {
     }
 };
 
-window.saveProfileSettings = function() {
+window.saveProfileSettings = function () {
     const name = getEl('profile-name-input')?.value;
     const email = getEl('profile-email-input')?.value;
     if (name) localStorage.setItem('pps-profile-name', name);
@@ -630,7 +790,7 @@ window.saveProfileSettings = function() {
     alert('Profile information saved successfully!');
 };
 
-window.saveCompanySettings = function() {
+window.saveCompanySettings = function () {
     const name = getEl('setting-company-name')?.value;
     const address = getEl('setting-company-address')?.value;
     if (name) localStorage.setItem('pps-company-name', name);
@@ -639,7 +799,7 @@ window.saveCompanySettings = function() {
 };
 
 // --- Global Employee Rendering Functions (must be at top-level to avoid TypeError on init) ---
-window.renderEmployeeTable = function() {
+window.renderEmployeeTable = function () {
     const employeeTableBody = getEl('employee-table-body');
     if (!employeeTableBody) return;
     employeeTableBody.innerHTML = '';
@@ -647,7 +807,7 @@ window.renderEmployeeTable = function() {
         const initials = emp.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
         const statusClasses = { 'Active': 'badge-green', 'On Leave': 'badge-orange', 'Inactive': 'badge-red' };
         const badgeClass = statusClasses[emp.status] || 'badge-green';
-        
+
         const assigned = emp.assignedTasks || 0;
         const completed = emp.completedTasks || 0;
         const perfPct = assigned > 0 ? ((completed / assigned) * 100).toFixed(1) : '0.0';
@@ -692,7 +852,7 @@ window.renderEmployeeTable = function() {
     });
 };
 
-window.updateDashboardStats = function() {
+window.updateDashboardStats = function () {
     if (!getEl('admin-overview') || getEl('admin-overview').style.display === 'none') return;
 
     const totalEmp = employees.length;
@@ -710,11 +870,11 @@ window.updateDashboardStats = function() {
     if (presenceTotal) presenceTotal.textContent = `/ ${totalEmp} total`;
 };
 
-window.getNextId = function() {
+window.getNextId = function () {
     return `PPS${String(employees.length + 1).padStart(3, '0')}`;
 };
 
-window.showAddEmployeeModal = function() {
+window.showAddEmployeeModal = function () {
     const employeeModal = getEl('employee-modal');
     const addEmployeeForm = getEl('add-employee-form');
     const editEmpIndexInput = getEl('edit-emp-index');
@@ -728,13 +888,13 @@ window.showAddEmployeeModal = function() {
     if (employeeModal) employeeModal.classList.remove('hidden');
 };
 
-window.updatePayrollAnalytics = function() {
+window.updatePayrollAnalytics = function () {
     const bars = document.querySelectorAll('.css-bar');
     const values = [];
-    
+
     bars.forEach(bar => {
         const amountText = bar.getAttribute('data-amount') || '';
-        const match = amountText.replace(/[^\d.]/g, ''); 
+        const match = amountText.replace(/[^\d.]/g, '');
         if (match) values.push(parseFloat(match));
     });
 
@@ -746,7 +906,7 @@ window.updatePayrollAnalytics = function() {
     let totalGrowth = 0;
     let growthCount = 0;
     for (let i = 1; i < values.length; i++) {
-        totalGrowth += (values[i] - values[i-1]);
+        totalGrowth += (values[i] - values[i - 1]);
         growthCount++;
     }
     const avgGrowth = growthCount > 0 ? totalGrowth / growthCount : 0;
@@ -775,19 +935,20 @@ function initApp() {
         window.loadEmployees();
         window.loadPayrolls();
         window.initPayrollModule();
+        window.initAttendanceTimer();
     } catch (err) {
         console.error('Initialization Error:', err);
     }
-    
+
     const menuToggle = document.querySelector('.menu-toggle');
     const header = document.querySelector('.header');
     const modal = getEl('role-modal');
     const roleBtns = queryAll('.role-card[data-role]');
-    
+
     // UI Selectors (auth)
     const authTitle = getEl('auth-title');
     const authSubmitBtn = getEl('auth-submit-btn');
-    
+
     // Employee Management DOM refs & state
     const addEmployeeBtn = getEl('add-employee-btn');
     const cancelEmployeeBtn = getEl('cancel-employee-btn');
@@ -840,9 +1001,9 @@ function initApp() {
         });
     };
     attachOpenModalHandlers();
-    
+
     if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
-    
+
     roleBtns.forEach(btn => btn.addEventListener('click', (e) => {
         e.preventDefault();
         const role = btn.getAttribute('data-role');
@@ -1001,7 +1162,7 @@ function initApp() {
 
             isEditing = true;
             editRow = id;
-            
+
             if (getEl('new-emp-name')) getEl('new-emp-name').value = emp.name;
             if (getEl('new-emp-email')) getEl('new-emp-email').value = emp.email;
             if (getEl('new-emp-role')) getEl('new-emp-role').value = emp.role;
@@ -1019,10 +1180,10 @@ function initApp() {
 
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', () => {
-            if (rowToDelete) { 
+            if (rowToDelete) {
                 employees = employees.filter(e => e.id !== rowToDelete);
                 window.saveEmployees();
-                rowToDelete = null; 
+                rowToDelete = null;
             }
             if (deleteModal) deleteModal.classList.add('hidden');
         });
@@ -1058,7 +1219,7 @@ function initApp() {
                 };
                 employees.unshift(newEmp);
             }
-            
+
             window.saveEmployees();
             if (employeeModal) employeeModal.classList.add('hidden');
             addEmployeeForm.reset();
@@ -1084,7 +1245,7 @@ function initApp() {
 
             employees.sort((a, b) => {
                 const getPerf = (emp) => (emp.assignedTasks > 0 ? (emp.completedTasks / emp.assignedTasks) : 0);
-                
+
                 switch (criteria) {
                     case 'id-asc':
                         return a.id.localeCompare(b.id, undefined, { numeric: true });
@@ -1109,7 +1270,7 @@ function initApp() {
             window.renderEmployeeTable();
         });
     }
-    
+
     // --- LOGOTYPE NAVIGATION FIX ---
     document.querySelectorAll('.logo').forEach(logo => {
         logo.addEventListener('click', (e) => window.handleDashboardLogoClick(e));
@@ -1170,14 +1331,14 @@ function initApp() {
     applyCurrency(localStorage.getItem('pps-currency') || 'INR');
 
     // --- Payroll Analytics ---
-    window.updatePayrollAnalytics = function() {
+    window.updatePayrollAnalytics = function () {
         const bars = document.querySelectorAll('.css-bar');
         const values = [];
-        
+
         bars.forEach(bar => {
             const amountText = bar.getAttribute('data-amount') || '';
             // Robust parsing for ₹28.4L or $33.2k
-            const match = amountText.replace(/[^\d.]/g, ''); 
+            const match = amountText.replace(/[^\d.]/g, '');
             if (match) values.push(parseFloat(match));
         });
 
@@ -1195,7 +1356,7 @@ function initApp() {
         let totalGrowth = 0;
         let growthCount = 0;
         for (let i = 1; i < values.length; i++) {
-            totalGrowth += (values[i] - values[i-1]);
+            totalGrowth += (values[i] - values[i - 1]);
             growthCount++;
         }
         const avgGrowth = growthCount > 0 ? totalGrowth / growthCount : 0;
@@ -1266,7 +1427,7 @@ function initApp() {
             });
         });
     }
-    
+
     // Initialize Reports Module
     if (typeof initReportsModule === 'function') initReportsModule();
 }
@@ -1280,7 +1441,7 @@ document.addEventListener('click', (e) => {
 });
 
 // --- Payroll Processing Logic ---
-window.getFinancialYear = function(dateObj) {
+window.getFinancialYear = function (dateObj) {
     let d = dateObj;
     if (!(d instanceof Date) || isNaN(d.getTime())) d = new Date();
     const month = d.getMonth() + 1;
@@ -1290,7 +1451,7 @@ window.getFinancialYear = function(dateObj) {
     return fy;
 };
 
-window.initPayrollModule = function() {
+window.initPayrollModule = function () {
     const dateInput = getEl('payroll-date');
     const monthInput = getEl('payroll-month-display');
     const fyInput = getEl('payroll-fy-display');
@@ -1318,8 +1479,8 @@ window.initPayrollModule = function() {
             const processedEntries = [];
             // Extremely robust date extraction
             const dayParts = dateInput.value.split('-'); // YYYY-MM-DD
-            const d = new Date(dayParts[0], dayParts[1]-1, dayParts[2]);
-            
+            const d = new Date(dayParts[0], dayParts[1] - 1, dayParts[2]);
+
             if (isNaN(d.getTime())) {
                 alert('Invalid Date selected.');
                 return;
@@ -1330,13 +1491,13 @@ window.initPayrollModule = function() {
                 alert('Date out of range (2020-2030).');
                 return;
             }
-            
+
             const fyStr = window.getFinancialYear(d);
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const monthOnly = monthNames[d.getMonth()];
             const yearStr = String(yearOnly).slice(-4);
             const monthLabel = monthOnly + " " + yearStr;
-            
+
             console.log('Generating Payroll for:', monthLabel, 'FY:', fyStr);
 
             // Check if already processed
@@ -1350,40 +1511,40 @@ window.initPayrollModule = function() {
                 const basic = emp.monthlySalary * 0.5;
                 const allow = emp.monthlySalary * 0.4;
                 const rating = emp.rating || 5; // Fallback to 5 if rating is missing
-                const bonus = emp.monthlySalary * 0.1 * (rating / 5); 
-                const gross = basic + allow; 
-                const totalGross = basic + allow + bonus; 
+                const bonus = emp.monthlySalary * 0.1 * (rating / 5);
+                const gross = basic + allow;
+                const totalGross = basic + allow + bonus;
 
                 let tds = 0;
                 if (totalGross > 50000) tds = Math.round(totalGross * 0.10);
                 else if (totalGross > 30000) tds = Math.round(totalGross * 0.05);
-                
+
                 // Attendance Deductions (Synced with selected month)
                 const attDed = calculateDeductionForMonth(emp, 'monthly', monthLabel);
-                
+
                 // --- NEW: Bonuses & Deductions Module Integration (SaaS Upgrade) ---
                 const periodMonthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                
+
                 const periodEntries = bonusesDeductions.filter(item => {
-                    return item.empId === emp.id && 
-                           item.effectiveMonth === periodMonthStr && 
-                           item.status === 'Pending';
+                    return item.empId === emp.id &&
+                        item.effectiveMonth === periodMonthStr &&
+                        item.status === 'Pending';
                 });
-                
+
                 const totalModuleBonus = periodEntries
                     .filter(item => item.type === 'Bonus')
                     .reduce((sum, item) => sum + item.amount, 0);
-                    
+
                 const totalModuleDeduction = periodEntries
                     .filter(item => item.type === 'Deduction')
                     .reduce((sum, item) => sum + item.amount, 0);
-                
+
                 // Record entries to mark as Applied later
                 periodEntries.forEach(entry => processedEntries.push(entry.id));
 
                 const finalBonus = bonus + totalModuleBonus;
                 const finalGross = gross + finalBonus; // Gross including all bonuses
-                
+
                 // TDS recalculation based on new gross
                 if (finalGross > 50000) tds = Math.round(finalGross * 0.10);
                 else if (finalGross > 30000) tds = Math.round(finalGross * 0.05);
@@ -1392,14 +1553,14 @@ window.initPayrollModule = function() {
                 // Unpaid Leave Deductions
                 const startOfMonth = new Date(d.getFullYear(), d.getMonth(), 1);
                 const endOfMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0);
-                
+
                 let unpaidLeaveDays = 0;
                 leaveRequests.filter(r => r.empId === emp.id && r.status === 'Approved').forEach(req => {
                     const reqType = leaveTypes.find(t => t.id === req.typeId);
                     if (reqType && !reqType.isPaid) {
                         const ls = new Date(req.startDate);
                         const le = new Date(req.endDate);
-                        
+
                         // Check if leave overlaps with current month
                         if (ls <= endOfMonth && le >= startOfMonth) {
                             const overlapStart = ls < startOfMonth ? startOfMonth : ls;
@@ -1408,10 +1569,10 @@ window.initPayrollModule = function() {
                         }
                     }
                 });
-                
+
                 const perDaySalary = emp.monthlySalary / (emp.totalWorking || 22); // Default to 22 working days
                 const leaveDed = Math.round(unpaidLeaveDays * perDaySalary);
-                
+
                 // Total Deductions = TDS + AttDed + LeaveDed + Module Deductions
                 const totalDed = tds + attDed + leaveDed + totalModuleDeduction;
                 const net = finalGross - totalDed;
@@ -1467,7 +1628,7 @@ window.initPayrollModule = function() {
             } else {
                 alert(`Payroll for ${monthLabel} generated successfully!`);
             }
-            
+
             // Show the newly generated payroll
             window.renderPayrollTable(monthLabel, fyStr);
         });
@@ -1510,32 +1671,32 @@ window.initPayrollModule = function() {
     if (tabForm16) tabForm16.addEventListener('click', () => switchPayrollTab('form16'));
 
     // Form 16 Render Logic
-    window.renderForm16Table = function() {
+    window.renderForm16Table = function () {
         const tbody = getEl('form16-table-body');
         if (!tbody) return;
         const searchQuery = getEl('form16-search')?.value.toLowerCase() || '';
         const selectedFY = getEl('form16-fy')?.value || 'FY 2025-26';
-        
+
         let html = '';
         const filtered = employees.filter(emp => emp.name.toLowerCase().includes(searchQuery) || emp.id.toLowerCase().includes(searchQuery));
-        
+
         if (filtered.length === 0) {
             html = `<tr><td colspan="5" class="text-center py-6 text-muted">No employees found.</td></tr>`;
         } else {
             filtered.forEach(emp => {
                 const totalCTC = currentSalaryType === 'monthly' ? (emp.monthlySalary * 12) : (emp.dailyWage * emp.totalWorking * 12);
-                
+
                 // Find latest payroll for this FY to pass to Form 16 logic
                 const empPayrolls = payrolls.filter(p => p.empId === emp.id && p.financialYear === selectedFY);
                 empPayrolls.sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
-                
+
                 // If no payroll record, pass the FY itself — showForm16 will generate synthetic data
                 const f16Month = empPayrolls.length > 0 ? empPayrolls[0].month : selectedFY;
                 // Button is always enabled since showForm16 now generates synthetic data for any FY
-                const availabilityBadge = empPayrolls.length > 0 
+                const availabilityBadge = empPayrolls.length > 0
                     ? '<span class="badge badge-green" style="font-size:0.7rem;">Available</span>'
                     : '<span class="badge badge-orange" style="font-size:0.7rem;">Synthetic</span>';
-                
+
                 html += `
                     <tr>
                         <td><strong>${emp.name}</strong></td>
@@ -1581,18 +1742,18 @@ window.initPayrollModule = function() {
         const month = searchMonthSelect?.value || 'All';
         const fy = searchFYSelect?.value || 'All';
         const filename = `Payroll_Report_${month}_${fy}_${Date.now()}.csv`;
-        
+
         let csv = 'Employee Name,Employee ID,Financial Year,Month,Gross Salary,Total Deductions,Net Salary\n';
         const filtered = payrolls.filter(p => {
             const matchesMonth = month !== 'All' ? p.month.includes(month) : true;
             const matchesFY = fy !== 'All' ? p.financialYear === fy : true;
             return matchesMonth && matchesFY;
         });
-        
+
         filtered.forEach(p => {
             csv += `"${p.empName}","${p.empId}","${p.financialYear}","${p.month}",${p.gross},${p.totalDeductions},${p.net}\n`;
         });
-        
+
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -1640,33 +1801,33 @@ window.initPayrollModule = function() {
     }
 
     // Close Modals
-    window.closeForm16Modal = function() {
+    window.closeForm16Modal = function () {
         getEl('form16-modal')?.classList.add('hidden');
     };
 };
 
-window.savePayrolls = function() {
+window.savePayrolls = function () {
     localStorage.setItem('pps-payrolls', JSON.stringify(payrolls));
     // We do not auto-render here without arguments to preserve the blank state requirement
     // window.renderPayrollTable();
     window.updatePayrollSummary();
 };
 
-window.loadPayrolls = function() {
+window.loadPayrolls = function () {
     const saved = localStorage.getItem('pps-payrolls');
     if (saved) payrolls = JSON.parse(saved);
     else payrolls = [];
 };
 
-window.renderPayrollTable = function(searchMonth = '', searchFY = '', forceShow = false) {
+window.renderPayrollTable = function (searchMonth = '', searchFY = '', forceShow = false) {
     const tbody = getEl('payroll-table-body');
     if (!tbody) return;
 
     const query = (getEl('payroll-search')?.value || '').toLowerCase();
-    
+
     // Sort reverse chronological by date
     const sorted = [...payrolls].sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
-    
+
     // Default to show senaste data if no search is active
     let filtered = sorted;
     if (searchMonth || searchFY || query) {
@@ -1680,7 +1841,7 @@ window.renderPayrollTable = function(searchMonth = '', searchFY = '', forceShow 
         // Show only the 10 most recent records by default if no search
         filtered = sorted.slice(0, 10);
     }
-    
+
     // Update Summary labels and values
     // Update Summary labels and values based on the filtered set
     window.updatePayrollSummary(searchFY, searchMonth, query, filtered);
@@ -1735,7 +1896,7 @@ window.renderPayrollTable = function(searchMonth = '', searchFY = '', forceShow 
     }
 };
 
-window.updatePayrollSummary = function(fyFilter = '', monthFilter = '', searchText = '', records = null) {
+window.updatePayrollSummary = function (fyFilter = '', monthFilter = '', searchText = '', records = null) {
     let displayFY = fyFilter;
     if (!displayFY) {
         if (records && records.length > 0) {
@@ -1747,7 +1908,7 @@ window.updatePayrollSummary = function(fyFilter = '', monthFilter = '', searchTe
             displayFY = window.getFinancialYear(new Date());
         }
     }
-    
+
     displayFY = String(displayFY || '').replace(/^6/, '').trim();
     const label = getEl('summary-fy-label');
     if (label) label.textContent = `(${displayFY})`;
@@ -1760,7 +1921,7 @@ window.updatePayrollSummary = function(fyFilter = '', monthFilter = '', searchTe
         const matchesSearch = s ? Object.values(p).some(val => String(val).toLowerCase().includes(s)) : true;
         return matchesFY && matchesMonth && matchesSearch;
     });
-    
+
     const totals = filteredPayrolls.reduce((acc, curr) => {
         acc.gross += (parseFloat(curr.gross) || 0);
         acc.deduction += (parseFloat(curr.totalDeductions) || 0);
@@ -1773,7 +1934,7 @@ window.updatePayrollSummary = function(fyFilter = '', monthFilter = '', searchTe
     getEl('summary-total-net') && (getEl('summary-total-net').textContent = `₹${Math.round(totals.net).toLocaleString()}`);
 };
 
-window.showForm16 = function(empId, month) {
+window.showForm16 = function (empId, month) {
     let p = payrolls.find(x => x.empId === empId && x.month === month);
     const emp = employees.find(e => e.id === empId);
 
@@ -1837,16 +1998,16 @@ window.showForm16 = function(empId, month) {
     // Part A Data
     if (getEl('f16-emp-name')) getEl('f16-emp-name').textContent = p.empName;
     if (getEl('f16-emp-address')) getEl('f16-emp-address').textContent = emp ? `${emp.dept || 'Engineering'}, PPS Software` : 'PPS Software Solution';
-    if (getEl('f16-emp-pan')) getEl('f16-emp-pan').textContent = p.empName.substring(0, 4).toUpperCase() + 'E' + p.empId.replace(/\D/g,'') + 'F';
+    if (getEl('f16-emp-pan')) getEl('f16-emp-pan').textContent = p.empName.substring(0, 4).toUpperCase() + 'E' + p.empId.replace(/\D/g, '') + 'F';
     if (getEl('f16-emp-id')) getEl('f16-emp-id').textContent = p.empId;
     if (getEl('f16-emp-designation')) getEl('f16-emp-designation').textContent = emp ? emp.role : 'Professional';
-    
+
     if (getEl('f16-fy')) getEl('f16-fy').textContent = p.financialYear.replace('FY ', '');
     const fyYears = p.financialYear.replace('FY ', '').split('-');
     const aySecond = fyYears[1] ? (parseInt(fyYears[1]) + 1) + '' : '27';
     if (getEl('f16-ay')) getEl('f16-ay').textContent = `20${fyYears[1]}-${aySecond}`.replace('20202', '2026');
     if (getEl('f16-period')) getEl('f16-period').textContent = `01-Apr-${fyYears[0]} to 31-Mar-${fyYears[1] ? '20' + fyYears[1] : '2026'}`;
-    
+
     const formattedDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     if (getEl('f16-current-date')) getEl('f16-current-date').textContent = formattedDate;
     if (getEl('f16-current-date-final')) getEl('f16-current-date-final').textContent = formattedDate;
@@ -1881,27 +2042,27 @@ window.showForm16 = function(empId, month) {
     const exempt10_val = (f16 && f16.exempt10) ? f16.exempt10 : Math.round(grossVal * 0.1);
     const stdDed_val = (f16 && f16.stdDed) ? f16.stdDed : 50000;
     const chaper6A_val = (f16 && f16.chapter6A) ? f16.chapter6A : 150000;
-    
+
     if (getEl('f16-gross-salary')) getEl('f16-gross-salary').textContent = `₹${grossVal.toLocaleString()}`;
     if (getEl('f16-sec17-1')) getEl('f16-sec17-1').textContent = `₹${sec17_1_val.toLocaleString()}`;
     if (getEl('f16-sec17-2')) getEl('f16-sec17-2').textContent = `₹${sec17_2_val.toLocaleString()}`;
     if (getEl('f16-sec17-3')) getEl('f16-sec17-3').textContent = `₹${sec17_3_val.toLocaleString()}`;
     if (getEl('f16-exempt-10')) getEl('f16-exempt-10').textContent = `₹${exempt10_val.toLocaleString()}`;
-    
+
     const totalSal = sec17_1_val + sec17_2_val + sec17_3_val - exempt10_val;
     if (getEl('f16-total-salary')) getEl('f16-total-salary').textContent = `₹${totalSal.toLocaleString()}`;
-    
+
     const taxableSal = totalSal - stdDed_val;
     if (getEl('f16-taxable-salary')) getEl('f16-taxable-salary').textContent = `₹${taxableSal.toLocaleString()}`;
     if (getEl('f16-chapter-via')) getEl('f16-chapter-via').textContent = `₹${chaper6A_val.toLocaleString()}`;
-    
+
     const finalTaxable = Math.max(0, taxableSal - chaper6A_val);
     if (getEl('f16-total-taxable-income')) getEl('f16-total-taxable-income').textContent = `₹${finalTaxable.toLocaleString()}`;
-    
+
     // Tax simple simulation
     const taxPayable = Math.round(finalTaxable * 0.05);
     if (getEl('f16-tax-payable')) getEl('f16-tax-payable').textContent = `₹${taxPayable.toLocaleString()}`;
-    
+
     // Using total TDS as subtracted
     const totalTDS = (f16 && f16.challans) ? f16.challans.reduce((a, b) => a + b.amt, 0) : p.tds;
     const netPayable = taxPayable - totalTDS;
@@ -1915,7 +2076,7 @@ window.showForm16 = function(empId, month) {
 };
 
 
-window.showPayrollDetails = function(empId, month) {
+window.showPayrollDetails = function (empId, month) {
     const p = payrolls.find(x => x.empId === empId && x.month === month);
     if (!p) return;
 
@@ -1926,26 +2087,26 @@ window.showPayrollDetails = function(empId, month) {
         mfEl.textContent = `${p.month} | ${p.financialYear}`;
         mfEl.setAttribute('data-month', p.month);
     }
-    
+
     getEl('pd-basic').textContent = `₹${p.basic.toLocaleString()}`;
     getEl('pd-allow').textContent = `₹${p.allowances.toLocaleString()}`;
     getEl('pd-bonus').textContent = `₹${p.bonus.toLocaleString()}`;
     getEl('pd-gross').textContent = `₹${p.gross.toLocaleString()}`;
-    
+
     getEl('pd-tds').textContent = `₹${p.tds.toLocaleString()}`;
     getEl('pd-other-ded').textContent = `₹${p.otherDeductions.toLocaleString()}`;
     getEl('pd-total-ded').textContent = `₹${p.totalDeductions.toLocaleString()}`;
-    
+
     getEl('pd-net').textContent = `₹${p.net.toLocaleString()}`;
 
     getEl('payroll-detail-modal')?.classList.remove('hidden');
 };
 
-window.closePayrollDetailModal = function() {
+window.closePayrollDetailModal = function () {
     getEl('payroll-detail-modal')?.classList.add('hidden');
 };
 
-window.showPayslip = function(empId, month) {
+window.showPayslip = function (empId, month) {
     let p = payrolls.find(x => x.empId === empId && x.month === month);
     const emp = employees.find(x => x.id === empId);
 
@@ -1960,7 +2121,7 @@ window.showPayslip = function(empId, month) {
             empRole: emp.role,
             month: month.split(' | ')[0],
             financialYear: month.split(' | ')[1] || 'FY 2025-26',
-            dateFormatted: '01-' + (month.split(' ')[0].substring(0,3)) + '-2026',
+            dateFormatted: '01-' + (month.split(' ')[0].substring(0, 3)) + '-2026',
             ...breakdown
         };
     }
@@ -1997,7 +2158,7 @@ window.showPayslip = function(empId, month) {
     if (iframe) {
         iframe.src = 'payslip.html?t=' + Date.now();
     }
-    
+
     getEl('payslip-modal')?.classList.remove('hidden');
     // Ensure scaling is applied after the modal is visible and layout is calculated
     setTimeout(window.autoScalePayslip, 50);
@@ -2011,40 +2172,35 @@ window.showPayslip = function(empId, month) {
  * Unified Document Scaling Engine
  * STRICT 2px padding (4px total buffer)
  */
-window.autoScaleViewer = function(containerId, modalId) {
+window.autoScaleViewer = function (containerId, modalId) {
     const modal = document.getElementById(modalId);
-    const root = modal?.querySelector('.clean-preview-root');
+    const body = modal?.querySelector('.preview-modal-body');
     const container = document.getElementById(containerId);
     const modalWindow = modal?.querySelector('.preview-modal-window');
-    
-    if (!root || !container || !modalWindow) return;
 
-    // 'Breathing Room' Buffer: ensures document is comfortably 'reduced' in size
-    const margin = 8; 
-    const availableW = root.getBoundingClientRect().width - (margin * 2);
-    const availableH = root.getBoundingClientRect().height - (margin * 2);
-    
-    // Dynamic Document Dimensions: detect natural size of content (card/frame)
-    const card = container.querySelector('.clean-document-frame');
-    
-    // Fallback logic for hidden elements or slow rendering
-    const docW = card?.offsetWidth || 800; 
-    const docH = card?.offsetHeight || 900; 
-    
+    if (!body || !container || !modalWindow) return;
+
+    // Use the modal body as the viewport reference
+    const availableW = body.offsetWidth - 40;
+    const availableH = body.offsetHeight - 40;
+
+    // A4 Dimensions: 210mm x 297mm (approx 794px x 1123px at 96dpi)
+    const docW = 794; 
+    const docH = 1123;
+
     // Scaling ratio logic: ensure full visibility without scroll
-    // Multiply available height by 0.95 to give a small safety buffer
-    let scale = Math.min(availableW / docW, (availableH * 0.95) / docH);
-    
+    let scale = Math.min(availableW / docW, availableH / docH);
+
     // Safety Fallback: Don't let it get microscopically small or over-scale
-    scale = Math.min(Math.max(scale, 0.4), 1.0);
-    
-    // Apply transform and ensure it's centered in its own layout box
+    scale = Math.min(Math.max(scale, 0.3), 1.0);
+
+    // Apply transform and ensure it's centered
     container.style.transform = `scale(${scale})`;
     container.style.transformOrigin = 'center center';
 
-    // Tight-fit Modal Width: ensure the modal isn't unnecessarily wide
-    const tightWidth = Math.floor(docW * scale) + 40;
-    modalWindow.style.width = `min(90vw, ${tightWidth}px)`;
+    // Tight-fit Modal Width for visual balance
+    const tightWidth = Math.floor(docW * scale) + 60;
+    modalWindow.style.width = `min(95vw, ${tightWidth}px)`;
 };
 
 // Global Resize Listener for all Previews
@@ -2058,23 +2214,23 @@ window.addEventListener('resize', () => {
     });
 });
 
-window.printPayslipIframe = function() {
+window.printPayslip = function () {
     const iframe = getEl('payslip-iframe');
     if (iframe && iframe.contentWindow) {
         iframe.contentWindow.print();
     }
 };
 
-window.closePayslipModal = function() {
+window.closePayslipModal = function () {
     getEl('payslip-modal')?.classList.add('hidden');
 };
 
-window.applyTheme = function(theme, persist = false) {
+window.applyTheme = function (theme, persist = false) {
     document.documentElement.setAttribute('data-theme', theme);
     if (persist) {
         localStorage.setItem('pps-theme', theme);
     }
-    
+
     // Update theme icons in top bar
     const sun = document.getElementById('icon-sun');
     const moon = document.getElementById('icon-moon');
@@ -2082,14 +2238,14 @@ window.applyTheme = function(theme, persist = false) {
         sun.style.display = theme === 'dark' ? 'block' : 'none';
         moon.style.display = theme === 'dark' ? 'none' : 'block';
     }
-    
+
     // Update active state in settings buttons
     document.querySelectorAll('[id^="settings-theme-"]').forEach(btn => {
         btn.classList.toggle('active', btn.id === `settings-theme-${theme}`);
     });
 };
 
-window.setTheme = function(theme, event = null) {
+window.setTheme = function (theme, event = null) {
     // --- Premium Circular Clip-Path Animation via View Transitions API ---
     const isDark = theme === 'dark';
     const isReverse = !isDark; // light = reverse animation
@@ -2149,7 +2305,7 @@ window.setTheme = function(theme, event = null) {
 
         transition.finished.then(() => {
             document.documentElement.classList.remove('theme-transitioning-reverse');
-        }).catch(() => {});
+        }).catch(() => { });
 
     } else {
         // Fallback for browsers without View Transitions API
@@ -2161,7 +2317,7 @@ window.setTheme = function(theme, event = null) {
     }
 };
 
-window.savePreferences = function() {
+window.savePreferences = function () {
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
     localStorage.setItem('pps-theme', currentTheme);
     if (window.showToast) {
@@ -2172,11 +2328,11 @@ window.savePreferences = function() {
 };
 
 // Initialize app always in light mode for the landing page
-(function() { 
-    window.applyTheme('light', false); 
+(function () {
+    window.applyTheme('light', false);
 })();
 
-window.initPayrollChart = function() {
+window.initPayrollChart = function () {
     const canvas = document.getElementById('payrollChart');
     if (!canvas || !window.Chart) return;
     if (window.payrollChart) window.payrollChart.destroy();
@@ -2203,16 +2359,16 @@ window.initPayrollChart = function() {
 };
 
 // --- Employee Data Management & Persistence ---
-window.saveEmployees = function() {
+window.saveEmployees = function () {
     localStorage.setItem('pps-employees', JSON.stringify(employees));
     window.refreshAllTables();
     window.updateDashboardStats();
 };
 
-window.renderEmployeeDashboard = function() {
+window.renderEmployeeDashboard = function () {
     const userRole = localStorage.getItem('pps-role');
     const userEmail = localStorage.getItem('pps-user');
-    
+
     // Safety check - if not an employee, redirect or clear
     if (userRole !== 'employee') return;
 
@@ -2224,7 +2380,7 @@ window.renderEmployeeDashboard = function() {
     window.renderEmployeePayslipsTable(emp.id);
 };
 
-window.renderEmployeePayslipsTable = function(empId) {
+window.renderEmployeePayslipsTable = function (empId) {
     const tbody = getEl('employee-payslip-body');
     if (!tbody) return;
 
@@ -2257,7 +2413,7 @@ window.renderEmployeePayslipsTable = function(empId) {
     });
 };
 
-window.loadEmployees = function() {
+window.loadEmployees = function () {
     console.log('Loading Employees...');
     const saved = localStorage.getItem('pps-employees');
     if (saved) {
@@ -2266,10 +2422,25 @@ window.loadEmployees = function() {
         // Migration: ensure tasks and attendance fields exist
         employees.forEach(emp => {
             const def = defaultEmployees.find(d => d.id === emp.id) || defaultEmployees[0];
-            
-            if (emp.assignedTasks === undefined) emp.assignedTasks = def.assignedTasks;
-            if (emp.completedTasks === undefined) emp.completedTasks = def.completedTasks;
-            
+
+            if (emp.assignedTasks === undefined) emp.assignedTasks = def.assignedTasks || 5;
+            if (emp.completedTasks === undefined) emp.completedTasks = def.completedTasks || 0;
+
+            // Generate TaskList dynamically if not present
+            if (!emp.taskList) {
+                emp.taskList = [];
+                const pendingCount = Math.max(0, emp.assignedTasks - emp.completedTasks);
+                // Create mock tasks
+                for (let i = 0; i < pendingCount; i++) {
+                    emp.taskList.push({
+                        id: 'TASK_' + emp.id + '_' + i,
+                        title: 'Pending Task #' + (i + 1) + ' for ' + emp.name,
+                        completed: false,
+                        priority: ['High', 'Medium', 'Low'][i % 3]
+                    });
+                }
+            }
+
             // Attendance fields migration
             if (emp.present === undefined) emp.present = def.present || 22;
             if (emp.absent === undefined) emp.absent = def.absent || 0;
@@ -2303,7 +2474,7 @@ window.loadEmployees = function() {
         localStorage.setItem('pps-employees', JSON.stringify(employees));
     }
     console.log(`Final employee count: ${employees.length}`);
-    
+
     // Load Leave Types
     const savedLeaveTypes = localStorage.getItem('pps-leave-types');
     if (savedLeaveTypes) {
@@ -2317,21 +2488,44 @@ window.loadEmployees = function() {
         ];
         localStorage.setItem('pps-leave-types', JSON.stringify(leaveTypes));
     }
-    
+
     // Load Leave Requests
     const savedLeaveRequests = localStorage.getItem('pps-leave-requests');
     if (savedLeaveRequests) {
         leaveRequests = JSON.parse(savedLeaveRequests);
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const hasCurrentMonthLeaves = leaveRequests.some(r => {
+            const sd = new Date(r.start_date || r.startDate);
+            return sd.getMonth() === currentMonth;
+        });
+        if (!hasCurrentMonthLeaves) {
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            leaveRequests.push(
+                { id: 'LR-D1', employee_id: 'PPS001', leave_type: 'Sick Leave', start_date: `${y}-${m}-04`, end_date: `${y}-${m}-05`, reason: 'Fever', status: 'Pending', created_at: `${y}-${m}-01` },
+                { id: 'LR-D2', employee_id: 'PPS003', leave_type: 'Casual Leave', start_date: `${y}-${m}-12`, end_date: `${y}-${m}-13`, reason: 'Personal', status: 'Approved', created_at: `${y}-${m}-10` },
+                { id: 'LR-D3', employee_id: 'PPS005', leave_type: 'Privilege Leave', start_date: `${y}-${m}-20`, end_date: `${y}-${m}-22`, reason: 'Travel', status: 'Rejected', created_at: `${y}-${m}-15` },
+                { id: 'LR-D4', employee_id: 'PPS007', leave_type: 'Sick Leave', start_date: `${y}-${m}-14`, end_date: `${y}-${m}-15`, reason: 'Urgent Work', status: 'Approved', created_at: `${y}-${m}-11` }
+            );
+            localStorage.setItem('pps-leave-requests', JSON.stringify(leaveRequests));
+        }
     } else {
+        const today = new Date();
+        const year = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const prevM = String(today.getMonth() === 0 ? 12 : today.getMonth()).padStart(2, '0');
+        const prevY = today.getMonth() === 0 ? year - 1 : year;
+
         leaveRequests = [
-            { id: 'LR001', employee_id: 'PPS001', leave_type: 'Sick Leave', start_date: '2026-03-10', end_date: '2026-03-12', reason: 'Fever and cold', status: 'Pending', created_at: '2026-03-09' },
-            { id: 'LR002', employee_id: 'PPS003', leave_type: 'Casual Leave', start_date: '2026-03-15', end_date: '2026-03-15', reason: 'Personal work', status: 'Approved', created_at: '2026-03-13' },
-            { id: 'LR003', employee_id: 'PPS005', leave_type: 'Privilege Leave', start_date: '2026-03-20', end_date: '2026-03-22', reason: 'Family vacation', status: 'Rejected', created_at: '2026-03-18' },
-            { id: 'LR004', employee_id: 'PPS007', leave_type: 'Sick Leave', start_date: '2026-03-05', end_date: '2026-03-06', reason: 'Medical appointment', status: 'Approved', created_at: '2026-03-04' },
-            { id: 'LR005', employee_id: 'PPS010', leave_type: 'Casual Leave', start_date: '2026-03-25', end_date: '2026-03-26', reason: 'Wedding ceremony', status: 'Pending', created_at: '2026-03-22' },
-            { id: 'LR006', employee_id: 'PPS014', leave_type: 'Loss of Pay', start_date: '2026-03-18', end_date: '2026-03-19', reason: 'Visa appointment', status: 'Approved', created_at: '2026-03-16' },
-            { id: 'LR007', employee_id: 'PPS016', leave_type: 'Casual Leave', start_date: '2026-03-28', end_date: '2026-03-29', reason: 'Visiting hometown', status: 'Pending', created_at: '2026-03-20' },
-            { id: 'LR008', employee_id: 'PPS017', leave_type: 'Sick Leave', start_date: '2026-03-26', end_date: '2026-03-26', reason: 'Severe headache', status: 'Pending', created_at: '2026-03-24' }
+            { id: 'LR001', employee_id: 'PPS001', leave_type: 'Sick Leave', start_date: `${year}-${m}-10`, end_date: `${year}-${m}-12`, reason: 'Fever and cold', status: 'Pending', created_at: `${year}-${m}-09` },
+            { id: 'LR002', employee_id: 'PPS003', leave_type: 'Casual Leave', start_date: `${year}-${m}-15`, end_date: `${year}-${m}-15`, reason: 'Personal work', status: 'Approved', created_at: `${year}-${m}-13` },
+            { id: 'LR003', employee_id: 'PPS005', leave_type: 'Privilege Leave', start_date: `${year}-${m}-20`, end_date: `${year}-${m}-22`, reason: 'Family vacation', status: 'Rejected', created_at: `${year}-${m}-18` },
+            { id: 'LR004', employee_id: 'PPS007', employee_id: 'PPS007', leave_type: 'Sick Leave', start_date: `${year}-${m}-05`, end_date: `${year}-${m}-06`, reason: 'Medical appointment', status: 'Approved', created_at: `${year}-${m}-04` },
+            { id: 'LR005', employee_id: 'PPS010', leave_type: 'Casual Leave', start_date: `${year}-${m}-25`, end_date: `${year}-${m}-26`, reason: 'Wedding ceremony', status: 'Pending', created_at: `${year}-${m}-22` },
+            { id: 'LR006', employee_id: 'PPS014', leave_type: 'Loss of Pay', start_date: `${prevY}-${prevM}-18`, end_date: `${prevY}-${prevM}-19`, reason: 'Visa appointment', status: 'Approved', created_at: `${prevY}-${prevM}-16` },
+            { id: 'LR007', employee_id: 'PPS016', leave_type: 'Casual Leave', start_date: `${year}-${m}-28`, end_date: `${year}-${m}-29`, reason: 'Visiting hometown', status: 'Pending', created_at: `${year}-${m}-20` },
+            { id: 'LR008', employee_id: 'PPS017', leave_type: 'Sick Leave', start_date: `${year}-${m}-26`, end_date: `${year}-${m}-26`, reason: 'Severe headache', status: 'Pending', created_at: `${year}-${m}-24` }
         ];
         localStorage.setItem('pps-leave-requests', JSON.stringify(leaveRequests));
     }
@@ -2345,7 +2539,7 @@ window.loadEmployees = function() {
     if (window.updatePayrollAnalytics) window.updatePayrollAnalytics();
 };
 
-window.loadBonusesDeductions = function() {
+window.loadBonusesDeductions = function () {
     const saved = localStorage.getItem('pps-bonuses-deductions');
     if (saved) {
         bonusesDeductions = JSON.parse(saved);
@@ -2364,7 +2558,7 @@ window.loadBonusesDeductions = function() {
     }
 };
 
-window.saveBonusesDeductions = function() {
+window.saveBonusesDeductions = function () {
     localStorage.setItem('pps-bonuses-deductions', JSON.stringify(bonusesDeductions));
 };
 
@@ -2399,7 +2593,7 @@ function initBonusesDeductionsModule() {
             const category = getEl('bd-category-select').value;
             const title = getEl('bd-title').value;
             const amount = parseFloat(getEl('bd-amount').value);
-            
+
             // Combine Split Selects
             const m = getEl('bd-month-select').value;
             const y = getEl('bd-year-select').value;
@@ -2427,7 +2621,7 @@ function initBonusesDeductionsModule() {
     bdInitialized = true;
 }
 
-window.saveLeaveData = function() {
+window.saveLeaveData = function () {
     localStorage.setItem('pps-leave-types', JSON.stringify(leaveTypes));
     localStorage.setItem('pps-leave-requests', JSON.stringify(leaveRequests));
     window.renderAdminLeaveTypes?.();
@@ -2437,7 +2631,7 @@ window.saveLeaveData = function() {
 };
 
 
-window.refreshAllTables = function() {
+window.refreshAllTables = function () {
     window.renderEmployeeTable();
     window.renderAttendanceTable();
 };
@@ -2533,7 +2727,7 @@ function renderAttendanceTable(filterData = employees) {
         const deduction = calculateDeductionForMonth(emp, currentSalaryType, currentAttMonth);
         const grossSalary = currentSalaryType === 'monthly' ? emp.monthlySalary : (emp.dailyWage * att.totalWorking);
         const netSalary = grossSalary - deduction;
-        
+
         const tr = document.createElement('tr');
         tr.className = 'emp-att-row';
         tr.innerHTML = `
@@ -2563,7 +2757,7 @@ function renderAttendanceTable(filterData = employees) {
 function calculateAttPercentage(emp) { return calculateAttPercentageForMonth(emp, ''); }
 function calculateEstimatedDeduction(emp, type) { return calculateDeductionForMonth(emp, type, ''); }
 
-window.showAttendanceDetailModal = function(id) {
+window.showAttendanceDetailModal = function (id) {
     const emp = employees.find(e => e.id === id);
     if (!emp) return;
 
@@ -2603,7 +2797,7 @@ window.showAttendanceDetailModal = function(id) {
     const reasonList = getEl('att-modal-reason');
     const protectedList = getEl('att-modal-protected');
     const perDay = currentSalaryType === 'monthly' ? (emp.monthlySalary / att.totalWorking) : emp.dailyWage;
-    
+
     // Deducted items
     let reasonsHTML = '';
     if (att.absent > 0) reasonsHTML += `<li class="flex-between"><span>${att.absent} Full Day Absent</span> <span class="text-red">-₹${Math.round(att.absent * perDay).toLocaleString()}</span></li>`;
@@ -2623,12 +2817,12 @@ window.showAttendanceDetailModal = function(id) {
     modal.classList.remove('hidden');
 };
 
-window.closeAttendanceModal = function() {
+window.closeAttendanceModal = function () {
     const modal = getEl('attendance-detail-modal');
     if (modal) modal.classList.add('hidden');
 };
 
-window.showCTCBreakdown = function(empId) {
+window.showCTCBreakdown = function (empId) {
     const emp = employees.find(e => e.id === empId);
     if (!emp) return;
 
@@ -2638,11 +2832,11 @@ window.showCTCBreakdown = function(empId) {
     // --- DETAILED CALCULATION ENGINE ---
     const annualCTC = emp.ctc;
     const monthlyCTC = Math.round(annualCTC / 12);
-    
+
     // Employer Contributions (e.g., PF) are part of CTC but not Gross
-    const monthlyEmployerPF = Math.min(Math.round(monthlyCTC * 0.5 * 0.12), 1800); 
+    const monthlyEmployerPF = Math.min(Math.round(monthlyCTC * 0.5 * 0.12), 1800);
     const monthlyGross = monthlyCTC - monthlyEmployerPF;
-    
+
     // Earnings breakdown from Gross
     const basic = Math.round(monthlyGross * 0.5);
     const hra = Math.round(basic * 0.4);
@@ -2650,7 +2844,7 @@ window.showCTCBreakdown = function(empId) {
     const cca = 2000;
     const bonus = Math.round(monthlyGross * 0.0833); // approx 1 month salary as annual bonus
     const specialAllowance = monthlyGross - basic - hra - conveyance - cca - bonus;
-    
+
     // Deductions
     const employeePF = monthlyEmployerPF; // Typically matches
     const pt = 200;
@@ -2667,11 +2861,11 @@ window.showCTCBreakdown = function(empId) {
         { name: 'Special Allowance', type: 'Earning', m: specialAllowance, y: specialAllowance * 12 },
         { name: 'Performance Bonus (Monthly Prov.)', type: 'Earning', m: bonus, y: bonus * 12 },
         { name: 'Employer PF Contribution', type: 'Earning', m: monthlyEmployerPF, y: monthlyEmployerPF * 12 },
-        
+
         { title: 'Deductions & Statutory', type: 'head' },
         { name: 'Employee PF Contribution', type: 'Deduction', m: employeePF, y: employeePF * 12 },
         { name: 'Professional Tax (PT)', type: 'Deduction', m: pt, y: pt * 12 },
-        
+
         { title: 'Summary (Net & Cost)', type: 'head' },
         { name: 'Gross Salary', type: 'Total', m: monthlyGross, y: monthlyGross * 12, class: 'ctc-row-total' },
         { name: 'Total Deductions', type: 'Total', m: totalDeductions, y: totalDeductions * 12, class: 'text-red font-bold' },
@@ -2690,10 +2884,10 @@ window.showCTCBreakdown = function(empId) {
             if (row.type === 'head') {
                 return `<tr class="ctc-section-header"><td colspan="4">${row.title}</td></tr>`;
             }
-            
+
             const badgeClass = row.type === 'Earning' ? 'badge-earning' : (row.type === 'Deduction' ? 'badge-deduction' : '');
             const typeHtml = badgeClass ? `<span class="ctc-type-badge ${badgeClass}">${row.type}</span>` : `<span class="font-bold">${row.type}</span>`;
-            
+
             return `
                 <tr class="${row.class || ''}">
                     <td>${row.name}</td>
@@ -2710,17 +2904,17 @@ window.showCTCBreakdown = function(empId) {
     setTimeout(() => window.autoScaleViewer('ctc-scaling-container', 'ctc-breakdown-modal'), 50);
 };
 
-window.closeCTCBreakdownModal = function() {
+window.closeCTCBreakdownModal = function () {
     const modal = getEl('ctc-breakdown-modal');
     if (modal) modal.classList.add('hidden');
 };
 
 // --- PDF Export Logic ---
-window.downloadCTCAsPDF = function() {
+window.downloadCTCAsPDF = function () {
     const element = document.querySelector('.ctc-card');
     const empName = getEl('ctc-modal-name')?.textContent || 'Employee';
     const logoImg = element?.querySelector('.ctc-branding-header img');
-    
+
     if (!element) {
         showToast('Error: Document not found', 'error');
         return;
@@ -2728,11 +2922,11 @@ window.downloadCTCAsPDF = function() {
 
     // High-Resolution Export Options
     const opt = {
-        margin:       [0.5, 0.5],
-        filename:     `CTC_Breakdown_${empName.replace(/\s+/g, '_')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+        margin: [0.5, 0.5],
+        filename: `CTC_Breakdown_${empName.replace(/\s+/g, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
 
     // Show loading state
@@ -2817,7 +3011,7 @@ function initAttendanceModule() {
             data.sort((a, b) => {
                 if (sortVal === 'id-asc') return a.id.localeCompare(b.id, undefined, { numeric: true });
                 if (sortVal === 'id-desc') return b.id.localeCompare(a.id, undefined, { numeric: true });
-                
+
                 if (sortVal.startsWith('att-')) {
                     const pctA = calculateAttPercentageForMonth(a, currentMonth);
                     const pctB = calculateAttPercentageForMonth(b, currentMonth);
@@ -3023,7 +3217,7 @@ function initAttendanceModule() {
 
 // Ensure it initializes when dashboard is shown or view switched
 const originalShowView = window.showView;
-window.showView = function(viewId) {
+window.showView = function (viewId) {
     originalShowView(viewId);
     if (viewId === 'admin-attendance') {
         initAttendanceModule();
@@ -3045,9 +3239,10 @@ function initAdminLeaveModule() {
     if (adminLeaveInitialized) {
         window.renderAdminLeaveTypes();
         window.renderAdminLeaveRequests();
+        window.renderAdminLeaveCalendar();
         return;
     }
-    
+
     // Setup Leave Type Form
     const typeForm = getEl('leave-type-form');
     if (typeForm) {
@@ -3059,7 +3254,7 @@ function initAdminLeaveModule() {
             const category = getEl('leave-type-category').value;
             const description = getEl('leave-type-desc').value;
             const isPaid = category === 'Paid';
-            
+
             if (idInput) {
                 const type = leaveTypes.find(t => t.id === idInput);
                 if (type) {
@@ -3072,7 +3267,7 @@ function initAdminLeaveModule() {
                 const newId = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
                 leaveTypes.push({ id: newId, name, code, isPaid, description });
             }
-            
+
             window.saveLeaveData();
             window.closeLeaveTypeModal();
         });
@@ -3084,28 +3279,28 @@ function initAdminLeaveModule() {
     adminLeaveInitialized = true;
 }
 
-window.renderAdminLeaveCalendar = function() {
+window.renderAdminLeaveCalendar = function () {
     const container = getEl('admin-leave-calendar-container');
     if (!container) return;
-    
+
     container.innerHTML = '';
-    
+
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    
+
     // Add Days of week headers
     const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     daysOfWeek.forEach(d => {
         container.innerHTML += `<div class="text-xs font-bold text-muted p-1">${d}</div>`;
     });
-    
+
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    for(let i=0; i<firstDay; i++) {
+    for (let i = 0; i < firstDay; i++) {
         container.innerHTML += `<div class="p-2"></div>`;
     }
-    
+
     // Filter ALL leaves for this month (not just approved)
     const monthLeaves = leaveRequests.filter(req => {
         const startDate = req.start_date || req.startDate;
@@ -3114,18 +3309,18 @@ window.renderAdminLeaveCalendar = function() {
         const ed = new Date(endDate);
         return (sd.getMonth() === currentMonth || ed.getMonth() === currentMonth);
     });
-    
+
     const statusColors = {
-        'Approved': { bg: 'rgba(34,197,94,0.15)', text: '#16a34a', border: '#22c55e' },
-        'Pending': { bg: 'rgba(245,158,11,0.15)', text: '#d97706', border: '#f59e0b' },
-        'Rejected': { bg: 'rgba(239,68,68,0.12)', text: '#dc2626', border: '#ef4444' }
+        'Approved': { bg: '#22c55e', text: '#ffffff', border: '#16a34a' },
+        'Pending': { bg: '#f59e0b', text: '#ffffff', border: '#d97706' },
+        'Rejected': { bg: '#ef4444', text: '#ffffff', border: '#dc2626' }
     };
-    
+
     for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const currentDate = new Date(dateStr);
         let leavesOnDay = [];
-        
+
         monthLeaves.forEach(req => {
             const startDate = req.start_date || req.startDate;
             const endDate = req.end_date || req.endDate;
@@ -3138,12 +3333,12 @@ window.renderAdminLeaveCalendar = function() {
                 if (emp) leavesOnDay.push({ name: emp.name, status: req.status, leaveType });
             }
         });
-        
+
         const isToday = day === today.getDate() && currentMonth === today.getMonth();
         let cellContent = `<div class="p-2 border rounded" style="min-height: 70px; display: flex; flex-direction: column; gap: 4px; ${isToday ? 'border-color: var(--primary); background: rgba(59,130,246,0.06);' : ''}">
             <div class="text-right text-xs font-bold ${isToday ? 'text-blue' : 'text-muted'}">${day}</div>
             <div style="display: flex; flex-direction: column; gap: 3px;">`;
-            
+
         leavesOnDay.forEach(l => {
             const col = statusColors[l.status] || statusColors['Pending'];
             const firstName = l.name.split(' ')[0];
@@ -3152,16 +3347,16 @@ window.renderAdminLeaveCalendar = function() {
                                  ${firstName}
                             </div>`;
         });
-        
+
         cellContent += `</div></div>`;
         container.innerHTML += cellContent;
     }
 };
 
-window.renderAdminLeaveTypes = function() {
+window.renderAdminLeaveTypes = function () {
     const tbody = getEl('admin-leave-types-body');
     if (!tbody) return;
-    
+
     if (leaveTypes.length === 0) {
         tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-muted">No leave types found.</td></tr>`;
         return;
@@ -3189,11 +3384,11 @@ window.renderAdminLeaveTypes = function() {
     });
 };
 
-window.showAddLeaveRequestModal = function() {
+window.showAddLeaveRequestModal = function () {
     // Build employee select options
     const empOptions = employees.map(e => `<option value="${e.id}">${e.name} (${e.id})</option>`).join('');
     const typeOptions = leaveTypes.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-    
+
     // Create modal dynamically
     let modal = getEl('add-leave-request-modal');
     if (!modal) {
@@ -3242,13 +3437,13 @@ window.showAddLeaveRequestModal = function() {
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
 };
 
-window.submitLeaveRequest = function() {
+window.submitLeaveRequest = function () {
     const empId = getEl('lr-employee')?.value;
     const leaveType = getEl('lr-type')?.value;
     const startDate = getEl('lr-start')?.value;
     const endDate = getEl('lr-end')?.value;
     const reason = getEl('lr-reason')?.value || '';
-    
+
     if (!empId || !leaveType || !startDate || !endDate) {
         alert('Please fill all required fields.');
         return;
@@ -3257,7 +3452,7 @@ window.submitLeaveRequest = function() {
         alert('End date cannot be before start date.');
         return;
     }
-    
+
     const newReq = {
         id: 'LR' + Date.now(),
         employee_id: empId,
@@ -3268,7 +3463,7 @@ window.submitLeaveRequest = function() {
         status: 'Pending',
         created_at: new Date().toISOString().split('T')[0]
     };
-    
+
     leaveRequests.push(newReq);
     window.saveLeaveData();
     getEl('add-leave-request-modal')?.classList.add('hidden');
@@ -3276,13 +3471,13 @@ window.submitLeaveRequest = function() {
     alert('Leave request submitted successfully!');
 };
 
-window.showAddLeaveTypeModal = function(id = null) {
+window.showAddLeaveTypeModal = function (id = null) {
     const modal = getEl('leave-type-modal');
     if (!modal) return;
-    
+
     const form = getEl('leave-type-form');
     if (form) form.reset();
-    
+
     if (id) {
         const type = leaveTypes.find(t => t.id === id);
         if (type) {
@@ -3300,25 +3495,25 @@ window.showAddLeaveTypeModal = function(id = null) {
         getEl('leave-type-id-display').textContent = newId;
         getEl('edit-leave-type-id').value = '';
     }
-    
+
     modal.classList.remove('hidden');
 };
 
-window.closeLeaveTypeModal = function() {
+window.closeLeaveTypeModal = function () {
     getEl('leave-type-modal')?.classList.add('hidden');
 };
 
-window.deleteLeaveType = function(id) {
-    if(confirm('Are you sure you want to delete this leave type? Past requests will not be affected.')) {
+window.deleteLeaveType = function (id) {
+    if (confirm('Are you sure you want to delete this leave type? Past requests will not be affected.')) {
         leaveTypes = leaveTypes.filter(t => t.id !== id);
         window.saveLeaveData();
     }
 };
 
-window.renderAdminLeaveRequests = function() {
+window.renderAdminLeaveRequests = function () {
     const tbody = getEl('admin-leave-requests-body');
     if (!tbody) return;
-    
+
     // Sort logic (Pending first, then by date descending)
     const sorted = [...leaveRequests].sort((a, b) => {
         if (a.status === 'Pending' && b.status !== 'Pending') return -1;
@@ -3342,16 +3537,16 @@ window.renderAdminLeaveRequests = function() {
         const empId = req.employee_id || req.empId;
         const emp = employees.find(e => e.id === empId) || { name: 'Unknown', dept: '' };
         const leaveTypeName = req.leave_type || (leaveTypes.find(t => t.id === req.typeId)?.name || 'Unknown');
-        
+
         const startDate = req.start_date || req.startDate;
         const endDate = req.end_date || req.endDate;
         const sd = new Date(startDate);
         const ed = new Date(endDate);
         const days = Math.round((ed - sd) / (1000 * 60 * 60 * 24)) + 1;
-        
+
         const fmtDate = (d) => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
         const dateRange = days === 1 ? fmtDate(sd) : `${fmtDate(sd)} — ${fmtDate(ed)}`;
-        
+
         let statusBadge = '';
         if (req.status === 'Pending') statusBadge = '<span class="badge badge-orange">Pending</span>';
         else if (req.status === 'Approved') statusBadge = '<span class="badge badge-green">Approved</span>';
@@ -3382,7 +3577,7 @@ window.renderAdminLeaveRequests = function() {
     });
 };
 
-window.updateLeaveStatus = function(reqId, newStatus) {
+window.updateLeaveStatus = function (reqId, newStatus) {
     const req = leaveRequests.find(r => r.id === reqId);
     if (req) {
         req.status = newStatus;
@@ -3392,7 +3587,7 @@ window.updateLeaveStatus = function(reqId, newStatus) {
     }
 };
 
-window.renderBonusesDeductionsTable = function() {
+window.renderBonusesDeductionsTable = function () {
     const tbody = getEl('bd-table-body');
     if (!tbody) return;
 
@@ -3404,13 +3599,13 @@ window.renderBonusesDeductionsTable = function() {
         const matchesSearch = (item.empName || '').toLowerCase().includes(query) || (item.empId || '').toLowerCase().includes(query) || (item.title || '').toLowerCase().includes(query);
         const matchesType = type === 'all' || item.type === type;
         const matchesCat = cat === 'all' || item.category === cat;
-        
+
         const monthFilterVal = getEl('bd-month-select-filter')?.value || 'all';
         const yearFilterVal = getEl('bd-year-select-filter')?.value || 'all';
         const [itemYear, itemMonth] = item.effectiveMonth.split('-');
         const matchesMonth = monthFilterVal === 'all' || itemMonth === monthFilterVal;
         const matchesYear = yearFilterVal === 'all' || itemYear === yearFilterVal;
-        
+
         return matchesSearch && matchesType && matchesCat && matchesMonth && matchesYear;
     });
 
@@ -3430,7 +3625,7 @@ window.renderBonusesDeductionsTable = function() {
         const statusClass = item.status === 'Applied' ? 'badge-blue' : 'badge-orange';
         const emp = employees.find(e => e.id === item.empId) || {};
         const empEmail = (emp.email || 'N/A').toLowerCase();
-        
+
         tr.innerHTML = `
             <td>
                 <div class="font-bold text-sm" style="color: var(--text);">${item.empName}</div>
@@ -3462,7 +3657,7 @@ window.renderBonusesDeductionsTable = function() {
         // Apply has-scroll only if there are enough records to warrant it
         const shouldScroll = filtered.length > 5;
         scrollContainer.classList.toggle('has-scroll', shouldScroll);
-        
+
         // Ensure the inner table-container doesn't also scroll
         const innerTable = scrollContainer.querySelector('.table-container');
         if (innerTable) {
@@ -3473,7 +3668,7 @@ window.renderBonusesDeductionsTable = function() {
 
 };
 
-window.updateBonusesDeductionsMetrics = function(data) {
+window.updateBonusesDeductionsMetrics = function (data) {
     const totalBonus = data.filter(item => item.type === 'Bonus').reduce((sum, item) => sum + item.amount, 0);
     const totalDeduction = data.filter(item => item.type === 'Deduction').reduce((sum, item) => sum + item.amount, 0);
     const net = totalBonus - totalDeduction;
@@ -3489,7 +3684,7 @@ window.updateBonusesDeductionsMetrics = function(data) {
     }
 };
 
-window.showAddBonusDeductionModal = function(id = null) {
+window.showAddBonusDeductionModal = function (id = null) {
     const modal = getEl('bonus-deduction-modal');
     if (!modal) return;
 
@@ -3513,33 +3708,33 @@ window.showAddBonusDeductionModal = function(id = null) {
             getEl('bd-category-select').value = item.category || 'Other';
             getEl('bd-title').value = item.title;
             getEl('bd-amount').value = item.amount;
-            
+
             // Split Effective Month (YYYY-MM)
             const [year, month] = item.effectiveMonth.split('-');
             if (getEl('bd-month-select')) getEl('bd-month-select').value = month;
             if (getEl('bd-year-select')) getEl('bd-year-select').value = year;
-            
+
             getEl('bd-date').value = item.date;
         }
     } else {
         const now = new Date();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const year = String(now.getFullYear());
-        
+
         if (getEl('bd-month-select')) getEl('bd-month-select').value = month;
         if (getEl('bd-year-select')) getEl('bd-year-select').value = year;
-        
+
         getEl('bd-date').value = now.toISOString().split('T')[0];
     }
 
     modal.classList.remove('hidden');
 };
 
-window.closeBonusDeductionModal = function() {
+window.closeBonusDeductionModal = function () {
     getEl('bonus-deduction-modal')?.classList.add('hidden');
 };
 
-window.deleteBonusDeduction = function(id) {
+window.deleteBonusDeduction = function (id) {
     const item = bonusesDeductions.find(b => b.id === id);
     if (!item) return;
 
@@ -3589,7 +3784,7 @@ function initEmployeeLeaveModule() {
             const leaveTypeObj = leaveTypes.find(t => t.id === typeId) || { name: 'Unknown' };
             const appliedDate = new Date().toISOString().split('T')[0];
             const createdAt = new Date().toLocaleString();
-            
+
             leaveRequests.push({
                 id: newId,
                 empId: emp.id,
@@ -3617,7 +3812,7 @@ function initEmployeeLeaveModule() {
     employeeLeaveInitialized = true;
 }
 
-window.renderEmployeeLeaveBalance = function(empId) {
+window.renderEmployeeLeaveBalance = function (empId) {
     if (!empId) {
         const userEmail = localStorage.getItem('pps-user');
         const emp = employees.find(e => e.email === userEmail);
@@ -3626,7 +3821,7 @@ window.renderEmployeeLeaveBalance = function(empId) {
 
     const container = getEl('emp-leave-balance');
     if (!container) return;
-    
+
     // We only display Paid leave balance metrics for simplicity unless unpaid is requested
     const defaultLimits = {
         'Privilege Leave': 15,
@@ -3635,10 +3830,10 @@ window.renderEmployeeLeaveBalance = function(empId) {
     };
 
     container.innerHTML = '';
-    
+
     leaveTypes.filter(lt => lt.isPaid).forEach(lt => {
         const limit = defaultLimits[lt.name] || 15;
-        
+
         // Count approved days for this leave type for this employee in the current year
         const usedDays = leaveRequests.filter(req => req.empId === empId && req.typeId === lt.id && req.status === 'Approved').reduce((acc, req) => {
             const sd = new Date(req.startDate);
@@ -3662,17 +3857,17 @@ window.renderEmployeeLeaveBalance = function(empId) {
     });
 };
 
-window.renderEmployeeLeaveHistory = function(empId) {
+window.renderEmployeeLeaveHistory = function (empId) {
     if (!empId) {
         const userEmail = localStorage.getItem('pps-user');
         const emp = employees.find(e => e.email === userEmail);
         if (emp) empId = emp.id; else return;
     }
-    
+
     const tbody = getEl('emp-leave-history');
     if (!tbody) return;
 
-    const myReqs = leaveRequests.filter(r => r.empId === empId).sort((a,b) => new Date(b.appliedDate) - new Date(a.appliedDate));
+    const myReqs = leaveRequests.filter(r => r.empId === empId).sort((a, b) => new Date(b.appliedDate) - new Date(a.appliedDate));
 
     if (myReqs.length === 0) {
         tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-muted">No leave history found.</td></tr>`;
@@ -3682,14 +3877,14 @@ window.renderEmployeeLeaveHistory = function(empId) {
     tbody.innerHTML = '';
     myReqs.forEach(req => {
         const type = leaveTypes.find(t => t.id === req.typeId) || { name: 'Unknown', isPaid: true };
-        
+
         const sd = new Date(req.startDate);
         const ed = new Date(req.endDate);
         const days = Math.round((ed - sd) / (1000 * 60 * 60 * 24)) + 1;
-        
+
         // Format dates nicely
         const sStr = sd.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-        const eStr = ed.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year:'numeric' });
+        const eStr = ed.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
         let statusBadge = '';
         if (req.status === 'Pending') statusBadge = '<span class="badge badge-orange">Pending</span>';
@@ -3718,10 +3913,10 @@ window.renderEmployeeLeaveHistory = function(empId) {
     });
 };
 
-window.showApplyLeaveModal = function() {
+window.showApplyLeaveModal = function () {
     const modal = getEl('apply-leave-modal');
     if (!modal) return;
-    
+
     const form = getEl('apply-leave-form');
     if (form) form.reset();
 
@@ -3741,7 +3936,7 @@ window.showApplyLeaveModal = function() {
     // Auto-update end date min based on start date selection
     getEl('leave-start-date').addEventListener('change', (e) => {
         getEl('leave-end-date').setAttribute('min', e.target.value);
-        if(getEl('leave-end-date').value && getEl('leave-end-date').value < e.target.value) {
+        if (getEl('leave-end-date').value && getEl('leave-end-date').value < e.target.value) {
             getEl('leave-end-date').value = e.target.value;
         }
     });
@@ -3749,12 +3944,12 @@ window.showApplyLeaveModal = function() {
     modal.classList.remove('hidden');
 };
 
-window.closeApplyLeaveModal = function() {
+window.closeApplyLeaveModal = function () {
     getEl('apply-leave-modal')?.classList.add('hidden');
 };
 
 // --- Reports Module Logic ---
-window.initReportsModule = function() {
+window.initReportsModule = function () {
     const generateBtn = getEl('rep-generate-btn');
     const resetBtn = getEl('rep-reset-btn');
     const exportAllBtn = getEl('rep-export-all-btn');
@@ -3762,7 +3957,7 @@ window.initReportsModule = function() {
     const typeDropdownText = getEl('rep-dropdown-text');
     const monthSelect = getEl('rep-month-select');
     const yearSelect = getEl('rep-year-select');
-    
+
     // Custom Dropdown Logic
     const dropdown = getEl('rep-custom-dropdown');
     const dropdownBtn = getEl('rep-dropdown-btn');
@@ -3771,7 +3966,7 @@ window.initReportsModule = function() {
             e.stopPropagation();
             dropdown.classList.toggle('active');
         });
-        
+
         // Handle Item Selection
         dropdown.querySelectorAll('.submenu .dropdown-item').forEach(item => {
             item.addEventListener('click', (e) => {
@@ -3789,7 +3984,7 @@ window.initReportsModule = function() {
             }
         });
     }
-    
+
     // Generate Report Action
     if (generateBtn) {
         generateBtn.addEventListener('click', () => {
@@ -3813,7 +4008,7 @@ window.initReportsModule = function() {
             }
         });
     }
-    
+
     // Reset Filters Action
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
@@ -3822,7 +4017,7 @@ window.initReportsModule = function() {
             if (yearSelect) yearSelect.value = 'all';
             if (typeSelect) typeSelect.value = '';
             if (getEl('rep-dropdown-text')) getEl('rep-dropdown-text').textContent = 'Select Report Type';
-            
+
             // Hide table, show empty state
             getEl('rep-data-container')?.classList.add('hidden');
             getEl('rep-empty-state')?.classList.remove('hidden');
@@ -3839,7 +4034,7 @@ window.initReportsModule = function() {
             }
 
             let csvContent = "data:text/csv;charset=utf-8,";
-            
+
             // Extract Headers
             const headerCells = table.querySelectorAll('thead th');
             let headers = [];
@@ -3875,11 +4070,11 @@ window.initReportsModule = function() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             showToast('Report exported successfully!', 'success');
         });
     }
-    
+
     // Print Action
     const printBtn = getEl('rep-print-btn');
     if (printBtn) {
@@ -3890,7 +4085,7 @@ window.initReportsModule = function() {
 };
 
 // ── Fix 4: Dynamic Report Preview ─────────────────────────────────────────
-window.updateReportPreview = function(reportType) {
+window.updateReportPreview = function (reportType) {
     const panel = getEl('rep-live-preview');
     const previewTitle = getEl('rep-preview-title');
     const previewSubtitle = getEl('rep-preview-subtitle');
@@ -3909,15 +4104,15 @@ window.updateReportPreview = function(reportType) {
     const typeLabels = {
         payroll_summary: { title: 'Monthly Payroll Summary', sub: 'Preview of gross salary, deductions & net pay for all employees.' },
         employee_payroll: { title: 'Employee Payroll Report', sub: 'Individual payroll breakdowns with TDS and net salary per employee.' },
-        payslip:         { title: 'Payslip Report', sub: 'Full payslip details for each employee.' },
-        tds:             { title: 'TDS Report', sub: 'Monthly TDS deductions and estimated annual tax per employee.' },
-        form16:          { title: 'Form 16 Report', sub: 'Form 16 summary — TDS certificate data per financial year.' },
-        annual_salary:   { title: 'Annual Salary Report', sub: 'Yearly CTC breakdown and total salary paid per employee.' },
-        leave_summary:   { title: 'Leave Summary', sub: 'Total, used, and remaining leave count for all employees.' },
-        leave_balance:   { title: 'Leave Balance', sub: 'Remaining leave balance breakdown by type per employee.' },
-        bonus:           { title: 'Bonus Report', sub: 'All bonus entries by employee and category.' },
-        deduction:       { title: 'Deduction Report', sub: 'All deduction entries with amounts and status.' },
-        adjustment:      { title: 'Adjustment Report', sub: 'Net bonus/deduction adjustments per employee.' },
+        payslip: { title: 'Payslip Report', sub: 'Full payslip details for each employee.' },
+        tds: { title: 'TDS Report', sub: 'Monthly TDS deductions and estimated annual tax per employee.' },
+        form16: { title: 'Form 16 Report', sub: 'Form 16 summary — TDS certificate data per financial year.' },
+        annual_salary: { title: 'Annual Salary Report', sub: 'Yearly CTC breakdown and total salary paid per employee.' },
+        leave_summary: { title: 'Leave Summary', sub: 'Total, used, and remaining leave count for all employees.' },
+        leave_balance: { title: 'Leave Balance', sub: 'Remaining leave balance breakdown by type per employee.' },
+        bonus: { title: 'Bonus Report', sub: 'All bonus entries by employee and category.' },
+        deduction: { title: 'Deduction Report', sub: 'All deduction entries with amounts and status.' },
+        adjustment: { title: 'Adjustment Report', sub: 'Net bonus/deduction adjustments per employee.' },
     };
     const meta = typeLabels[reportType] || { title: 'Report Preview', sub: 'Preview of selected report.' };
     if (previewTitle) previewTitle.textContent = meta.title;
@@ -4015,20 +4210,20 @@ window.updateReportPreview = function(reportType) {
     previewBody.innerHTML = tableHtml;
 };
 
-window.generateReport = function() {
+window.generateReport = function () {
     const container = getEl('rep-data-container');
     const emptyState = getEl('rep-empty-state');
     const tbody = getEl('rep-table-body');
     const typeSelect = getEl('rep-type-select');
-    
+
     if (!container || !emptyState || !tbody || !typeSelect) return;
 
     const reportType = typeSelect.value;
     const reportTitleText = getEl('rep-dropdown-text') ? getEl('rep-dropdown-text').textContent : 'Detailed Report';
-    
+
     // Update generic metadata
     if (getEl('rep-table-title')) getEl('rep-table-title').textContent = reportTitleText;
-    
+
     // Determine Read/Download capability
     let canView = ['payroll_summary', 'employee_payroll', 'leave_summary', 'leave_balance', 'bonus', 'deduction', 'adjustment'].includes(reportType);
     let canDownload = true;
@@ -4037,7 +4232,7 @@ window.generateReport = function() {
     const searchVal = getEl('rep-search')?.value.toLowerCase() || '';
     const monthVal = getEl('rep-month-select')?.value;
     const yearVal = getEl('rep-year-select')?.value;
-    
+
     // Determine Category
     let category = 'payroll';
     if (reportType.includes('leave')) category = 'leave';
@@ -4058,16 +4253,16 @@ window.generateReport = function() {
 
     tbody.innerHTML = '';
     let totalAmount = 0;
-    
+
     // Filter employees for payroll/tax/leave
     let filteredEmployees = employees.filter(emp => emp.name.toLowerCase().includes(searchVal) || emp.id.toLowerCase().includes(searchVal));
-    
-    if(filteredEmployees.length === 0) {
+
+    if (filteredEmployees.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center py-6 text-muted">No employees found matching your criteria.</td></tr>';
     } else {
         filteredEmployees.forEach(emp => {
             const tr = document.createElement('tr');
-            
+
             let rowHtml = `
                 <td>
                     <div class="font-bold" style="color: var(--text);">${emp.name}</div>
@@ -4115,11 +4310,11 @@ window.generateReport = function() {
                     const matchesEmp = bd.empId === emp.id;
                     const matchesMonth = monthVal === 'all' || bd.effectiveMonth.endsWith(monthVal);
                     const matchesYear = yearVal === 'all' || bd.effectiveMonth.startsWith(yearVal);
-                    
+
                     let matchesType = true;
                     if (reportType === 'bonus') matchesType = bd.type === 'Bonus';
                     else if (reportType === 'deduction') matchesType = bd.type === 'Deduction';
-                    
+
                     return matchesEmp && matchesMonth && matchesYear && matchesType;
                 });
 
@@ -4143,7 +4338,7 @@ window.generateReport = function() {
                     </div>
                 </td>
             `;
-            
+
             tr.innerHTML = rowHtml;
             tbody.appendChild(tr);
         });
@@ -4170,18 +4365,18 @@ window.generateReport = function() {
     // Toggle views
     emptyState?.classList.add('hidden');
     container?.classList.remove('hidden');
-    
+
     // Auto-scroll to details if generated
     container?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (window.showToast) showToast('Report generated successfully.', 'success');
 };
 
-window.downloadReportAsCSV = function() {
+window.downloadReportAsCSV = function () {
     const type = getEl('rep-type-select')?.value || 'report';
     const filename = `${type}_${Date.now()}.csv`;
     const thead = getEl('rep-table-head');
     const tbody = getEl('rep-table-body');
-    
+
     if (!tbody || tbody.rows.length === 0) {
         if (window.showToast) showToast('Please generate a report first.', 'error');
         return;
@@ -4211,7 +4406,7 @@ window.downloadReportAsCSV = function() {
     if (window.showToast) showToast('Report downloaded successfully!', 'success');
 };
 
-window.viewReport = function(empId, reportType, empName) {
+window.viewReport = function (empId, reportType, empName) {
     // Override for Payslip Report to use the professional template
     if (reportType === 'payslip') {
         const monthVal = getEl('rep-month-select')?.value;
@@ -4219,19 +4414,19 @@ window.viewReport = function(empId, reportType, empName) {
         const monthText = monthVal === 'all' ? 'March' : getEl('rep-month-select')?.options[getEl('rep-month-select').selectedIndex].text;
         const yearText = yearVal === 'all' ? '2026' : yearVal;
         const monthKey = `${monthText} ${yearText}`;
-        
+
         window.showPayslip(empId, monthKey);
         return;
     }
 
     const modal = getEl('report-view-modal');
     if (!modal) return;
-    
+
     const title = getEl('rep-modal-title');
     const subtitle = getEl('rep-modal-subtitle');
     const body = getEl('rep-modal-body');
     const reportName = getEl('rep-dropdown-text') ? getEl('rep-dropdown-text').textContent : 'Detailed Report';
-    
+
     // Find Real Employee Data
     const emp = employees.find(e => e.id === empId) || defaultEmployees.find(e => e.id === empId);
     if (!emp) {
@@ -4241,7 +4436,7 @@ window.viewReport = function(empId, reportType, empName) {
 
     if (title) title.textContent = 'Report Preview';
     if (subtitle) subtitle.innerHTML = `Document Type: <span class="font-bold text-primary">${reportName}</span>`;
-    
+
     // Set data attributes for download button
     const downloadBtn = getEl('rep-modal-download-btn');
     if (downloadBtn) {
@@ -4249,7 +4444,7 @@ window.viewReport = function(empId, reportType, empName) {
         downloadBtn.setAttribute('data-report-type', reportType);
         downloadBtn.setAttribute('data-emp-name', emp.name);
     }
-    
+
     const monthVal = getEl('rep-month-select')?.value;
     const yearVal = getEl('rep-year-select')?.value;
     const monthText = monthVal === 'all' ? 'Annual / All Months' : getEl('rep-month-select')?.options[getEl('rep-month-select').selectedIndex].text;
@@ -4265,7 +4460,7 @@ window.viewReport = function(empId, reportType, empName) {
 
     const bonuses = records.filter(r => r.type === 'Bonus').reduce((s, i) => s + i.amount, 0);
     const deductions = records.filter(r => r.type === 'Deduction').reduce((s, i) => s + i.amount, 0);
-    
+
     // Calculate accurate Gross & Net
     const monthlySalary = emp.monthlySalary || 45000;
     const allowances = Math.round(monthlySalary * 0.15); // Fixed 15% allowance logic
@@ -4289,7 +4484,7 @@ window.viewReport = function(empId, reportType, empName) {
                     <div class="report-title-section">
                         <h1 style="font-size: 1.5rem; letter-spacing: 0.02em;">${reportName}</h1>
                         <div class="report-id">REF NO: ${reportType.toUpperCase()}-${empId}-${Date.now().toString().slice(-4)}</div>
-                        <div class="report-id" style="margin-top: 4px;">DATE: ${new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}).toUpperCase()}</div>
+                        <div class="report-id" style="margin-top: 4px;">DATE: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}</div>
                     </div>
                 </div>
 
@@ -4395,14 +4590,14 @@ window.viewReport = function(empId, reportType, empName) {
             </div>
         `;
     }
-    
+
     if (modal) modal.classList.remove('hidden');
 };
 
-window.downloadReport = function(empId, reportType, format) {
+window.downloadReport = function (empId, reportType, format) {
     const element = document.getElementById('printable-report');
     const empName = getEl('rep-modal-download-btn')?.getAttribute('data-emp-name') || empId;
-    
+
     if (!element) {
         showToast('Error: Preview content not found.', 'error');
         return;
@@ -4411,13 +4606,13 @@ window.downloadReport = function(empId, reportType, format) {
     if (format === 'pdf' || format === 'print') {
         if (window.html2pdf) {
             showToast('Generating Professional PDF...', 'success');
-            
+
             const opt = {
-                margin:       10,
-                filename:     `PPS_Report_${empName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                margin: 10,
+                filename: `PPS_Report_${empName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
@@ -4454,6 +4649,101 @@ window.downloadReport = function(empId, reportType, format) {
         document.body.removeChild(link);
     }
 };
+
+window.renderAdminLeaveTypes = function () {
+    const tbody = getEl('admin-leave-types-body');
+    const dropdown = getEl('emp-leave-type-select');
+
+    if (!tbody) return;
+
+    if (leaveTypes.length === 0) {
+        // Pre-populate with some default leave types for demonstration
+        leaveTypes.push({ id: 'LT001', name: 'Sick Leave', code: 'SL', category: 'Paid', desc: 'For medical emergencies' });
+        leaveTypes.push({ id: 'LT002', name: 'Casual Leave', code: 'CL', category: 'Paid', desc: 'For personal contingencies' });
+        leaveTypes.push({ id: 'LT003', name: 'Loss of Pay', code: 'LOP', category: 'Unpaid', desc: 'Leave without pay' });
+    }
+
+    let html = '';
+    let dropHtml = '';
+
+    leaveTypes.forEach(lt => {
+        const badgeColor = lt.category === 'Paid' ? 'badge-blue' : 'badge-orange';
+        html += `
+            <tr>
+                <td>
+                    <div class="font-bold">${lt.name}</div>
+                    <div class="text-xs text-muted">${lt.code} - ${lt.desc || 'No description'}</div>
+                </td>
+                <td style="text-align: center;"><span class="badge ${badgeColor}">${lt.category}</span></td>
+                <td style="text-align: right;">
+                    <button class="icon-btn text-red delete-btn" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                </td>
+            </tr>
+        `;
+        dropHtml += `<option value="${lt.name}">${lt.name} (${lt.category})</option>`;
+    });
+
+    tbody.innerHTML = html;
+    if (dropdown) dropdown.innerHTML = dropHtml;
+};
+
+window.showAddLeaveTypeModal = function () {
+    const form = getEl('leave-type-form');
+    if (form) form.reset();
+
+    const idDisplay = getEl('leave-type-id-display');
+    if (idDisplay) idDisplay.textContent = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
+
+    getEl('leave-type-modal')?.classList.remove('hidden');
+};
+
+window.closeLeaveTypeModal = function () {
+    getEl('leave-type-modal')?.classList.add('hidden');
+};
+
+// Event listener setup for Leave Type Form submission
+document.addEventListener('DOMContentLoaded', () => {
+    const leaveForm = getEl('leave-type-form');
+    if (leaveForm) {
+        leaveForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const submitBtn = leaveForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Saving...';
+            submitBtn.disabled = true;
+
+            const newType = {
+                id: 'LT' + String(leaveTypes.length + 1).padStart(3, '0'),
+                name: getEl('leave-type-name').value,
+                code: getEl('leave-type-code').value,
+                category: getEl('leave-type-category').value,
+                desc: getEl('leave-type-desc').value
+            };
+
+            // Mock backend validation and assignment request
+            new Promise(resolve => {
+                setTimeout(() => {
+                    leaveTypes.push(newType);
+                    resolve();
+                }, 500); // simulate network delay
+            }).then(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+
+                leaveForm.reset();
+                window.closeLeaveTypeModal();
+                window.renderAdminLeaveTypes();
+
+                if (window.showToast) window.showToast('Leave Type added successfully!', 'success');
+            }).catch(err => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                if (window.showToast) window.showToast('Failed to add Leave Type.', 'error');
+            });
+        });
+    }
+});
 
 // Final Safety wrapper for initialization - moved to bottom to ensure all functions are defined
 if (document.readyState === 'loading') {
