@@ -15,18 +15,17 @@
 
 <body>
     <div id="page-bg" class="page-background"></div>
-
     <!-- ================= LANDING PAGE VIEW ================= -->
     <div id="landing-view">
         <!-- Header -->
         <header class="header no-print">
             <div class="container header-container">
-                <a href="#" class="logo" id="landing-logo">
-                    <a href="#" class="logo"
-                        onclick="event.preventDefault(); var lv=document.getElementById('landing-view'); if(lv) lv.scrollTop=0;">
-                        <img src="logo.jpg" alt="PPS Logo" class="logo-icon">
-                        <span>Prime Payroll Solutions</span>
-                    </a>
+                <a href="#" class="logo" id="landing-logo"
+                    onclick="event.preventDefault(); var lv=document.getElementById('landing-view'); if(lv) lv.scrollTop=0;">
+                    <img src="logo.jpg" alt="PPS Logo" class="logo-icon">
+                    <span class="brand-text">Prime Payroll Solutions</span>
+                </a>
+                <div class="header-right">
                     <nav class="main-nav">
                         <a href="#features" class="nav-link">Features</a>
                         <a href="#pricing" class="nav-link">Pricing</a>
@@ -36,14 +35,15 @@
                         <a href="#signin" class="nav-link open-modal">Sign In</a>
                         <a href="#getstarted" class="btn btn-primary open-modal">Get Started</a>
                     </div>
-                    <button class="menu-toggle" aria-label="Toggle Menu">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
+                </div>
+                <button class="menu-toggle" aria-label="Toggle Menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
             </div>
         </header>
 
@@ -51,7 +51,7 @@
             <!-- Hero Section -->
             <section class="hero">
                 <div class="container hero-container">
-                    <h1 class="hero-title">Simplify Your Payroll<br>Management</h1>
+                    <h1 class="hero-title">Simplify Your Payroll<br><span>Management</span></h1>
                     <p class="hero-subtitle">Streamline salary processing, automate tax calculations, and manage
                         employee payments with our comprehensive payroll solution designed for modern businesses.</p>
                     <div class="hero-actions">
@@ -292,7 +292,6 @@
                     <span>PPS</span>
                     </a>
                 </div>
-
                 <!-- Admin Navigation -->
                 <nav id="admin-nav" class="sidebar-nav" style="display: none;">
                     <div class="nav-section-label">Main menu</div>
@@ -2152,7 +2151,8 @@
                                         <button class="btn btn-ghost compact-btn text-primary">View All</button>
                                     </div>
                                     <div class="p-0" id="emp-tasks-container">
-                                        <div class="p-6 text-center text-muted text-sm" id="emp-tasks-loading">Loading assigned tasks...</div>
+                                        <div class="p-6 text-center text-muted text-sm" id="emp-tasks-loading">Loading
+                                            assigned tasks...</div>
                                     </div>
                                 </div>
                             </div>
@@ -2812,6 +2812,63 @@
         </div>
     </div>
 
+    <!-- ================= TASK MANAGEMENT MODAL ================= -->
+    <div id="task-management-modal" class="modal-overlay hidden">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="task-modal-emp-name">Manage Tasks</h2>
+                    <p class="text-xs text-muted" id="task-modal-emp-id">Assign and track tasks</p>
+                </div>
+                <div class="flex-align gap-3">
+                    <button class="icon-btn" onclick="closeTaskManagementModal()">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Left: Assign New Task Form -->
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Assign New Task</h3>
+                    <form id="assign-task-form">
+                        <input type="hidden" id="task-assign-emp-id">
+                        <div class="form-group">
+                            <label class="form-label">Task Title</label>
+                            <input type="text" id="new-task-title" class="form-input" placeholder="e.g. Update Documentation" required>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label">Description (Optional)</label>
+                            <textarea id="new-task-desc" class="form-input" rows="3" placeholder="Task details..."></textarea>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label">Priority</label>
+                            <select id="new-task-priority" class="form-input">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-6 w-full">Assign Task</button>
+                    </form>
+                </div>
+
+                <!-- Right: Current Task List -->
+                <div>
+                    <div class="flex-between mb-4">
+                        <h3 class="font-bold text-lg">Current Tasks</h3>
+                        <span class="badge badge-blue" id="task-modal-counts">0 / 0 Completed</span>
+                    </div>
+                    <div id="admin-task-list-container" style="max-height: 350px; overflow-y: auto; padding-right: 0.5rem;">
+                        <!-- Tasks rendered here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <!-- ================= HOLIDAY CALENDAR MODAL ================= -->
     <div id="holiday-modal" class="modal-overlay hidden">
@@ -3056,18 +3113,15 @@
                     <span class="badge badge-blue ml-2">Annual Structure</span>
                 </div>
                 <div class="flex-align gap-3">
-                    <<<<<<< HEAD <button class="btn btn-primary compact-btn" onclick="downloadCTCAsPDF()">
-                        =======
-                        <button class="btn btn-primary compact-btn" onclick="alert('Downloading Financial Report...')">
-                            >>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" style="margin-right: 6px;">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                            Export PDF
-                        </button>
+                    <button class="btn btn-primary compact-btn" onclick="downloadCTCAsPDF()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" style="margin-right: 6px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export PDF
+                    </button>
                         <button class="icon-btn" onclick="closeCTCBreakdownModal()">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
@@ -3078,7 +3132,7 @@
                 </div>
             </div>
 
-            <<<<<<< HEAD <div class="preview-modal-body"
+            <div class="preview-modal-body"
                 style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
                 <div class="clean-preview-root">
                     <div id="ctc-scaling-container" class="clean-scaling-container">
@@ -3094,7 +3148,7 @@
                                 </div>
                                 <div style="text-align: right;">
                                     <span class="badge badge-blue">CTC Structure</span>
-                                    <p id="ctc-modal-id-new" style="font-size: 0.7rem; margin-top: 4px; opacity: 0.8;">
+                                    <p id="ctc-doc-emp-id" style="font-size: 0.7rem; margin-top: 4px; opacity: 0.8;">
                                         Employee ID: PPS000</p>
                                 </div>
                             </div>
@@ -3106,7 +3160,7 @@
                                 <div
                                     style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
                                     <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);"
-                                        id="ctc-modal-name">Employee Name</h3>
+                                        id="ctc-doc-emp-name">Employee Name</h3>
                                     <p style="font-size: 0.85rem; color: var(--text-muted);">Annual Cost to Company
                                         Breakdown</p>
                                 </div>
@@ -3135,36 +3189,11 @@
                                     distribution is prohibited.</p>
                                 <p style="font-size: 0.6rem; color: #94a3b8; margin-top: 4px;">© 2026 PPS Software
                                     Solutions. All rights reserved.</p>
-                                =======
-                                <div class="preview-modal-body"
-                                    style="padding: 0 !important; background: #025cca; overflow: hidden;">
-                                    <div class="clean-preview-root">
-                                        <div id="ctc-scaling-container" class="clean-scaling-container">
-                                            <div class="clean-document-frame"
-                                                style="width: 210mm; height: 297mm; background: rgb(147, 0, 0); padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                                                <div class="ctc-table-container"
-                                                    style="border: none !important; box-shadow: none !important;">
-                                                    <table class="ctc-table" style="font-size: 0.95rem !important;">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Component Name</th>
-                                                                <th style="text-align: center;">Type</th>
-                                                                <th style="text-align: right;">Monthly Amount</th>
-                                                                <th style="text-align: right;">Yearly Amount</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="ctc-table-body">
-                                                            <!-- Populated via script.js -->
-                                                        </tbody>
-                                                    </table>
-                                                    >>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
                         <!-- ================= PAYROLL DETAIL MODAL ================= -->
                         <div id="payroll-detail-modal" class="modal-overlay hidden">
@@ -3260,21 +3289,13 @@
                                     </div>
                                 </div>
 
-                                <<<<<<< HEAD <div class="preview-modal-body"
+                                <div class="preview-modal-body"
                                     style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
-                                    =======
-                                    <div class="preview-modal-body"
-                                        style="padding: 0 !important; background: #2f6db8; overflow: hidden;">
-                                        >>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
                                         <!-- Full-Fit Clean Document Preview (Zero-Border) -->
                                         <div class="clean-preview-root">
                                             <div id="payslip-scaling-container" class="clean-scaling-container">
-                                                <div class="clean-document-frame" <<<<<<< HEAD
+                                                <div class="clean-document-frame"
                                                     style="width: 210mm; height: 297mm; background: white; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                                                    =======
-                                                    style="width: 210mm; height: 297mm; background: rgb(209, 38, 38);
-                                                    padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                                                    >>>>>>> 3708a93d435de401efa530ee15b95f13c474a027
                                                     <iframe id="payslip-iframe" src="about:blank"
                                                         style="width: 100%; height: 100%; border: none; display: block;"></iframe>
                                                 </div>
