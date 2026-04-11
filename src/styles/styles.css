@@ -403,6 +403,326 @@ textarea {
 }
 
 /* --- Dashboard Refinements --- */
+/* --- Enterprise Employee Profile Card --- */
+.emp-profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+    margin: 0 auto;
+    transition: var(--transition);
+}
+
+.emp-profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 2rem;
+    gap: 2rem;
+    background: #fdfdfd;
+}
+
+[data-theme="dark"] .emp-profile-header {
+    background: rgba(30, 41, 59, 0.5);
+}
+
+.emp-profile-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.emp-profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.emp-profile-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.15rem;
+    letter-spacing: -0.01em;
+}
+
+.emp-profile-role {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.emp-profile-right {
+    display: flex;
+}
+
+.emp-detail-group {
+    display: flex;
+    gap: 3rem;
+}
+
+.emp-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.emp-detail-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.emp-detail-value {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    margin-right: 6px;
+}
+
+.emp-profile-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 2rem;
+}
+
+.emp-profile-body {
+    padding: 2rem;
+}
+
+.emp-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem 2rem;
+}
+
+.emp-profile-footer {
+    padding: 1.5rem 2rem;
+    background: var(--bg-alt);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+    .emp-profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem;
+    }
+    
+    .emp-detail-group {
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+    
+    .emp-detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .emp-profile-body,
+    .emp-profile-footer {
+        padding: 1.5rem;
+    }
+    
+    .emp-profile-divider {
+        margin: 0 1.5rem;
+    }
+}
+
+/* --- Enterprise Employee Welcome Header --- */
+.emp-welcome-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+    position: relative;
+    transition: var(--transition);
+}
+
+.emp-welcome-header:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04);
+}
+
+.emp-welcome-header__inner {
+    padding: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    background: linear-gradient(120deg, rgba(255,255,255,0) 50%, rgba(248, 250, 252, 0.6) 100%);
+}
+
+[data-theme="dark"] .emp-welcome-header__inner {
+    background: linear-gradient(120deg, rgba(0,0,0,0) 50%, rgba(15, 23, 42, 0.5) 100%);
+}
+
+.emp-welcome-header__left {
+    flex: 1;
+}
+
+.emp-welcome-header__greeting {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.01em;
+}
+
+.emp-welcome-header__name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.emp-welcome-header__subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+.emp-welcome-header__actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.emp-btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    border: none;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    height: auto;
+}
+
+.emp-btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+.emp-btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.emp-btn-ghost {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-high-contrast);
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    height: auto;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.emp-btn-ghost:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.emp-btn-ghost:hover {
+    background: var(--bg-alt);
+    border-color: var(--text-muted);
+}
+
+.emp-welcome-header__right {
+    flex-shrink: 0;
+}
+
+.emp-date-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.emp-date-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--surface);
+    color: var(--primary);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.emp-date-card__content {
+    display: flex;
+    flex-direction: column;
+}
+
+.emp-date-card__day {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+}
+
+.emp-date-card__month {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+    .emp-welcome-header__inner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+    
+    .emp-welcome-header__right {
+        width: 100%;
+    }
+    
+    .emp-date-card {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 .welcome-banner {
     border-radius: 32px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);

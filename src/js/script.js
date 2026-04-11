@@ -555,9 +555,13 @@ window.closeModal = function (modalId) {
 };
 
 window.simulateCheckIn = function () {
-    const emp = employees.find(e => e.name === window.currentUser.displayName) || employees[0];
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Save both display time and precise timestamp
     localStorage.setItem(`pps-checkin-${emp.id}`, time);
+    localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, now.getTime());
 
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = true;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = false;
@@ -568,9 +572,25 @@ window.simulateCheckIn = function () {
 };
 
 window.simulateCheckOut = function () {
-    const emp = employees.find(e => e.name === window.currentUser.displayName) || employees[0];
+    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Calculate and format total work hours as 00:00:00
+    let savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
+    if (savedTime) {
+        const startTimestamp = parseInt(savedTime);
+        const diff = Math.max(0, Date.now() - startTimestamp);
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        const formattedTotal = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        
+        if (getEl('live-work-hours')) getEl('live-work-hours').textContent = formattedTotal;
+    }
+
+    // Clear session states
     localStorage.removeItem(`pps-checkin-${emp.id}`);
+    localStorage.removeItem(`pps-checkin-timestamp-${emp.id}`);
 
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = false;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = true;
@@ -581,13 +601,19 @@ window.simulateCheckOut = function () {
 };
 
 window.startLiveTimer = function () {
+    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
     if (window.timerInterval) clearInterval(window.timerInterval);
-    const startTime = new Date();
-    startTime.setHours(9, 0, 0); // Assume they started at 9 AM for effect
+    
+    // Retrieve timestamp or default to now if missing (migration)
+    let savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
+    const startTimestamp = savedTime ? parseInt(savedTime) : Date.now();
+    if (!savedTime) {
+        localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, startTimestamp);
+    }
 
-    window.timerInterval = setInterval(() => {
-        const now = new Date();
-        const diff = now - startTime;
+    const updateTimer = () => {
+        const now = Date.now();
+        const diff = Math.max(0, now - startTimestamp);
         const h = Math.floor(diff / 3600000);
         const m = Math.floor((diff % 3600000) / 60000);
         const s = Math.floor((diff % 60000) / 1000);
@@ -596,7 +622,10 @@ window.startLiveTimer = function () {
         if (timerEl) {
             timerEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }
-    }, 1000);
+    };
+    
+    updateTimer(); // Initial call to avoid 1-second delay
+    window.timerInterval = setInterval(updateTimer, 1000);
 };
 
 window.simulateLeaveSubmit = function (event) {
