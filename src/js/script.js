@@ -1383,6 +1383,25 @@ window.getFinancialYear = function (dateObj) {
     return fy;
 };
 
+// --- Payroll Conditional Rendering Helpers ---
+window.showPayrollContent = function () {
+    getEl('payroll-empty-state')?.classList.add('hidden');
+    getEl('tax-summary-title-wrapper')?.classList.remove('hidden');
+    getEl('tax-summary-grid')?.classList.remove('hidden');
+    getEl('payroll-records-header')?.classList.remove('hidden');
+    getEl('payroll-records-table-container')?.classList.remove('hidden');
+};
+
+window.hidePayrollContent = function () {
+    getEl('payroll-empty-state')?.classList.remove('hidden');
+    getEl('tax-summary-title-wrapper')?.classList.add('hidden');
+    getEl('tax-summary-grid')?.classList.add('hidden');
+    getEl('payroll-records-header')?.classList.add('hidden');
+    getEl('payroll-records-table-container')?.classList.add('hidden');
+    const tfoot = getEl('payroll-table-foot');
+    if (tfoot) tfoot.classList.add('hidden');
+};
+
 window.initPayrollModule = function () {
     const dateInput = getEl('payroll-date');
     const monthInput = getEl('payroll-month-display');
@@ -1395,6 +1414,8 @@ window.initPayrollModule = function () {
             if (!e.target.value) {
                 monthInput.value = '';
                 fyInput.value = '';
+                // Revert to empty state when date is cleared
+                window.hidePayrollContent();
                 return;
             }
             const d = new Date(e.target.value);
@@ -1403,6 +1424,12 @@ window.initPayrollModule = function () {
             const yearStr = String(d.getFullYear()).slice(-4);
             monthInput.value = monthNames[d.getMonth()] + " " + yearStr;
             fyInput.value = window.getFinancialYear(d);
+
+            // Show payroll content and render filtered table for the selected date
+            window.showPayrollContent();
+            const monthLabel = monthNames[d.getMonth()] + " " + yearStr;
+            const fyStr = window.getFinancialYear(d);
+            window.renderPayrollTable(monthLabel, fyStr);
         });
     }
 
@@ -1562,6 +1589,8 @@ window.initPayrollModule = function () {
             }
 
             // Show the newly generated payroll
+            // Show the payroll content after generation
+            window.showPayrollContent();
             window.renderPayrollTable(monthLabel, fyStr);
         });
     }
@@ -1587,14 +1616,29 @@ window.initPayrollModule = function () {
         if (searchCard) searchCard.classList.toggle('hidden', tab !== 'search');
         if (form16Card) form16Card.classList.toggle('hidden', tab !== 'form16');
 
-        const showRecordsAndSummary = tab !== 'form16';
-        if (taxSummaryTitle) taxSummaryTitle.classList.toggle('hidden', !showRecordsAndSummary);
-        if (taxSummaryGrid) taxSummaryGrid.classList.toggle('hidden', !showRecordsAndSummary);
-        if (payrollRecordsHeader) payrollRecordsHeader.classList.toggle('hidden', !showRecordsAndSummary);
-        if (payrollRecordsTableContainer) payrollRecordsTableContainer.classList.toggle('hidden', !showRecordsAndSummary);
-
         if (tab === 'form16') {
+            // Form16 tab: hide all payroll content including empty state
+            window.hidePayrollContent();
+            getEl('payroll-empty-state')?.classList.add('hidden');
             if (window.renderForm16Table) window.renderForm16Table();
+        } else if (tab === 'search') {
+            // Search tab: always show payroll content (search shows all records)
+            window.showPayrollContent();
+            window.renderPayrollTable();
+        } else if (tab === 'run') {
+            // Run Payroll tab: check if a date is already selected
+            const dateInput = getEl('payroll-date');
+            if (dateInput && dateInput.value) {
+                window.showPayrollContent();
+                const d = new Date(dateInput.value);
+                if (!isNaN(d.getTime())) {
+                    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                    const monthLabel = monthNames[d.getMonth()] + " " + d.getFullYear();
+                    window.renderPayrollTable(monthLabel, window.getFinancialYear(d));
+                }
+            } else {
+                window.hidePayrollContent();
+            }
         }
     }
 
@@ -1802,7 +1846,7 @@ window.renderPayrollTable = function (searchMonth = '', searchFY = '', forceShow
             <td data-label="Status"><span class="badge badge-green">${p.status}</span></td>
             <td>
                 <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                    <button class="btn btn-secondary compact-btn text-xs" onclick="showPayslip('${p.empId}', '${p.month}')">Payslip</button>
+                    <button class="btn btn-secondary compact-btn text-xs payslip-gen-btn" onclick="generatePayslipWithLoading(this, '${p.empId}', '${p.month}')">Payslip</button>
                 </div>
             </td>
         `;
@@ -2038,15 +2082,66 @@ window.closePayrollDetailModal = function () {
     getEl('payroll-detail-modal')?.classList.add('hidden');
 };
 
+/**
+ * Payslip Generation with Loading State & Error Handling
+ * Wraps showPayslip() with a spinner on the button, simulates async processing,
+ * and catches errors with toast notifications.
+ */
+window.generatePayslipWithLoading = function (btn, empId, month) {
+    if (!btn || btn.disabled) return;
+
+    // Show loading state on button
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-sm"></span> Generating...';
+    btn.disabled = true;
+    btn.classList.add('btn-loading');
+
+    // Simulate async salary calculation + data compilation
+    setTimeout(() => {
+        try {
+            window.showPayslip(empId, month);
+            // Restore button state
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            btn.classList.remove('btn-loading');
+        } catch (err) {
+            console.error('Payslip generation failed:', err);
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            btn.classList.remove('btn-loading');
+            showToast(`Failed to generate payslip: ${err.message || 'Unknown error'}`, 'error');
+        }
+    }, 600); // Simulated processing delay for salary calculation
+};
+
 window.showPayslip = function (empId, month) {
     let p = payrolls.find(x => x.empId === empId && x.month === month);
     const emp = employees.find(x => x.id === empId);
 
-    if (!p && !emp) return;
+    if (!p && !emp) {
+        throw new Error(`Employee ${empId} not found. Cannot generate payslip.`);
+    }
 
     // Synthetic record if missing
     if (!p) {
-        const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
+        if (!emp) throw new Error(`No payroll record or employee data found for ${empId}.`);
+
+        // Build salary breakdown inline (fallback if calculateSalaryBreakdown doesn't exist)
+        let breakdown;
+        if (typeof window.calculateSalaryBreakdown === 'function') {
+            breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
+        } else {
+            const salary = emp.monthlySalary || 50000;
+            breakdown = {
+                basic: Math.round(salary * 0.5),
+                allowances: Math.round(salary * 0.4),
+                bonus: Math.round(salary * 0.1),
+                gross: salary,
+                tds: Math.round(salary * 0.1),
+                totalDeductions: Math.round(salary * 0.1),
+                net: Math.round(salary * 0.9)
+            };
+        }
         p = {
             empName: emp.name,
             empId: emp.id,
@@ -2073,11 +2168,11 @@ window.showPayslip = function (empId, month) {
         companyAddress: companyAddress,
         salary: {
             basic: p.basic,
-            hra: p.hra || Math.round(p.basic * 0.4),
+            hra: p.hra || Math.round((p.basic || 0) * 0.4),
             edu: p.edu || 2500,
             lta: p.lta || 5000,
             special: p.special || (p.bonus || 0),
-            pf: p.pf || Math.round(p.basic * 0.12),
+            pf: p.pf || Math.round((p.basic || 0) * 0.12),
             pt: p.pt || 200
         }
     };
