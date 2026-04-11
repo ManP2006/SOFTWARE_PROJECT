@@ -156,6 +156,7 @@ window.showLandingView = function () {
     // Scroll the landing-view container (not window) to top
     const landingView = getEl('landing-view');
     if (landingView) landingView.scrollTop = 0;
+    document.body.classList.remove('auth-active');
     window.applyTheme('light', false); // Landing page is always light mode
 };
 
@@ -184,6 +185,7 @@ window.showDashboardView = function (role, userName) {
     const views = ['landing-view', 'auth-view', 'dashboard-view'];
     views.forEach(v => { const el = getEl(v); if (el) el.style.display = (v === 'dashboard-view' ? 'flex' : 'none'); });
 
+    document.body.classList.remove('auth-active');
     document.body.style.overflow = 'auto';
     document.documentElement.style.overflow = 'auto';
 
@@ -830,7 +832,10 @@ window.renderEmployeeTable = function () {
             <td data-label="Department">${emp.dept}</td>
             <td data-label="Status"><span class="badge ${badgeClass}">${emp.status}</span></td>
             <td data-label="Tasks">
-                <span class="text-xs font-bold">${completed}/${assigned}</span>
+                <div class="flex-align gap-2">
+                    <span class="text-xs font-bold">${completed}/${assigned}</span>
+                    <button class="btn btn-primary compact-btn text-xs" onclick="window.showTaskManagementModal('${emp.id}')" style="padding: 3px 8px;">Manage</button>
+                </div>
             </td>
             <td data-label="Rating">
                 <span class="text-xs ${perfColor} font-bold">${perfPct}%</span>
@@ -1059,6 +1064,7 @@ function initApp() {
         if (modal) modal.classList.add('hidden');
         const views = ['landing-view', 'dashboard-view', 'auth-view'];
         views.forEach(v => { const el = getEl(v); if (el) el.style.display = (v === 'auth-view' ? 'flex' : 'none'); });
+        document.body.classList.add('auth-active');
         hydrateCredentials(role);
         window.scrollTo(0, 0);
     }
@@ -1224,6 +1230,42 @@ function initApp() {
             if (employeeModal) employeeModal.classList.add('hidden');
             addEmployeeForm.reset();
             isEditing = false;
+        });
+    }
+
+    const assignTaskForm = getEl('assign-task-form');
+    if (assignTaskForm) {
+        assignTaskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const empId = getEl('task-assign-emp-id').value;
+            const title = getEl('new-task-title').value.trim();
+            const desc = getEl('new-task-desc').value.trim();
+            const priority = getEl('new-task-priority').value;
+
+            const emp = employees.find(e => e.id === empId);
+            if (!emp) return;
+
+            if (!emp.taskList) emp.taskList = [];
+            if (emp.assignedTasks === undefined) emp.assignedTasks = 0;
+
+            const newTask = {
+                id: 'task_' + Date.now(),
+                title: title,
+                desc: desc,
+                priority: priority,
+                completed: false
+            };
+
+            emp.taskList.push(newTask);
+            emp.assignedTasks++;
+            window.saveEmployees();
+
+            assignTaskForm.reset();
+            getEl('task-assign-emp-id').value = empId; // retain context across submissions
+
+            window.renderAdminTaskList(empId);
+            window.renderEmployeeTable();
+            window.showToast('Task assigned successfully!', 'success');
         });
     }
 
@@ -2822,6 +2864,74 @@ window.closeAttendanceModal = function () {
     if (modal) modal.classList.add('hidden');
 };
 
+window.showTaskManagementModal = function (empId) {
+    const emp = employees.find(e => e.id === empId);
+    if (!emp) return;
+
+    if (!emp.taskList) emp.taskList = [];
+    
+    getEl('task-assign-emp-id').value = empId;
+    getEl('task-modal-emp-name').textContent = `Manage Tasks - ${emp.name}`;
+    getEl('task-modal-emp-id').textContent = `Employee ID: ${emp.id}`;
+    
+    window.renderAdminTaskList(empId);
+    
+    const modal = getEl('task-management-modal');
+    if (modal) modal.classList.remove('hidden');
+};
+
+window.closeTaskManagementModal = function () {
+    const modal = getEl('task-management-modal');
+    if (modal) modal.classList.add('hidden');
+    const form = getEl('assign-task-form');
+    if (form) form.reset();
+};
+
+window.renderAdminTaskList = function (empId) {
+    const emp = employees.find(e => e.id === empId);
+    if (!emp) return;
+
+    const listContainer = getEl('admin-task-list-container');
+    const countsEl = getEl('task-modal-counts');
+    
+    if (!emp.taskList || emp.taskList.length === 0) {
+        listContainer.innerHTML = '<div class="text-center text-muted p-4">No tasks assigned yet.</div>';
+        if (countsEl) countsEl.textContent = '0 / 0 Completed';
+        return;
+    }
+
+    const assigned = emp.assignedTasks || 0;
+    const completed = emp.completedTasks || 0;
+    if (countsEl) countsEl.textContent = `${completed} / ${assigned} Completed`;
+
+    // Sort: pending first
+    const sortedTasks = [...emp.taskList].sort((a, b) => {
+        if (a.completed === b.completed) return 0;
+        return a.completed ? 1 : -1;
+    });
+
+    let html = '';
+    sortedTasks.forEach(task => {
+        const badgeColor = task.priority === 'High' ? 'badge-red' : (task.priority === 'Medium' ? 'badge-orange' : 'badge-blue');
+        const statusBadge = task.completed ? '<span class="badge badge-green">Completed</span>' : '<span class="badge badge-yellow">Pending</span>';
+        
+        html += `
+            <div class="p-3 mb-3 border rounded-lg ${task.completed ? 'bg-gray-50 opacity-70' : 'bg-white'}">
+                <div class="flex-between">
+                    <div class="font-medium text-sm ${task.completed ? 'line-through text-muted' : ''}">${task.title}</div>
+                    ${statusBadge}
+                </div>
+                ${task.desc ? `<div class="text-xs text-muted mt-1">${task.desc}</div>` : ''}
+                <div class="text-xs mt-2">
+                    <span class="text-muted mr-1">Priority:</span>
+                    <span class="badge ${badgeColor}" style="padding: 2px 6px; font-size: 0.6rem;">${task.priority}</span>
+                </div>
+            </div>
+        `;
+    });
+    listContainer.innerHTML = html;
+};
+
 window.showCTCBreakdown = function (empId) {
     const emp = employees.find(e => e.id === empId);
     if (!emp) return;
@@ -2873,9 +2983,11 @@ window.showCTCBreakdown = function (empId) {
         { name: 'Cost to Company (CTC)', type: 'Total', m: monthlyCTC, y: annualCTC, class: 'ctc-row-total ctc-total-value' }
     ];
 
-    // Populate Modal Header
+    // Populate Modal Header & Document Frame
     if (getEl('ctc-modal-name')) getEl('ctc-modal-name').textContent = emp.name;
-    if (getEl('ctc-modal-id-new')) getEl('ctc-modal-id-new').textContent = `Employee ID: ${emp.id}`;
+    if (getEl('ctc-modal-id')) getEl('ctc-modal-id').textContent = emp.id;
+    if (getEl('ctc-doc-emp-name')) getEl('ctc-doc-emp-name').textContent = emp.name;
+    if (getEl('ctc-doc-emp-id')) getEl('ctc-doc-emp-id').textContent = `Employee ID: ${emp.id}`;
 
     // Render Table Rows
     const tbody = getEl('ctc-table-body');

@@ -10,23 +10,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=10">
+    <link rel="stylesheet" href="../src/styles/styles.css?v=10">
 </head>
 
 <body>
     <div id="page-bg" class="page-background"></div>
-
     <!-- ================= LANDING PAGE VIEW ================= -->
     <div id="landing-view">
         <!-- Header -->
         <header class="header no-print">
             <div class="container header-container">
-                <a href="#" class="logo" id="landing-logo">
-                    <a href="#" class="logo"
-                        onclick="event.preventDefault(); var lv=document.getElementById('landing-view'); if(lv) lv.scrollTop=0;">
-                        <img src="logo.jpg" alt="PPS Logo" class="logo-icon">
-                        <span>Prime Payroll Solutions</span>
-                    </a>
+                <a href="#" class="logo" id="landing-logo"
+                    onclick="event.preventDefault(); var lv=document.getElementById('landing-view'); if(lv) lv.scrollTop=0;">
+                    <img src="../assets/images/logo.jpg" alt="PPS Logo" class="logo-icon">
+                    <span class="brand-text">Prime Payroll Solutions</span>
+                </a>
+                <div class="header-right">
                     <nav class="main-nav">
                         <a href="#features" class="nav-link">Features</a>
                         <a href="#pricing" class="nav-link">Pricing</a>
@@ -36,14 +35,15 @@
                         <a href="#signin" class="nav-link open-modal">Sign In</a>
                         <a href="#getstarted" class="btn btn-primary open-modal">Get Started</a>
                     </div>
-                    <button class="menu-toggle" aria-label="Toggle Menu">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
+                </div>
+                <button class="menu-toggle" aria-label="Toggle Menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
             </div>
         </header>
 
@@ -51,7 +51,7 @@
             <!-- Hero Section -->
             <section class="hero">
                 <div class="container hero-container">
-                    <h1 class="hero-title">Simplify Your Payroll<br>Management</h1>
+                    <h1 class="hero-title">Simplify Your Payroll<br><span>Management</span></h1>
                     <p class="hero-subtitle">Streamline salary processing, automate tax calculations, and manage
                         employee payments with our comprehensive payroll solution designed for modern businesses.</p>
                     <div class="hero-actions">
@@ -187,7 +187,7 @@
 
             <!-- Image Panel -->
             <div class="auth-image-panel" id="auth-image-panel">
-                <img src="admin-auth-image.jpg" id="auth-panel-img" class="auth-panel-img" alt="">
+                <img src="../assets/images/admin-auth-image.jpg" id="auth-panel-img" class="auth-panel-img" alt="">
             </div>
 
             <!-- Form Panel -->
@@ -201,7 +201,7 @@
 
                 <div class="auth-header">
                     <div class="auth-brand">
-                        <img src="logo.jpg" alt="PPS Logo" class="brand-logo">
+                        <img src="../assets/images/logo.jpg" alt="PPS Logo" class="brand-logo">
                         <span class="brand-name">PPS</span>
                     </div>
                     <h1 id="auth-title" class="auth-heading">Sign In</h1>
@@ -288,11 +288,10 @@
         <aside class="sidebar no-print">
             <div class="sidebar-header">
                 <div class="logo dashboard-logo-link" style="cursor: pointer;">
-                    <img src="logo.jpg" alt="PPS Logo" class="logo-icon">
+                    <img src="../assets/images/logo.jpg" alt="PPS Logo" class="logo-icon">
                     <span>PPS</span>
                     </a>
                 </div>
-
                 <!-- Admin Navigation -->
                 <nav id="admin-nav" class="sidebar-nav" style="display: none;">
                     <div class="nav-section-label">Main menu</div>
@@ -527,7 +526,7 @@
 
             <div id="dashboard-content" class="dashboard-content">
                 <!-- Admin: Overview Section -->
-                <section id="admin-overview" class="view-section scroll-mode-content" style="display: block;">
+                <section id="admin-overview" class="view-section scroll-mode-none" style="display: block;">
                     <div class="page-module-container">
                         <div class="modern-dashboard-header">
                             <div class="header-content-left">
@@ -2150,7 +2149,8 @@
                                         <button class="btn btn-ghost compact-btn text-primary">View All</button>
                                     </div>
                                     <div class="p-0" id="emp-tasks-container">
-                                        <div class="p-6 text-center text-muted text-sm" id="emp-tasks-loading">Loading assigned tasks...</div>
+                                        <div class="p-6 text-center text-muted text-sm" id="emp-tasks-loading">Loading
+                                            assigned tasks...</div>
                                     </div>
                                 </div>
                             </div>
@@ -2723,6 +2723,63 @@
         </div>
     </div>
 
+    <!-- ================= TASK MANAGEMENT MODAL ================= -->
+    <div id="task-management-modal" class="modal-overlay hidden">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="task-modal-emp-name">Manage Tasks</h2>
+                    <p class="text-xs text-muted" id="task-modal-emp-id">Assign and track tasks</p>
+                </div>
+                <div class="flex-align gap-3">
+                    <button class="icon-btn" onclick="closeTaskManagementModal()">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Left: Assign New Task Form -->
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Assign New Task</h3>
+                    <form id="assign-task-form">
+                        <input type="hidden" id="task-assign-emp-id">
+                        <div class="form-group">
+                            <label class="form-label">Task Title</label>
+                            <input type="text" id="new-task-title" class="form-input" placeholder="e.g. Update Documentation" required>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label">Description (Optional)</label>
+                            <textarea id="new-task-desc" class="form-input" rows="3" placeholder="Task details..."></textarea>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label">Priority</label>
+                            <select id="new-task-priority" class="form-input">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-6 w-full">Assign Task</button>
+                    </form>
+                </div>
+
+                <!-- Right: Current Task List -->
+                <div>
+                    <div class="flex-between mb-4">
+                        <h3 class="font-bold text-lg">Current Tasks</h3>
+                        <span class="badge badge-blue" id="task-modal-counts">0 / 0 Completed</span>
+                    </div>
+                    <div id="admin-task-list-container" style="max-height: 350px; overflow-y: auto; padding-right: 0.5rem;">
+                        <!-- Tasks rendered here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
     <!-- ================= HOLIDAY CALENDAR MODAL ================= -->
     <div id="holiday-modal" class="modal-overlay hidden">
@@ -2994,7 +3051,7 @@
                             <!-- Branded Header -->
                             <div class="ctc-branding-header">
                                 <div class="ctc-branding-logo-box">
-                                    <img src="logo.jpg" alt="PPS Logo" class="ctc-branding-logo">
+                                    <img src="../assets/images/logo.jpg" alt="PPS Logo" class="ctc-branding-logo">
                                     <div class="ctc-branding-text">
                                         <h2 id="ctc-company-name">PPS Payroll Management</h2>
                                         <p>Confidential Financial Document</p>
@@ -3002,7 +3059,7 @@
                                 </div>
                                 <div style="text-align: right;">
                                     <span class="badge badge-blue">CTC Structure</span>
-                                    <p id="ctc-modal-id-new" style="font-size: 0.7rem; margin-top: 4px; opacity: 0.8;">
+                                    <p id="ctc-doc-emp-id" style="font-size: 0.7rem; margin-top: 4px; opacity: 0.8;">
                                         Employee ID: PPS000</p>
                                 </div>
                             </div>
@@ -3014,7 +3071,7 @@
                                 <div
                                     style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
                                     <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);"
-                                        id="ctc-modal-name">Employee Name</h3>
+                                        id="ctc-doc-emp-name">Employee Name</h3>
                                     <p style="font-size: 0.85rem; color: var(--text-muted);">Annual Cost to Company
                                         Breakdown</p>
                                 </div>
@@ -3048,8 +3105,11 @@
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD:index.html
         </div>
     </div>
+=======
+>>>>>>> c0cbb865c359f65bccd6089b82751930c8b4a9b4:public/index.html
 
                         <!-- ================= PAYROLL DETAIL MODAL ================= -->
                         <div id="payroll-detail-modal" class="modal-overlay hidden">
@@ -3154,6 +3214,7 @@
                                 </div>
 
                                 <div class="preview-modal-body"
+<<<<<<< HEAD:index.html
                                     style="padding: 0 !important; background: var(--bg-alt); overflow: hidden !important; height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center;">
                                     <div id="payslip-scaling-container"
                                         style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 1rem 0;">
@@ -3161,6 +3222,18 @@
                                             style="width: 210mm; height: 297mm; background: white; box-shadow: var(--shadow-xl); overflow: hidden; flex-shrink: 0;">
                                             <iframe id="payslip-iframe" src="about:blank"
                                                 style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+=======
+                                    style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
+                                        <!-- Full-Fit Clean Document Preview (Zero-Border) -->
+                                        <div class="clean-preview-root">
+                                            <div id="payslip-scaling-container" class="clean-scaling-container">
+                                                <div class="clean-document-frame"
+                                                    style="width: 210mm; height: 297mm; background: white; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                                                    <iframe id="payslip-iframe" src="about:blank"
+                                                        style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+                                                </div>
+                                            </div>
+>>>>>>> c0cbb865c359f65bccd6089b82751930c8b4a9b4:public/index.html
                                         </div>
                                     </div>
                                 </div>
@@ -3639,7 +3712,7 @@
 
                     <script
                         src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-                    <script src="script.js?v=123"></script>
+                    <script src="../src/js/script.js?v=123"></script>
 </body>
 
 </html>
