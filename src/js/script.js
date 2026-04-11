@@ -65,25 +65,25 @@ window.showToast = function (message, type = 'info') {
 };
 // --- Auth Storage & Remember Me Utility ---
 window.AuthStorage = {
-    getKeys: function(role) {
+    getKeys: function (role) {
         return {
             nameKey: role === 'employee' ? 'employee_remember_name' : 'admin_remember_name',
             emailKey: role === 'employee' ? 'employee_remember_email' : 'admin_remember_email'
         };
     },
-    saveCredentials: function(role, name, email) {
+    saveCredentials: function (role, name, email) {
         const keys = this.getKeys(role);
         localStorage.setItem(keys.nameKey, name);
         localStorage.setItem(keys.emailKey, email);
     },
-    getCredentials: function(role) {
+    getCredentials: function (role) {
         const keys = this.getKeys(role);
         return {
             name: localStorage.getItem(keys.nameKey) || '',
             email: localStorage.getItem(keys.emailKey) || ''
         };
     },
-    clearCredentials: function(role) {
+    clearCredentials: function (role) {
         const keys = this.getKeys(role);
         localStorage.removeItem(keys.nameKey);
         localStorage.removeItem(keys.emailKey);
@@ -331,20 +331,6 @@ window.initEmployeePortal = function (userName) {
     // 5. Payslip History Table Sync (Refined for Modern Redesign)
     const tableBody = getEl('emp-payslips-table-body');
     if (tableBody) {
-        tableBody.innerHTML = `
-            <tr>
-                <td class="font-medium">February 2026</td>
-                <td>Mar 01, 2026</td>
-                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
-                <td><span class="badge badge-green">Paid</span></td>
-                <td><button class="btn btn-primary compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'February 2026')">View</button></td>
-            </tr>
-            <tr>
-                <td class="font-medium text-sm">January 2026</td>
-                <td>Feb 01, 2026</td>
-                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
-                <td><span class="badge badge-green">Paid</span></td>
-                <td><button class="btn btn-primary compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'January 2026')">View</button></td>
         const months = ["February 2026", "January 2026"];
         const dates = ["Mar 01, 2026", "Feb 01, 2026"];
 
@@ -391,7 +377,7 @@ window.initEmployeePortal = function (userName) {
 window.showPayslip = function (empId, month) {
     const emp = employees.find(e => String(e.id) === String(empId)) || employees[0];
     const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
-    
+
     // Prepare data for the iframe
     const payload = {
         name: emp.name,
@@ -420,7 +406,7 @@ window.showPayslip = function (empId, month) {
             }, 100);
         };
     }
-    
+
     getEl('payslip-modal')?.classList.remove('hidden');
     // Also scale immediately in case iframe was already loaded
     setTimeout(() => {
@@ -1018,7 +1004,7 @@ function initApp() {
         window.loadEmployees();
         window.loadPayrolls();
         window.initPayrollModule();
-        window.initAttendanceTimer();
+        window.initAttendanceModule();
     } catch (err) {
         console.error('Initialization Error:', err);
     }
@@ -2314,7 +2300,7 @@ window.autoScaleViewer = function (containerId, modalId) {
     const availableH = body.offsetHeight - 40;
 
     // A4 Dimensions: 210mm x 297mm (approx 794px x 1123px at 96dpi)
-    const docW = 794; 
+    const docW = 794;
     const docH = 1123;
 
     // Scaling ratio logic: ensure full visibility without scroll
@@ -2963,13 +2949,13 @@ window.showTaskManagementModal = function (empId) {
     if (!emp) return;
 
     if (!emp.taskList) emp.taskList = [];
-    
+
     getEl('task-assign-emp-id').value = empId;
     getEl('task-modal-emp-name').textContent = `Manage Tasks - ${emp.name}`;
     getEl('task-modal-emp-id').textContent = `Employee ID: ${emp.id}`;
-    
+
     window.renderAdminTaskList(empId);
-    
+
     const modal = getEl('task-management-modal');
     if (modal) modal.classList.remove('hidden');
 };
@@ -2987,7 +2973,7 @@ window.renderAdminTaskList = function (empId) {
 
     const listContainer = getEl('admin-task-list-container');
     const countsEl = getEl('task-modal-counts');
-    
+
     if (!emp.taskList || emp.taskList.length === 0) {
         listContainer.innerHTML = '<div class="text-center text-muted p-4">No tasks assigned yet.</div>';
         if (countsEl) countsEl.textContent = '0 / 0 Completed';
@@ -3008,7 +2994,7 @@ window.renderAdminTaskList = function (empId) {
     sortedTasks.forEach(task => {
         const badgeColor = task.priority === 'High' ? 'badge-red' : (task.priority === 'Medium' ? 'badge-orange' : 'badge-blue');
         const statusBadge = task.completed ? '<span class="badge badge-green">Completed</span>' : '<span class="badge badge-yellow">Pending</span>';
-        
+
         html += `
             <div class="p-3 mb-3 border rounded-lg ${task.completed ? 'bg-gray-50 opacity-70' : 'bg-white'}">
                 <div class="flex-between">
@@ -3178,7 +3164,7 @@ function updateAttSummary() {
 }
 
 let attendanceInitialized = false;
-function initAttendanceModule() {
+window.initAttendanceModule = function () {
     if (attendanceInitialized) {
         renderAttendanceTable();
         return;
