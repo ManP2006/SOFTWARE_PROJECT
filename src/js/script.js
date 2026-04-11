@@ -784,7 +784,7 @@ window.showView = function (viewId) {
     } else if (viewId === 'admin-payroll') {
         if (window.renderPayrollTable) window.renderPayrollTable();
     } else if (viewId === 'admin-leave') {
-        if (window.renderAdminLeaveTypes) window.renderAdminLeaveTypes();
+        if (window.initAdminLeaveModule) window.initAdminLeaveModule();
     }
 
     if (viewId === 'shared-settings') {
@@ -2748,6 +2748,7 @@ window.saveLeaveData = function () {
     localStorage.setItem('pps-leave-requests', JSON.stringify(leaveRequests));
     window.renderAdminLeaveTypes?.();
     window.renderAdminLeaveRequests?.();
+    window.renderAdminLeaveCalendar?.();
     window.renderEmployeeLeaveBalance?.();
     window.renderEmployeeLeaveHistory?.();
 };
@@ -3415,7 +3416,7 @@ window.showView = function (viewId) {
         initAttendanceModule();
     }
     if (viewId === 'admin-leave') {
-        initAdminLeaveModule();
+        window.initAdminLeaveModule();
     }
     if (viewId === 'admin-bonuses') {
         initBonusesDeductionsModule();
@@ -3427,7 +3428,16 @@ window.showView = function (viewId) {
 
 // --- Leave Management Logic ---
 let adminLeaveInitialized = false;
-function initAdminLeaveModule() {
+window.initAdminLeaveModule = function () {
+    // Fix: Relocate modals to <body> if they're trapped inside hidden parent containers
+    // (The payslip-modal area has malformed HTML that causes browser parsers to nest these modals inside it)
+    ['leave-type-modal', 'apply-leave-modal', 'bonus-deduction-modal'].forEach(modalId => {
+        const modal = getEl(modalId);
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+    });
+
     if (adminLeaveInitialized) {
         window.renderAdminLeaveTypes();
         window.renderAdminLeaveRequests();
@@ -3440,14 +3450,28 @@ function initAdminLeaveModule() {
     if (typeForm) {
         typeForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const idInput = getEl('edit-leave-type-id').value;
-            const name = getEl('leave-type-name').value;
-            const code = getEl('leave-type-code').value;
+            const idInput = getEl('edit-leave-type-id').value.trim();
+            const name = getEl('leave-type-name').value.trim();
+            const code = getEl('leave-type-code').value.trim();
             const category = getEl('leave-type-category').value;
-            const description = getEl('leave-type-desc').value;
+            const description = getEl('leave-type-desc').value.trim();
             const isPaid = category === 'Paid';
 
+            // Validate required fields
+            if (!name || !code) {
+                window.showToast('Please fill in all required fields.', 'warning');
+                return;
+            }
+
+            // Check for duplicate leave code (excluding current item when editing)
+            const duplicateCode = leaveTypes.find(t => t.code.toLowerCase() === code.toLowerCase() && t.id !== idInput);
+            if (duplicateCode) {
+                window.showToast(`Leave ID "${code}" is already used by "${duplicateCode.name}". Please use a unique ID.`, 'error');
+                return;
+            }
+
             if (idInput) {
+                // Edit existing leave type
                 const type = leaveTypes.find(t => t.id === idInput);
                 if (type) {
                     type.name = name;
@@ -3456,11 +3480,12 @@ function initAdminLeaveModule() {
                     type.isPaid = isPaid;
                     type.desc = description;
                 }
-                if (window.showToast) window.showToast('Leave type updated.', 'success');
+                window.showToast(`"${name}" leave type updated successfully.`, 'success');
             } else {
+                // Add new leave type
                 const newId = window.getNextLeaveTypeId();
                 leaveTypes.push({ id: newId, name, code, isPaid, category, desc: description });
-                if (window.showToast) window.showToast('New leave type added.', 'success');
+                window.showToast(`"${name}" leave type created successfully.`, 'success');
             }
 
             window.saveLeaveData();
@@ -3472,7 +3497,7 @@ function initAdminLeaveModule() {
     window.renderAdminLeaveRequests();
     window.renderAdminLeaveCalendar();
     adminLeaveInitialized = true;
-}
+};
 
 window.renderAdminLeaveCalendar = function () {
     const container = getEl('admin-leave-calendar-container');
@@ -3676,7 +3701,10 @@ window.showAddLeaveTypeModal = function (id = null) {
     const form = getEl('leave-type-form');
     if (form) form.reset();
 
+    const submitBtn = getEl('leave-type-submit-btn');
+
     if (id) {
+        // Edit mode — pre-fill all fields with existing leave type data
         const type = leaveTypes.find(t => t.id === id);
         if (type) {
             getEl('leave-type-modal-title').textContent = 'Edit Leave Type';
@@ -3686,25 +3714,35 @@ window.showAddLeaveTypeModal = function (id = null) {
             getEl('leave-type-code').value = type.code || '';
             getEl('leave-type-category').value = type.category || (type.isPaid ? 'Paid' : 'Unpaid');
             getEl('leave-type-desc').value = type.desc || type.description || '';
+            if (submitBtn) submitBtn.textContent = 'Update';
         }
     } else {
+        // Add mode — auto-generate ID and leave code
         getEl('leave-type-modal-title').textContent = 'Add Leave Type';
-        const newId = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
+        const newId = window.getNextLeaveTypeId();
         getEl('leave-type-id-display').textContent = newId;
         getEl('edit-leave-type-id').value = '';
+        if (submitBtn) submitBtn.textContent = 'Create Leave';
     }
 
     modal.classList.remove('hidden');
+
+    // Click outside modal to close
+    modal.onclick = function (e) {
+        if (e.target === modal) window.closeLeaveTypeModal();
+    };
 };
 
 window.closeLeaveTypeModal = function () {
-    getEl('leave-type-modal')?.classList.add('hidden');
+    const modal = getEl('leave-type-modal');
+    if (modal) modal.classList.add('hidden');
 };
 
 window.deleteLeaveType = function (id) {
     if (confirm('Are you sure you want to delete this leave type? Past requests will not be affected.')) {
         leaveTypes = leaveTypes.filter(t => t.id !== id);
         window.saveLeaveData();
+        if (window.showToast) window.showToast('Leave type deleted.', 'success');
     }
 };
 

@@ -3569,226 +3569,232 @@
                     </div>
                 </div>
             </div>
-
-            <!-- ================= ADD/EDIT LEAVE TYPE MODAL ================= -->
-            <div id="leave-type-modal" class="modal-overlay hidden">
-                <div class="modal" style="max-width: 400px;">
-                    <div class="modal-header">
-                        <h2 id="leave-type-modal-title">Add Leave Type</h2>
-                        <div class="modal-id-badge">
-                            <span class="modal-id-label">ID:</span>
-                            <strong class="modal-id-value" id="leave-type-id-display">LT005</strong>
-                        </div>
-                    </div>
-
-                    <form id="leave-type-form">
-                        <input type="hidden" id="edit-leave-type-id" value="">
-
-                        <div class="form-row">
-                            <label class="form-label">Leave Type Name</label>
-                            <input type="text" id="leave-type-name" class="form-input" placeholder="e.g. Sick Leave"
-                                required>
-                        </div>
-
-                        <div class="form-row">
-                            <label class="form-label">Leave Code</label>
-                            <input type="text" id="leave-type-code" class="form-input" placeholder="e.g. SL, CL, PL"
-                                required>
-                        </div>
-
-                        <div class="form-row">
-                            <label class="form-label">Category</label>
-                            <select id="leave-type-category" class="form-select" required>
-                                <option value="Paid">Paid</option>
-                                <option value="Unpaid">Unpaid</option>
-                            </select>
-                        </div>
-
-                        <div class="form-row">
-                            <label class="form-label">Description (Optional)</label>
-                            <textarea id="leave-type-desc" class="form-input" style="height: 80px; resize: none;"
-                                placeholder="Brief details about this leave type..."></textarea>
-                        </div>
-
-                        <div class="modal-footer" style="margin-top: 2rem;">
-                            <button type="button" class="btn btn-outline"
-                                onclick="closeLeaveTypeModal()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Leave Type</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- ================= APPLY LEAVE MODAL (EMPLOYEE) ================= -->
-            <div id="apply-leave-modal" class="modal-overlay hidden">
-                <div class="modal" style="max-width: 450px;">
-                    <div class="modal-header">
-                        <h2>Apply for Leave</h2>
-                    </div>
-
-                    <form id="apply-leave-form">
-                        <div class="form-row">
-                            <label class="form-label">Leave Type</label>
-                            <select id="emp-leave-type-select" class="form-select" required>
-                                <!-- Rendered via JS -->
-                            </select>
-                        </div>
-
-                        <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
-                            <div class="form-group">
-                                <label class="form-label">Start Date</label>
-                                <input type="date" id="leave-start-date" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">End Date</label>
-                                <input type="date" id="leave-end-date" class="form-input" required>
-                            </div>
-                        </div>
-
-                        <div class="form-row" style="margin-top: 1rem;">
-                            <label class="form-label">Reason</label>
-                            <textarea id="leave-reason" class="form-input" rows="3"
-                                placeholder="Brief reason for your leave..." required></textarea>
-                        </div>
-
-                        <div class="modal-footer" style="margin-top: 2rem;">
-                            <button type="button" class="btn btn-outline"
-                                onclick="closeApplyLeaveModal()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Submit Request</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div id="bonus-deduction-modal" class="modal-overlay hidden">
-                <div class="modal" style="max-width: 500px;">
-                    <div class="modal-header">
-                        <h2 id="bd-modal-title">Create New Entry</h2>
-                    </div>
-
-                    <form id="bd-form">
-                        <input type="hidden" id="bd-edit-id" value="">
-
-                        <div class="form-row">
-                            <label class="form-label">Employee</label>
-                            <select id="bd-employee-select" class="form-select" required>
-                                <!-- Populated via JS -->
-                            </select>
-                        </div>
-
-                        <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
-                            <div class="form-group">
-                                <label class="form-label">Type</label>
-                                <select id="bd-type-select" class="form-select" required>
-                                    <option value="Bonus">Bonus</option>
-                                    <option value="Deduction">Deduction</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Category</label>
-                                <select id="bd-category-select" class="form-select" required>
-                                    <option value="Performance Bonus">Performance Bonus</option>
-                                    <option value="Overtime">Overtime</option>
-                                    <option value="Late Penalty">Late Penalty</option>
-                                    <option value="Tax Adjustment">Tax Adjustment</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row" style="margin-top: 1rem;">
-                            <label class="form-label">Title / Note</label>
-                            <input type="text" id="bd-title" class="form-input"
-                                placeholder="e.g. Q1 Reward, March Overtime" required>
-                        </div>
-
-                        <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
-                            <div class="form-group">
-                                <label class="form-label">Amount (₹)</label>
-                                <input type="number" id="bd-amount" class="form-input" placeholder="0" required min="1">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Effective Month</label>
-                                <div class="flex-align gap-2">
-                                    <select id="bd-month-select" class="form-select" required>
-                                        <option value="01">Jan</option>
-                                        <option value="02">Feb</option>
-                                        <option value="03">Mar</option>
-                                        <option value="04">Apr</option>
-                                        <option value="05">May</option>
-                                        <option value="06">Jun</option>
-                                        <option value="07">Jul</option>
-                                        <option value="08">Aug</option>
-                                        <option value="09">Sep</option>
-                                        <option value="10">Oct</option>
-                                        <option value="11">Nov</option>
-                                        <option value="12">Dec</option>
-                                    </select>
-                                    <select id="bd-year-select" class="form-select" required>
-                                        <option value="2025">2025</option>
-                                        <option value="2026">2026</option>
-                                        <option value="2027">2027</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row" style="margin-top: 1rem;">
-                            <label class="form-label">Entry Date</label>
-                            <input type="date" id="bd-date" class="form-input" required>
-                        </div>
-
-                        <div class="modal-footer" style="margin-top: 2rem;">
-                            <button type="button" class="btn btn-outline"
-                                onclick="closeBonusDeductionModal()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Adjustment</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div id="report-view-modal" class="modal-overlay preview-modal-overlay hidden">
-                <div class="modal preview-modal-window">
-                    <div class="preview-modal-header no-print">
-                        <div>
-                            <h3 id="rep-modal-title" class="font-bold text-lg">Report Title</h3>
-                            <p id="rep-modal-subtitle" class="text-xs text-muted mt-0.5">Report Subtitle
-                            </p>
-                        </div>
-                        <div class="flex-align gap-3">
-                            <button class="btn btn-primary compact-btn" id="rep-modal-download-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" style="margin-right: 6px;">
-                                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                    <path
-                                        d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2">
-                                    </path>
-                                    <rect x="6" y="14" width="12" height="8"></rect>
-                                </svg>
-                                Print / Download
-                            </button>
-                            <button class="icon-btn"
-                                onclick="document.getElementById('report-view-modal').classList.add('hidden')"
-                                style="color: var(--text-muted);">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="preview-modal-body">
-                        <div id="rep-modal-body-container" class="document-viewer-frame"
-                            style="max-width: 1000px !important;">
-                            <div id="rep-modal-body" style="padding: 0;">
-                                <!-- Content will be injected by JS -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
+
+        <!-- ================= ADD/EDIT LEAVE TYPE MODAL ================= -->
+        <div id="leave-type-modal" class="modal-overlay hidden">
+            <div class="modal" style="max-width: 440px;">
+                <div class="modal-header" style="position: relative;">
+                    <h2 id="leave-type-modal-title">Add Leave Type</h2>
+                    <button type="button" class="leave-modal-close-btn" onclick="closeLeaveTypeModal()"
+                        aria-label="Close modal"
+                        style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg-alt);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all 0.2s ease;">&#10005;</button>
+                    <div class="modal-id-badge">
+                        <span class="modal-id-label">ID:</span>
+                        <strong class="modal-id-value" id="leave-type-id-display">LT005</strong>
+                    </div>
+                </div>
+
+                <form id="leave-type-form">
+                    <input type="hidden" id="edit-leave-type-id" value="">
+
+                    <div class="form-row">
+                        <label class="form-label">Leave Name <span style="color:var(--danger);">*</span></label>
+                        <input type="text" id="leave-type-name" class="form-input"
+                            placeholder="e.g. Sick Leave, Casual Leave" required>
+                    </div>
+
+                    <div class="grid-cols-2 form-row" style="margin-top: 0;">
+                        <div class="form-group">
+                            <label class="form-label">Leave ID <span style="color:var(--danger);">*</span></label>
+                            <input type="text" id="leave-type-code" class="form-input" placeholder="e.g. SL-01" required
+                                style="font-family: 'Monaco','Consolas',monospace; letter-spacing: 0.03em;">
+                            <span class="form-helper"
+                                style="font-size:0.7rem; color:var(--text-muted); margin-top:4px; display:block;">Unique
+                                shortcode for this leave</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Paid Status <span style="color:var(--danger);">*</span></label>
+                            <select id="leave-type-category" class="form-select" required>
+                                <option value="Paid">✅ Paid</option>
+                                <option value="Unpaid">❌ Unpaid</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Description <span
+                                style="font-weight:400;color:var(--text-muted);">(Optional)</span></label>
+                        <textarea id="leave-type-desc" class="form-input" style="height: 80px; resize: none;"
+                            placeholder="Brief details about this leave type..."></textarea>
+                    </div>
+
+                    <div class="modal-footer" style="margin-top: 2rem;">
+                        <button type="button" class="btn btn-outline" onclick="closeLeaveTypeModal()">Cancel</button>
+                        <button type="submit" id="leave-type-submit-btn" class="btn btn-primary">Create Leave</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================= APPLY LEAVE MODAL (EMPLOYEE) ================= -->
+        <div id="apply-leave-modal" class="modal-overlay hidden">
+            <div class="modal" style="max-width: 450px;">
+                <div class="modal-header">
+                    <h2>Apply for Leave</h2>
+                </div>
+
+                <form id="apply-leave-form">
+                    <div class="form-row">
+                        <label class="form-label">Leave Type</label>
+                        <select id="emp-leave-type-select" class="form-select" required>
+                            <!-- Rendered via JS -->
+                        </select>
+                    </div>
+
+                    <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" id="leave-start-date" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">End Date</label>
+                            <input type="date" id="leave-end-date" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top: 1rem;">
+                        <label class="form-label">Reason</label>
+                        <textarea id="leave-reason" class="form-input" rows="3"
+                            placeholder="Brief reason for your leave..." required></textarea>
+                    </div>
+
+                    <div class="modal-footer" style="margin-top: 2rem;">
+                        <button type="button" class="btn btn-outline" onclick="closeApplyLeaveModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="bonus-deduction-modal" class="modal-overlay hidden">
+            <div class="modal" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h2 id="bd-modal-title">Create New Entry</h2>
+                </div>
+
+                <form id="bd-form">
+                    <input type="hidden" id="bd-edit-id" value="">
+
+                    <div class="form-row">
+                        <label class="form-label">Employee</label>
+                        <select id="bd-employee-select" class="form-select" required>
+                            <!-- Populated via JS -->
+                        </select>
+                    </div>
+
+                    <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select id="bd-type-select" class="form-select" required>
+                                <option value="Bonus">Bonus</option>
+                                <option value="Deduction">Deduction</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select id="bd-category-select" class="form-select" required>
+                                <option value="Performance Bonus">Performance Bonus</option>
+                                <option value="Overtime">Overtime</option>
+                                <option value="Late Penalty">Late Penalty</option>
+                                <option value="Tax Adjustment">Tax Adjustment</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top: 1rem;">
+                        <label class="form-label">Title / Note</label>
+                        <input type="text" id="bd-title" class="form-input" placeholder="e.g. Q1 Reward, March Overtime"
+                            required>
+                    </div>
+
+                    <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Amount (₹)</label>
+                            <input type="number" id="bd-amount" class="form-input" placeholder="0" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Effective Month</label>
+                            <div class="flex-align gap-2">
+                                <select id="bd-month-select" class="form-select" required>
+                                    <option value="01">Jan</option>
+                                    <option value="02">Feb</option>
+                                    <option value="03">Mar</option>
+                                    <option value="04">Apr</option>
+                                    <option value="05">May</option>
+                                    <option value="06">Jun</option>
+                                    <option value="07">Jul</option>
+                                    <option value="08">Aug</option>
+                                    <option value="09">Sep</option>
+                                    <option value="10">Oct</option>
+                                    <option value="11">Nov</option>
+                                    <option value="12">Dec</option>
+                                </select>
+                                <select id="bd-year-select" class="form-select" required>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-top: 1rem;">
+                        <label class="form-label">Entry Date</label>
+                        <input type="date" id="bd-date" class="form-input" required>
+                    </div>
+
+                    <div class="modal-footer" style="margin-top: 2rem;">
+                        <button type="button" class="btn btn-outline"
+                            onclick="closeBonusDeductionModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Adjustment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="report-view-modal" class="modal-overlay preview-modal-overlay hidden">
+            <div class="modal preview-modal-window">
+                <div class="preview-modal-header no-print">
+                    <div>
+                        <h3 id="rep-modal-title" class="font-bold text-lg">Report Title</h3>
+                        <p id="rep-modal-subtitle" class="text-xs text-muted mt-0.5">Report Subtitle
+                        </p>
+                    </div>
+                    <div class="flex-align gap-3">
+                        <button class="btn btn-primary compact-btn" id="rep-modal-download-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" style="margin-right: 6px;">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2">
+                                </path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            Print / Download
+                        </button>
+                        <button class="icon-btn"
+                            onclick="document.getElementById('report-view-modal').classList.add('hidden')"
+                            style="color: var(--text-muted);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="preview-modal-body">
+                    <div id="rep-modal-body-container" class="document-viewer-frame"
+                        style="max-width: 1000px !important;">
+                        <div id="rep-modal-body" style="padding: 0;">
+                            <!-- Content will be injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
     </div>
 
     <script src="../src/js/script.js?v=789"></script>
