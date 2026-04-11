@@ -331,20 +331,7 @@ window.initEmployeePortal = function (userName) {
     // 5. Payslip History Table Sync (Refined for Modern Redesign)
     const tableBody = getEl('emp-payslips-table-body');
     if (tableBody) {
-        tableBody.innerHTML = `
-            <tr>
-                <td class="font-medium">February 2026</td>
-                <td>Mar 01, 2026</td>
-                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
-                <td><span class="badge badge-green">Paid</span></td>
-                <td><button class="btn btn-primary compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'February 2026')">View</button></td>
-            </tr>
-            <tr>
-                <td class="font-medium text-sm">January 2026</td>
-                <td>Feb 01, 2026</td>
-                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
-                <td><span class="badge badge-green">Paid</span></td>
-                <td><button class="btn btn-primary compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'January 2026')">View</button></td>
+
         const months = ["February 2026", "January 2026"];
         const dates = ["Mar 01, 2026", "Feb 01, 2026"];
 
