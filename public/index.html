@@ -1390,12 +1390,12 @@
                         <div class="flex-between" style="margin-bottom: 1.5rem;">
                             <h2 style="font-size: 1.5rem;">Leave Management</h2>
                             <div style="display: flex; gap: 0.75rem;">
-                                <button class="btn btn-primary" onclick="showAddLeaveTypeModal()">+ Add Leave
+                                <button class="btn btn-primary" id="add-leave-type-btn">+ Add Leave
                                     Type</button>
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 7fr 3fr; gap: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 6.2fr 3.8fr; gap: 1.5rem;">
 
                             <!-- Leave Requests -->
                             <div class="card p-0 overflow-hidden" style="display: flex; flex-direction: column;">
@@ -1434,7 +1434,7 @@
                                             <tr>
                                                 <th>Type</th>
                                                 <th style="text-align: center;">Category</th>
-                                                <th style="text-align: right;">Actions</th>
+                                                <th style="text-align: center;">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody id="admin-leave-types-body">
@@ -1901,7 +1901,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div id="rep-preview-body" style="max-height:320px; overflow-y:auto; overflow-x:auto;">
+                            <div id="rep-preview-body" style="max-height:320px; overflow-y:auto; overflow-x:hidden;">
                                 <!-- Dynamically populated by JS -->
                             </div>
                         </div>
@@ -2485,8 +2485,8 @@
                                                     <td>Mar 01, 2026</td>
                                                     <td class="font-bold text-primary">₹ 65,000</td>
                                                     <td><span class="badge badge-green">Paid</span></td>
-                                                    <td><button
-                                                            class="btn btn-outline compact-btn text-xs">Download</button>
+                                                    <td><button class="btn btn-primary compact-btn text-xs"
+                                                            onclick="window.showPayslip('PPS001', 'February 2026')">View</button>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -2505,109 +2505,33 @@
                             </div>
 
                             <div class="flex-column gap-6">
-                                <div class="premium-card p-0 overflow-hidden glass-card animate-fade-in delay-200"
-                                    style="border: 1px solid var(--primary-light); min-width: 320px;">
-                                    <div class="p-4 border-b bg-sky-50 flex-between">
-                                        <h3 class="mb-0 text-sky-900 flex-align text-sm">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2" class="mr-2">
-                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z">
-                                                </path>
-                                                <polyline points="14 2 14 8 20 8"></polyline>
-                                            </svg>
-                                            Monthly Payslip Preview
-                                        </h3>
-                                        <span class="badge badge-blue" style="font-size: 0.6rem;">OFFICIAL</span>
+                                <div class="premium-card p-6 blur-card">
+                                    <h3 class="mb-4">Monthly Payslip Preview</h3>
+                                    <div class="text-center py-4">
+                                        <div class="text-muted text-sm mb-1" id="preview-month">February 2026</div>
+                                        <h1 class="text-4xl mb-4" id="preview-net-pay">₹ 65,000</h1>
+                                        <div class="badge badge-green">Salary Credited</div>
                                     </div>
-                                    <div class="p-5">
-                                        <div class="flex-column gap-4">
-                                            <!-- Earnings -->
-                                            <div>
-                                                <div class="flex-between mb-2 pb-1 border-b"
-                                                    style="border-color: var(--border);">
-                                                    <span
-                                                        class="text-[10px] uppercase font-bold text-muted">Earnings</span>
-                                                    <span
-                                                        class="text-[10px] uppercase font-bold text-muted">Amount</span>
-                                                </div>
-                                                <div class="flex-column gap-2 text-sm">
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">Basic Salary</span>
-                                                        <span class="font-medium" id="pre-basic">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">HRA</span>
-                                                        <span class="font-medium" id="pre-hra">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">Education Allowance</span>
-                                                        <span class="font-medium" id="pre-edu">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">L.T.A</span>
-                                                        <span class="font-medium" id="pre-lta">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">Special Allowance</span>
-                                                        <span class="font-medium" id="pre-special">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between font-bold pt-2 mt-1 border-t"
-                                                        style="border-style: dashed; border-color: var(--border);">
-                                                        <span>Gross Total</span>
-                                                        <span class="text-primary" id="pre-gross">₹ 0</span>
-                                                    </div>
-                                                </div>
-                                            </div>
 
-                                            <!-- Deductions -->
-                                            <div>
-                                                <div class="flex-between mb-2 pb-1 border-b"
-                                                    style="border-color: var(--border);">
-                                                    <span
-                                                        class="text-[10px] uppercase font-bold text-muted">Deductions</span>
-                                                    <span
-                                                        class="text-[10px] uppercase font-bold text-muted">Amount</span>
-                                                </div>
-                                                <div class="flex-column gap-2 text-sm">
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">PF Contribution</span>
-                                                        <span class="text-red" id="pre-pf">₹ 0</span>
-                                                    </div>
-                                                    <div class="flex-between">
-                                                        <span class="text-muted">Professional Tax</span>
-                                                        <span class="text-red" id="pre-pt">₹ 200</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Net Salary -->
-                                            <div
-                                                class="mt-2 p-4 rounded-xl bg-gradient-to-br from-sky-600 to-blue-700 text-white shadow-lg shadow-sky-100 flex-between transform transition hover:scale-[1.02]">
-                                                <div>
-                                                    <div
-                                                        class="text-[9px] uppercase font-bold opacity-80 tracking-wider">
-                                                        Net Take Home</div>
-                                                    <div class="text-xl font-black" id="pre-net">₹ 0</div>
-                                                </div>
-                                                <div
-                                                    class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="3">
-                                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                                    </svg>
-                                                </div>
-                                            </div>
+                                    <div class="mt-6 pt-6 border-t flex-column gap-3">
+                                        <div class="flex-between">
+                                            <span class="text-sm text-muted">Total Earnings</span>
+                                            <span class="font-medium">₹ 72,500</span>
                                         </div>
-                                        <button class="btn btn-primary w-full mt-6"
-                                            onclick="window.showPayslipFromDashboard()">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2" class="mr-2">
-                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                <circle cx="12" cy="12" r="3"></circle>
-                                            </svg>
-                                            View Detailed Payslip
-                                        </button>
+                                        <div class="flex-between">
+                                            <span class="text-sm text-muted">Total Deductions</span>
+                                            <span class="font-medium text-red">₹ 7,500</span>
+                                        </div>
+                                        <div class="flex-between pt-2 border-t mt-2">
+                                            <span class="font-bold">Net Payable</span>
+                                            <span class="font-bold text-primary">₹ 65,000</span>
+                                        </div>
                                     </div>
+
+                                    <button class="btn btn-primary w-full mt-8"
+                                        onclick="window.showPayslip('PPS001', 'February 2026')">
+                                        Generate Full PDF
+                                    </button>
                                 </div>
                             </div>
                         </div>
