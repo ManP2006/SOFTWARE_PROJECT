@@ -90,6 +90,18 @@ window.AuthStorage = {
     }
 };
 
+// --- Attendance Live Timer System ---
+// simulateCheckIn, simulateCheckOut, and startLiveTimer are defined further below
+// after the employees array is available.
+
+window.formatTime = function (ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds].map(v => v < 10 ? '0' + v : v).join(':');
+};
+
 // --- Logout System ---
 window.handleLogout = function () {
     // Show custom confirmation modal
@@ -242,8 +254,15 @@ window.initEmployeePortal = function (userName) {
     const now = new Date();
     const dayNums = getEl('dash-day-num');
     const monthYears = getEl('dash-month-year');
+    const dayNumsModern = getEl('dash-day-num-modern');
+    const monthYearsModern = getEl('dash-month-year-modern');
+
     if (dayNums) dayNums.textContent = now.getDate();
-    if (monthYears) monthYears.textContent = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
+    if (dayNumsModern) dayNumsModern.textContent = now.getDate();
+
+    const monthYearText = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
+    if (monthYears) monthYears.textContent = monthYearText;
+    if (monthYearsModern) monthYearsModern.textContent = monthYearText;
 
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${emp.monthlySalary.toLocaleString()}`;
     if (getEl('dash-emp-leave')) getEl('dash-emp-leave').textContent = `${emp.paidLeave + emp.sickLeave + 12} Days`; // Simulated
@@ -270,16 +289,22 @@ window.initEmployeePortal = function (userName) {
         getEl('prof-avatar-large').style.borderRadius = '50%';
     }
 
-    // 3. Attendance Simulation State
-    const isCheckedIn = localStorage.getItem(`pps-checkin-${emp.id}`);
+    // 3. Attendance Simulation State — uses CHECKIN_KEY set by simulateCheckIn
+    const savedTimestamp = localStorage.getItem('pps-active-checkin');
     const checkinBtn = getEl('btn-checkin');
     const checkoutBtn = getEl('btn-checkout');
     const timerEl = getEl('live-timer');
 
-    if (isCheckedIn) {
+    if (savedTimestamp) {
+        // Parse stored ms timestamp → show as readable punch-in time
+        const punchInDate = new Date(parseInt(savedTimestamp, 10));
+        const punchInTimeStr = punchInDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
         if (checkinBtn) checkinBtn.disabled = true;
         if (checkoutBtn) checkoutBtn.disabled = false;
-        if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = isCheckedIn;
+        if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = punchInTimeStr;
+
+        // Resume the live elapsed timer from actual punch-in moment
         window.startLiveTimer();
     } else {
         if (checkinBtn) checkinBtn.disabled = false;
@@ -303,7 +328,7 @@ window.initEmployeePortal = function (userName) {
     // Update main dashboard net salary card to be consistent
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${breakdown.net.toLocaleString()}`;
 
-    // 5. Payslip History Table Sync
+    // 5. Payslip History Table Sync (Refined for Modern Redesign)
     const tableBody = getEl('emp-payslips-table-body');
     if (tableBody) {
         tableBody.innerHTML = `
@@ -320,8 +345,26 @@ window.initEmployeePortal = function (userName) {
                 <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
                 <td><span class="badge badge-green">Paid</span></td>
                 <td><button class="btn btn-primary compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'January 2026')">View</button></td>
+        const months = ["February 2026", "January 2026"];
+        const dates = ["Mar 01, 2026", "Feb 01, 2026"];
+
+        tableBody.innerHTML = months.map((month, i) => `
+            <tr>
+                <td class="font-medium">${month}</td>
+                <td>${dates[i]}</td>
+                <td class="font-bold text-primary text-right">₹ ${breakdown.net.toLocaleString()}</td>
+                <td class="text-center"><span class="badge badge-green">Paid</span></td>
+                <td class="text-right">
+                    <button class="payslip-view-btn" onclick="window.showPayslip('${emp.id}', '${month}')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        View
+                    </button>
+                </td>
             </tr>
-        `;
+        `).join('');
     }
 
     // 6. Persist for Standalone View
@@ -343,6 +386,46 @@ window.initEmployeePortal = function (userName) {
 
     // 7. Render dynamic tasks
     window.renderEmployeeTasks(emp.id);
+};
+
+window.showPayslip = function (empId, month) {
+    const emp = employees.find(e => String(e.id) === String(empId)) || employees[0];
+    const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
+    
+    // Prepare data for the iframe
+    const payload = {
+        name: emp.name,
+        id: emp.id,
+        dept: emp.dept || 'Operations',
+        position: emp.position || 'Employee',
+        period: month,
+        date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
+        salary: breakdown,
+        companyName: 'Prime Payroll Solutions',
+        companyAddress: '123 Tech Hub, HITEC City, Hyderabad, 500081'
+    };
+
+    // Store in localStorage as backup
+    localStorage.setItem('pps-current-payslip', JSON.stringify(payload));
+
+    // Update Iframe
+    const iframe = getEl('payslip-iframe');
+    if (iframe) {
+        iframe.src = 'payslip.html?t=' + Date.now();
+        iframe.onload = () => {
+            iframe.contentWindow.postMessage({ type: 'POPULATE_PAYSLIP', payload }, '*');
+            // Trigger scaling after a small delay to ensure rendering
+            setTimeout(() => {
+                window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
+            }, 100);
+        };
+    }
+    
+    getEl('payslip-modal')?.classList.remove('hidden');
+    // Also scale immediately in case iframe was already loaded
+    setTimeout(() => {
+        window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
+    }, 50);
 };
 
 window.renderEmployeeTasks = function (empId) {
@@ -554,43 +637,83 @@ window.closeModal = function (modalId) {
     if (modal) modal.classList.add('hidden');
 };
 
-window.simulateCheckIn = function () {
-    const emp = employees.find(e => e.name === window.currentUser.displayName) || employees[0];
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    localStorage.setItem(`pps-checkin-${emp.id}`, time);
+// KEY used to persist the punch-in timestamp across page reloads
+const CHECKIN_KEY = 'pps-active-checkin';
 
+window.simulateCheckIn = function () {
+    const now = Date.now();
+    const timeStr = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Persist the exact punch-in moment
+    localStorage.setItem(CHECKIN_KEY, now.toString());
+
+    // Update UI
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = true;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = false;
-    if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = time;
+    if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = timeStr;
+
+    // Show 00:00:00 immediately, then start counting
+    const timerEl = getEl('live-timer');
+    if (timerEl) timerEl.textContent = '00:00:00';
 
     window.startLiveTimer();
-    alert('Punched in successfully at ' + time);
+    window.showToast('Punched in at ' + timeStr, 'success');
 };
 
 window.simulateCheckOut = function () {
-    const emp = employees.find(e => e.name === window.currentUser.displayName) || employees[0];
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    localStorage.removeItem(`pps-checkin-${emp.id}`);
+    const now = Date.now();
+    const timeStr = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    // Stop the running interval first
+    if (window.timerInterval) {
+        clearInterval(window.timerInterval);
+        window.timerInterval = null;
+    }
+
+    // Calculate total work time from stored punch-in
+    const savedTimestamp = localStorage.getItem(CHECKIN_KEY);
+    let totalTimeStr = '00:00:00';
+    if (savedTimestamp) {
+        const elapsed = now - parseInt(savedTimestamp, 10);
+        const h = Math.floor(elapsed / 3600000);
+        const m = Math.floor((elapsed % 3600000) / 60000);
+        const s = Math.floor((elapsed % 60000) / 1000);
+        totalTimeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // Clear persisted state
+    localStorage.removeItem(CHECKIN_KEY);
+
+    // Update UI
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = false;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = true;
-    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = time;
+    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = timeStr;
 
-    if (window.timerInterval) clearInterval(window.timerInterval);
-    alert('Punched out successfully at ' + time);
+    // Show the final total worked time on the timer display
+    const timerEl = getEl('live-timer');
+    if (timerEl) timerEl.textContent = totalTimeStr;
+
+    window.showToast(`Punched out at ${timeStr}  |  Total work time: ${totalTimeStr}`, 'info');
 };
 
 window.startLiveTimer = function () {
-    if (window.timerInterval) clearInterval(window.timerInterval);
-    const startTime = new Date();
-    startTime.setHours(9, 0, 0); // Assume they started at 9 AM for effect
+    // Clear any previous interval
+    if (window.timerInterval) {
+        clearInterval(window.timerInterval);
+        window.timerInterval = null;
+    }
+
+    // Read the punch-in time from localStorage
+    const savedTimestamp = localStorage.getItem(CHECKIN_KEY);
+    if (!savedTimestamp) return; // Nothing to count if not punched in
+
+    const punchInTime = parseInt(savedTimestamp, 10);
 
     window.timerInterval = setInterval(() => {
-        const now = new Date();
-        const diff = now - startTime;
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
+        const elapsed = Date.now() - punchInTime;
+        const h = Math.floor(elapsed / 3600000);
+        const m = Math.floor((elapsed % 3600000) / 60000);
+        const s = Math.floor((elapsed % 60000) / 1000);
 
         const timerEl = getEl('live-timer');
         if (timerEl) {
@@ -895,6 +1018,7 @@ function initApp() {
         window.loadEmployees();
         window.loadPayrolls();
         window.initPayrollModule();
+        window.initAttendanceTimer();
     } catch (err) {
         console.error('Initialization Error:', err);
     }
@@ -2179,38 +2303,33 @@ window.autoScalePayslip = function () {
  */
 window.autoScaleViewer = function (containerId, modalId) {
     const modal = document.getElementById(modalId);
-    const root = modal?.querySelector('.clean-preview-root');
+    const body = modal?.querySelector('.preview-modal-body');
     const container = document.getElementById(containerId);
     const modalWindow = modal?.querySelector('.preview-modal-window');
 
-    if (!root || !container || !modalWindow) return;
+    if (!body || !container || !modalWindow) return;
 
-    // 'Breathing Room' Buffer: ensures document is comfortably 'reduced' in size
-    const margin = 8;
-    const availableW = root.getBoundingClientRect().width - (margin * 2);
-    const availableH = root.getBoundingClientRect().height - (margin * 2);
+    // Use the modal body as the viewport reference
+    const availableW = body.offsetWidth - 40;
+    const availableH = body.offsetHeight - 40;
 
-    // Dynamic Document Dimensions: detect natural size of content (card/frame)
-    const card = container.querySelector('.clean-document-frame');
-
-    // Fallback logic for hidden elements or slow rendering
-    const docW = card?.offsetWidth || 800;
-    const docH = card?.offsetHeight || 900;
+    // A4 Dimensions: 210mm x 297mm (approx 794px x 1123px at 96dpi)
+    const docW = 794; 
+    const docH = 1123;
 
     // Scaling ratio logic: ensure full visibility without scroll
-    // Multiply available height by 0.95 to give a small safety buffer
-    let scale = Math.min(availableW / docW, (availableH * 0.95) / docH);
+    let scale = Math.min(availableW / docW, availableH / docH);
 
     // Safety Fallback: Don't let it get microscopically small or over-scale
-    scale = Math.min(Math.max(scale, 0.4), 1.0);
+    scale = Math.min(Math.max(scale, 0.3), 1.0);
 
-    // Apply transform and ensure it's centered in its own layout box
+    // Apply transform and ensure it's centered
     container.style.transform = `scale(${scale})`;
     container.style.transformOrigin = 'center center';
 
-    // Tight-fit Modal Width: ensure the modal isn't unnecessarily wide
-    const tightWidth = Math.floor(docW * scale) + 40;
-    modalWindow.style.width = `min(90vw, ${tightWidth}px)`;
+    // Tight-fit Modal Width for visual balance
+    const tightWidth = Math.floor(docW * scale) + 60;
+    modalWindow.style.width = `min(95vw, ${tightWidth}px)`;
 };
 
 // Global Resize Listener for all Previews
@@ -2224,7 +2343,7 @@ window.addEventListener('resize', () => {
     });
 });
 
-window.printPayslipIframe = function () {
+window.printPayslip = function () {
     const iframe = getEl('payslip-iframe');
     if (iframe && iframe.contentWindow) {
         iframe.contentWindow.print();
