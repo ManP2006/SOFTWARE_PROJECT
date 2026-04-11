@@ -63,6 +63,32 @@ window.showToast = function (message, type = 'info') {
         }
     }, 4000);
 };
+// --- Auth Storage & Remember Me Utility ---
+window.AuthStorage = {
+    getKeys: function(role) {
+        return {
+            nameKey: role === 'employee' ? 'employee_remember_name' : 'admin_remember_name',
+            emailKey: role === 'employee' ? 'employee_remember_email' : 'admin_remember_email'
+        };
+    },
+    saveCredentials: function(role, name, email) {
+        const keys = this.getKeys(role);
+        localStorage.setItem(keys.nameKey, name);
+        localStorage.setItem(keys.emailKey, email);
+    },
+    getCredentials: function(role) {
+        const keys = this.getKeys(role);
+        return {
+            name: localStorage.getItem(keys.nameKey) || '',
+            email: localStorage.getItem(keys.emailKey) || ''
+        };
+    },
+    clearCredentials: function(role) {
+        const keys = this.getKeys(role);
+        localStorage.removeItem(keys.nameKey);
+        localStorage.removeItem(keys.emailKey);
+    }
+};
 
 // --- Logout System ---
 window.handleLogout = function () {
@@ -115,11 +141,7 @@ window.handleLogout = function () {
 
         // Simulate async logout (clear all auth state)
         setTimeout(() => {
-            // 1. Clear all session/auth data
-            localStorage.removeItem('pps-admin-remember-name');
-            localStorage.removeItem('pps-admin-remember-email');
-            localStorage.removeItem('pps-emp-remember-name');
-            localStorage.removeItem('pps-emp-remember-email');
+            // 1. Clear session metadata (but preserve Remember Me data)
             localStorage.removeItem('pps-current-payslip');
             // Clear check-in states
             const keys = Object.keys(localStorage).filter(k => k.startsWith('pps-checkin-'));
@@ -723,10 +745,10 @@ window.renderEmployeeTable = function () {
             <td data-label="Department">${emp.dept}</td>
             <td data-label="Status"><span class="badge ${badgeClass}">${emp.status}</span></td>
             <td data-label="Tasks">
-                <div class="flex-align gap-2">
-                    <span class="text-xs font-bold">${completed}/${assigned}</span>
-                    <button class="btn btn-primary compact-btn text-xs" onclick="window.showTaskManagementModal('${emp.id}')" style="padding: 3px 8px;">Manage</button>
-                </div>
+                <span class="text-xs font-bold">${completed}/${assigned}</span>
+            </td>
+            <td data-label="Manage">
+                <button class="btn btn-primary compact-btn text-xs" onclick="window.showTaskManagementModal('${emp.id}')" style="padding: 3px 8px;">Manage</button>
             </td>
             <td data-label="Rating">
                 <span class="text-xs ${perfColor} font-bold">${perfPct}%</span>
@@ -911,19 +933,17 @@ function initApp() {
         if (getEl('employee-name')) getEl('employee-name').value = '';
         if (getEl('remember-me')) getEl('remember-me').checked = false;
 
-        const rolePrefix = role === 'employee' ? 'pps-emp-remember' : 'pps-admin-remember';
-        const savedName = localStorage.getItem(`${rolePrefix}-name`);
-        const savedEmail = localStorage.getItem(`${rolePrefix}-email`);
+        const creds = window.AuthStorage.getCredentials(role);
 
-        if (savedEmail) {
-            if (getEl('email')) getEl('email').value = savedEmail;
+        if (creds.email) {
+            if (getEl('email')) getEl('email').value = creds.email;
             if (getEl('remember-me')) getEl('remember-me').checked = true;
         }
-        if (savedName) {
+        if (creds.name) {
             if (role === 'employee') {
-                if (getEl('employee-name')) getEl('employee-name').value = savedName;
+                if (getEl('employee-name')) getEl('employee-name').value = creds.name;
             } else {
-                if (getEl('admin-user')) getEl('admin-user').value = savedName;
+                if (getEl('admin-user')) getEl('admin-user').value = creds.name;
             }
         }
     }
@@ -981,13 +1001,10 @@ function initApp() {
         }
 
         // Remember Me Logic
-        const rolePrefix = role === 'employee' ? 'pps-emp-remember' : 'pps-admin-remember';
         if (rememberMe) {
-            localStorage.setItem(`${rolePrefix}-name`, name);
-            localStorage.setItem(`${rolePrefix}-email`, email);
+            window.AuthStorage.saveCredentials(role, name, email);
         } else {
-            localStorage.removeItem(`${rolePrefix}-name`);
-            localStorage.removeItem(`${rolePrefix}-email`);
+            window.AuthStorage.clearCredentials(role);
         }
 
         window.loadEmployees();
