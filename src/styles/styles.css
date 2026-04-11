@@ -1473,7 +1473,7 @@ button,
         width: 34px;
     }
     .hero {
-        padding: 3rem 0 2.5rem;
+        padding: 4rem 0 1.5rem;
     }
     .hero-title {
         font-size: 2.25rem;
@@ -1485,7 +1485,7 @@ button,
    HERO SECTION
    ============================================= */
 .hero {
-    padding: 5rem 0 4rem;
+    padding: 6rem 0 2rem;
     text-align: center;
     position: relative;
     overflow: visible;
@@ -1600,7 +1600,7 @@ button,
 /* =============================================
    FEATURES SECTION
    ============================================= */
-.features { padding: 5rem 0; }
+.features { padding: 3rem 0 4rem; }
 .section-title {
     text-align: center;
     font-size: 1.875rem;
@@ -1986,7 +1986,7 @@ button,
     transform: translate(-50%, -50%) rotate(-15deg) !important;
     width: 300px !important;
     height: 300px !important;
-    background-image: url('logo.jpg') !important;
+    background-image: url('../../assets/images/logo.jpg') !important;
     background-size: contain !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
