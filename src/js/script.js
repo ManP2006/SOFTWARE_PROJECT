@@ -331,6 +331,20 @@ window.initEmployeePortal = function (userName) {
     // 5. Payslip History Table Sync (Refined for Modern Redesign)
     const tableBody = getEl('emp-payslips-table-body');
     if (tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td class="font-medium">February 2026</td>
+                <td>Mar 01, 2026</td>
+                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
+                <td><span class="badge badge-green">Paid</span></td>
+                <td><button class="btn btn-primary compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'February 2026')">View</button></td>
+            </tr>
+            <tr>
+                <td class="font-medium text-sm">January 2026</td>
+                <td>Feb 01, 2026</td>
+                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
+                <td><span class="badge badge-green">Paid</span></td>
+                <td><button class="btn btn-primary compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'January 2026')">View</button></td>
         const months = ["February 2026", "January 2026"];
         const dates = ["Mar 01, 2026", "Feb 01, 2026"];
 
@@ -841,12 +855,12 @@ window.renderEmployeeTable = function () {
         tr.setAttribute('data-id', emp.id);
         tr.innerHTML = `
             <td data-label="Employee ID"><span class="emp-id">${emp.id}</span></td>
-            <td data-label="Name">
+            <td data-label="Name" class="name-cell">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="avatar-sm" style="background: var(--primary-light); color: var(--primary);">${initials}</div>
                     <div>
                         <div class="font-medium">${emp.name}</div>
-                        <div class="text-xs text-muted">${emp.email}</div>
+                        <div class="text-xs text-muted email">${emp.email}</div>
                     </div>
                 </div>
             </td>
@@ -866,12 +880,12 @@ window.renderEmployeeTable = function () {
                 <span class="font-medium">₹${(emp.ctc / 100000).toFixed(2)} LPA</span>
             </td>
             <td data-label="CTC Breakdown">
-                <button class="btn btn-outline compact-btn text-xs" onclick="window.showCTCBreakdown('${emp.id}')">CTC Breakdown</button>
+                <button class="btn btn-outline compact-btn text-xs ctc-button" onclick="window.showCTCBreakdown('${emp.id}')">CTC Breakdown</button>
             </td>
             <td>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="icon-btn edit-btn" aria-label="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                    <button class="icon-btn text-red delete-btn" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                <div style="display: flex; gap: 0.5rem;" class="action-buttons-cell">
+                    <button class="icon-btn edit-btn" data-action="edit-employee" data-id="${emp.id}" aria-label="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                    <button class="icon-btn text-red delete-btn" data-action="delete-employee" data-id="${emp.id}" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                 </div>
             </td>
         `;
@@ -898,21 +912,63 @@ window.updateDashboardStats = function () {
 };
 
 window.getNextId = function () {
-    return `PPS${String(employees.length + 1).padStart(3, '0')}`;
+    if (employees.length === 0) return 'PPS001';
+    const ids = employees.map(e => parseInt(e.id.replace('PPS', '')) || 0);
+    const max = Math.max(...ids);
+    return `PPS${String(max + 1).padStart(3, '0')}`;
+};
+
+window.getNextLeaveTypeId = function () {
+    if (leaveTypes.length === 0) return 'LT001';
+    const ids = leaveTypes.map(lt => parseInt(lt.id.replace('LT', '')) || 0);
+    const max = Math.max(...ids);
+    return `LT${String(max + 1).padStart(3, '0')}`;
 };
 
 window.showAddEmployeeModal = function () {
     const employeeModal = getEl('employee-modal');
     const addEmployeeForm = getEl('add-employee-form');
-    const editEmpIndexInput = getEl('edit-emp-index');
-    const modalTitleEl = getEl('modal-title');
+    const editEmpIdInput = getEl('edit-emp-index');
+    const modalTitleEl = getEl('employee-modal-title');
     const nextEmpIdDisplay = getEl('next-emp-id');
+
     if (addEmployeeForm) addEmployeeForm.reset();
-    if (editEmpIndexInput) editEmpIndexInput.value = '';
+    if (editEmpIdInput) editEmpIdInput.value = '';
     if (modalTitleEl) modalTitleEl.textContent = 'Add New Employee';
     if (getEl('emp-id-label')) getEl('emp-id-label').textContent = 'Assigning ID:';
     if (nextEmpIdDisplay) nextEmpIdDisplay.textContent = window.getNextId();
     if (employeeModal) employeeModal.classList.remove('hidden');
+};
+
+window.editEmployee = function (id) {
+    const emp = employees.find(e => e.id === id);
+    if (!emp) return;
+
+    const employeeModal = getEl('employee-modal');
+    const editEmpIdInput = getEl('edit-emp-index');
+    const modalTitleEl = getEl('employee-modal-title');
+    const nextEmpIdDisplay = getEl('next-emp-id');
+
+    if (modalTitleEl) modalTitleEl.textContent = 'Edit Employee';
+    if (getEl('emp-id-label')) getEl('emp-id-label').textContent = 'Assigned ID:';
+    if (nextEmpIdDisplay) nextEmpIdDisplay.textContent = id;
+    if (editEmpIdInput) editEmpIdInput.value = id;
+
+    if (getEl('new-emp-name')) getEl('new-emp-name').value = emp.name;
+    if (getEl('new-emp-email')) getEl('new-emp-email').value = emp.email;
+    if (getEl('new-emp-role')) getEl('new-emp-role').value = emp.role;
+    if (getEl('new-emp-dept')) getEl('new-emp-dept').value = emp.dept;
+    if (getEl('new-emp-status')) getEl('new-emp-status').value = emp.status;
+    if (getEl('new-emp-ctc')) getEl('new-emp-ctc').value = emp.ctc;
+
+    if (employeeModal) employeeModal.classList.remove('hidden');
+};
+
+let rowToDelete = null;
+window.confirmDeleteEmployee = function (id) {
+    rowToDelete = id;
+    const deleteModal = getEl('delete-modal');
+    if (deleteModal) deleteModal.classList.remove('hidden');
 };
 
 window.updatePayrollAnalytics = function () {
@@ -1018,24 +1074,28 @@ function initApp() {
     }
 
     // Role Modal - Re-query to include dynamic buttons
-    const attachOpenModalHandlers = () => {
-        const openModalButtons = queryAll('.open-modal');
-        openModalButtons.forEach(btn => {
-            btn.onclick = (e) => {
-                e.preventDefault();
-                if (modal) modal.classList.remove('hidden');
-            };
-        });
-    };
-    attachOpenModalHandlers();
+    // Robust Modal Triggers using Event Delegation
+    document.addEventListener('click', (e) => {
+        const openBtn = e.target.closest('.open-modal');
+        if (openBtn) {
+            e.preventDefault();
+            const targetModal = getEl('role-modal');
+            if (targetModal) targetModal.classList.remove('hidden');
+        }
 
-    if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+        // Close modal if clicking overlay
+        if (e.target.id === 'role-modal') {
+            e.target.classList.add('hidden');
+        }
 
-    roleBtns.forEach(btn => btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const role = btn.getAttribute('data-role');
-        if (role) showAuthView(role);
-    }));
+        // Role Selection Handling
+        const roleBtn = e.target.closest('.role-card[data-role]');
+        if (roleBtn) {
+            e.preventDefault();
+            const role = roleBtn.getAttribute('data-role');
+            if (role) showAuthView(role);
+        }
+    });
 
     function hydrateCredentials(role) {
         if (getEl('email')) getEl('email').value = '';
@@ -1151,55 +1211,49 @@ function initApp() {
     // --- Employee Management Event Listeners ---
     // (renderEmployeeTable, updateDashboardStats, getNextId, showAddEmployeeModal are now global)
 
+    // --- Enhanced Listener Setup ---
     if (addEmployeeBtn) {
-        addEmployeeBtn.addEventListener('click', () => window.showAddEmployeeModal());
-    }
-
-    if (cancelEmployeeBtn) {
-        cancelEmployeeBtn.addEventListener('click', () => { if (employeeModal) employeeModal.classList.add('hidden'); });
-    }
-
-    if (employeeModal) {
-        employeeModal.addEventListener('click', (e) => {
-            if (e.target === employeeModal) employeeModal.classList.add('hidden');
+        addEmployeeBtn.addEventListener('click', (e) => {
+            console.log('Add Employee clicked');
+            window.showAddEmployeeModal();
         });
     }
 
-    // Global listener for Edit/Delete icons
-    document.addEventListener('click', (e) => {
-        const row = e.target.closest('tr');
-        if (!row) return;
-        const id = row.getAttribute('data-id') || row.querySelector('.emp-id')?.textContent;
-        if (!id) return;
+    const addLeaveTypeBtn = getEl('add-leave-type-btn');
+    if (addLeaveTypeBtn) {
+        addLeaveTypeBtn.addEventListener('click', (e) => {
+            console.log('Add Leave Type clicked');
+            window.showAddLeaveTypeModal();
+        });
+    }
 
-        // Delete action
-        if (e.target.closest('.delete-btn') || e.target.closest('.text-red')) {
-            rowToDelete = id;
-            if (deleteModal) deleteModal.classList.remove('hidden');
-        }
+    // Event Delegation for Tables
+    if (employeeTableBody) {
+        employeeTableBody.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+            const id = btn.getAttribute('data-id');
+            console.log(`Employee Table Action: ${action} for ID: ${id}`);
 
-        // Edit action
-        if (e.target.closest('.edit-btn') || (e.target.closest('.icon-btn') && !e.target.closest('.text-red'))) {
-            const emp = employees.find(e => e.id === id);
-            if (!emp) return;
+            if (action === 'edit-employee') window.editEmployee(id);
+            if (action === 'delete-employee') window.confirmDeleteEmployee(id);
+        });
+    }
 
-            isEditing = true;
-            editRow = id;
+    const leaveTypeTableBody = getEl('admin-leave-types-body');
+    if (leaveTypeTableBody) {
+        leaveTypeTableBody.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+            const id = btn.getAttribute('data-id');
+            console.log(`Leave Type Table Action: ${action} for ID: ${id}`);
 
-            if (getEl('new-emp-name')) getEl('new-emp-name').value = emp.name;
-            if (getEl('new-emp-email')) getEl('new-emp-email').value = emp.email;
-            if (getEl('new-emp-role')) getEl('new-emp-role').value = emp.role;
-            if (getEl('new-emp-dept')) getEl('new-emp-dept').value = emp.dept;
-            if (getEl('new-emp-status')) getEl('new-emp-status').value = emp.status;
-            if (getEl('new-emp-ctc')) getEl('new-emp-ctc').value = emp.ctc;
-            if (editEmpIndexInput) editEmpIndexInput.value = id;
-            if (modalTitleEl) modalTitleEl.textContent = 'Edit Employee';
-            if (getEl('emp-id-label')) getEl('emp-id-label').textContent = 'Assigned ID:';
-            if (nextEmpIdDisplay) nextEmpIdDisplay.textContent = id;
-
-            if (employeeModal) employeeModal.classList.remove('hidden');
-        }
-    });
+            if (action === 'edit-leave-type') window.showAddLeaveTypeModal(id);
+            if (action === 'delete-leave-type') window.deleteLeaveType(id);
+        });
+    }
 
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', () => {
@@ -1207,6 +1261,7 @@ function initApp() {
                 employees = employees.filter(e => e.id !== rowToDelete);
                 window.saveEmployees();
                 rowToDelete = null;
+                if (window.showToast) window.showToast('Employee deleted successfully.', 'success');
             }
             if (deleteModal) deleteModal.classList.add('hidden');
         });
@@ -1226,10 +1281,11 @@ function initApp() {
             const ctc = parseInt(getEl('new-emp-ctc').value) || 0;
             const editId = editEmpIndexInput ? editEmpIndexInput.value : '';
 
-            if (isEditing && editId) {
+            if (editId) {
                 const index = employees.findIndex(e => e.id === editId);
                 if (index !== -1) {
                     employees[index] = { ...employees[index], name, email, role, dept: department, status, ctc, monthlySalary: Math.round(ctc / 12 / 1.15) };
+                    if (window.showToast) window.showToast('Employee updated successfully.', 'success');
                 }
             } else {
                 const newEmp = {
@@ -1237,10 +1293,11 @@ function initApp() {
                     name, email, role, dept: department, status, ctc,
                     monthlySalary: Math.round(ctc / 12 / 1.15),
                     dailyWage: Math.round(ctc / 12 / 30),
-                    present: 20, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4,
-                    assignedTasks: 0, completedTasks: 0
+                    present: 22, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4,
+                    assignedTasks: 0, completedTasks: 0, taskList: []
                 };
                 employees.unshift(newEmp);
+                if (window.showToast) window.showToast('Employee added successfully.', 'success');
             }
 
             window.saveEmployees();
@@ -2169,7 +2226,13 @@ window.showPayslip = function (empId, month) {
     let p = payrolls.find(x => x.empId === empId && x.month === month);
     const emp = employees.find(x => x.id === empId);
 
-    if (!p && !emp) return;
+    if (!p && !emp) {
+        window.showToast('Employee record not found.', 'error');
+        return;
+    }
+
+    // Show professional feedback
+    window.showToast('Generating secure payslip preview...', 'info');
 
     // Synthetic record if missing
     if (!p) {
@@ -2218,9 +2281,16 @@ window.showPayslip = function (empId, month) {
         iframe.src = 'payslip.html?t=' + Date.now();
     }
 
-    getEl('payslip-modal')?.classList.remove('hidden');
-    // Ensure scaling is applied after the modal is visible and layout is calculated
-    setTimeout(window.autoScalePayslip, 50);
+    // Small delay to feel more professional and allow iframe to start loading
+    setTimeout(() => {
+        getEl('payslip-modal')?.classList.remove('hidden');
+        window.autoScalePayslip();
+        window.showToast('Payslip generated successfully.', 'success');
+    }, 400);
+};
+
+window.autoScalePayslip = function () {
+    window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
 };
 
 /**
@@ -2538,12 +2608,19 @@ window.loadEmployees = function () {
     const savedLeaveTypes = localStorage.getItem('pps-leave-types');
     if (savedLeaveTypes) {
         leaveTypes = JSON.parse(savedLeaveTypes);
+        // Migrations: Ensure all have category/code
+        leaveTypes = leaveTypes.map(lt => ({
+            ...lt,
+            code: lt.code || lt.id.replace('LT', ''),
+            category: lt.category || (lt.isPaid ? 'Paid' : 'Unpaid'),
+            desc: lt.desc || lt.name
+        }));
     } else {
         leaveTypes = [
-            { id: 'LT001', name: 'Privilege Leave', isPaid: true },
-            { id: 'LT002', name: 'Sick Leave', isPaid: true },
-            { id: 'LT003', name: 'Casual Leave', isPaid: true },
-            { id: 'LT004', name: 'Loss of Pay (Unpaid)', isPaid: false }
+            { id: 'LT001', name: 'Privilege Leave', code: 'PL', isPaid: true, category: 'Paid', desc: 'Annual earned leave' },
+            { id: 'LT002', name: 'Sick Leave', code: 'SL', isPaid: true, category: 'Paid', desc: 'For medical issues' },
+            { id: 'LT003', name: 'Casual Leave', code: 'CL', isPaid: true, category: 'Paid', desc: 'For personal contingencies' },
+            { id: 'LT004', name: 'Loss of Pay', code: 'LOP', isPaid: false, category: 'Unpaid', desc: 'Leave without pay' }
         ];
         localStorage.setItem('pps-leave-types', JSON.stringify(leaveTypes));
     }
@@ -3389,12 +3466,15 @@ function initAdminLeaveModule() {
                 if (type) {
                     type.name = name;
                     type.code = code;
+                    type.category = category;
                     type.isPaid = isPaid;
-                    type.description = description;
+                    type.desc = description;
                 }
+                if (window.showToast) window.showToast('Leave type updated.', 'success');
             } else {
-                const newId = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
-                leaveTypes.push({ id: newId, name, code, isPaid, description });
+                const newId = window.getNextLeaveTypeId();
+                leaveTypes.push({ id: newId, name, code, isPaid, category, desc: description });
+                if (window.showToast) window.showToast('New leave type added.', 'success');
             }
 
             window.saveLeaveData();
@@ -3496,16 +3576,19 @@ window.renderAdminLeaveTypes = function () {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
-                <div class="font-medium text-sm no-wrap-truncate" title="${lt.name}">${lt.name}</div>
-                <div class="text-xs text-muted">${lt.code || lt.id}</div>
+                <div class="type-cell">
+                    <span class="type-name" title="${lt.name}">${lt.name}</span>
+                    <span class="type-code">${lt.code}</span>
+                    <span class="text-xs text-muted" style="display:block;margin-top:2px;">${lt.desc}</span>
+                </div>
             </td>
             <td style="text-align: center;">
-                <span class="badge ${lt.isPaid ? 'badge-green' : 'badge-red'}" style="font-size: 0.65rem; padding: 2px 6px;">${lt.isPaid ? 'Paid' : 'Unpaid'}</span>
+                <span class="badge ${lt.category === 'Paid' ? 'badge-green' : 'badge-red'}" style="font-size: 0.65rem; padding: 2px 6px;">${lt.category}</span>
             </td>
-            <td style="text-align: right;">
-                <div style="display: flex; gap: 0.3rem; justify-content: flex-end;">
-                    <button class="icon-btn edit-btn" aria-label="Edit" onclick="showAddLeaveTypeModal('${lt.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                    ${lt.id !== 'LT001' && lt.id !== 'LT002' ? `<button class="icon-btn delete-btn" aria-label="Delete" onclick="deleteLeaveType('${lt.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>` : ''}
+            <td>
+                <div class="actions-cell">
+                    <button class="btn edit-btn" data-action="edit-leave-type" data-id="${lt.id}">✎</button>
+                    <button class="btn delete-btn" data-action="delete-leave-type" data-id="${lt.id}">🗑</button>
                 </div>
             </td>
         `;
@@ -3615,8 +3698,8 @@ window.showAddLeaveTypeModal = function (id = null) {
             getEl('edit-leave-type-id').value = type.id;
             getEl('leave-type-name').value = type.name;
             getEl('leave-type-code').value = type.code || '';
-            getEl('leave-type-category').value = type.isPaid ? 'Paid' : 'Unpaid';
-            getEl('leave-type-desc').value = type.description || '';
+            getEl('leave-type-category').value = type.category || (type.isPaid ? 'Paid' : 'Unpaid');
+            getEl('leave-type-desc').value = type.desc || type.description || '';
         }
     } else {
         getEl('leave-type-modal-title').textContent = 'Add Leave Type';
@@ -3683,19 +3766,19 @@ window.renderAdminLeaveRequests = function () {
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>
+            <td class="employee-cell">
                 <div class="font-medium">${emp.name}</div>
-                <div class="text-xs text-muted">${empId}</div>
+                <div class="employee-id">${empId}</div>
             </td>
             <td><span class="text-sm">${leaveTypeName}</span></td>
             <td><span class="text-sm">${dateRange}</span></td>
             <td style="text-align: center;">${days} Day${days > 1 ? 's' : ''}</td>
             <td style="text-align: center;">${statusBadge}</td>
-            <td style="text-align: center;">
+            <td>
                 ${req.status === 'Pending' ? `
-                    <div style="display: flex; gap: 0.4rem; justify-content: center;">
-                        <button class="btn compact-btn text-xs" style="background:#22c55e;color:#fff;border:none;" onclick="updateLeaveStatus('${req.id}', 'Approved')">Approve</button>
-                        <button class="btn compact-btn text-xs" style="background:#ef4444;color:#fff;border:none;" onclick="updateLeaveStatus('${req.id}', 'Rejected')">Reject</button>
+                    <div class="action-buttons">
+                        <button class="btn approve-btn" onclick="updateLeaveStatus('${req.id}', 'Approved')">✔</button>
+                        <button class="btn reject-btn" onclick="updateLeaveStatus('${req.id}', 'Rejected')">✖</button>
                     </div>
                 ` : `
                     <span class="text-xs text-muted">Processed</span>
@@ -4778,101 +4861,6 @@ window.downloadReport = function (empId, reportType, format) {
         document.body.removeChild(link);
     }
 };
-
-window.renderAdminLeaveTypes = function () {
-    const tbody = getEl('admin-leave-types-body');
-    const dropdown = getEl('emp-leave-type-select');
-
-    if (!tbody) return;
-
-    if (leaveTypes.length === 0) {
-        // Pre-populate with some default leave types for demonstration
-        leaveTypes.push({ id: 'LT001', name: 'Sick Leave', code: 'SL', category: 'Paid', desc: 'For medical emergencies' });
-        leaveTypes.push({ id: 'LT002', name: 'Casual Leave', code: 'CL', category: 'Paid', desc: 'For personal contingencies' });
-        leaveTypes.push({ id: 'LT003', name: 'Loss of Pay', code: 'LOP', category: 'Unpaid', desc: 'Leave without pay' });
-    }
-
-    let html = '';
-    let dropHtml = '';
-
-    leaveTypes.forEach(lt => {
-        const badgeColor = lt.category === 'Paid' ? 'badge-blue' : 'badge-orange';
-        html += `
-            <tr>
-                <td>
-                    <div class="font-bold">${lt.name}</div>
-                    <div class="text-xs text-muted">${lt.code} - ${lt.desc || 'No description'}</div>
-                </td>
-                <td style="text-align: center;"><span class="badge ${badgeColor}">${lt.category}</span></td>
-                <td style="text-align: right;">
-                    <button class="icon-btn text-red delete-btn" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-                </td>
-            </tr>
-        `;
-        dropHtml += `<option value="${lt.name}">${lt.name} (${lt.category})</option>`;
-    });
-
-    tbody.innerHTML = html;
-    if (dropdown) dropdown.innerHTML = dropHtml;
-};
-
-window.showAddLeaveTypeModal = function () {
-    const form = getEl('leave-type-form');
-    if (form) form.reset();
-
-    const idDisplay = getEl('leave-type-id-display');
-    if (idDisplay) idDisplay.textContent = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
-
-    getEl('leave-type-modal')?.classList.remove('hidden');
-};
-
-window.closeLeaveTypeModal = function () {
-    getEl('leave-type-modal')?.classList.add('hidden');
-};
-
-// Event listener setup for Leave Type Form submission
-document.addEventListener('DOMContentLoaded', () => {
-    const leaveForm = getEl('leave-type-form');
-    if (leaveForm) {
-        leaveForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const submitBtn = leaveForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Saving...';
-            submitBtn.disabled = true;
-
-            const newType = {
-                id: 'LT' + String(leaveTypes.length + 1).padStart(3, '0'),
-                name: getEl('leave-type-name').value,
-                code: getEl('leave-type-code').value,
-                category: getEl('leave-type-category').value,
-                desc: getEl('leave-type-desc').value
-            };
-
-            // Mock backend validation and assignment request
-            new Promise(resolve => {
-                setTimeout(() => {
-                    leaveTypes.push(newType);
-                    resolve();
-                }, 500); // simulate network delay
-            }).then(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-
-                leaveForm.reset();
-                window.closeLeaveTypeModal();
-                window.renderAdminLeaveTypes();
-
-                if (window.showToast) window.showToast('Leave Type added successfully!', 'success');
-            }).catch(err => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                if (window.showToast) window.showToast('Failed to add Leave Type.', 'error');
-            });
-        });
-    }
-});
 
 // Final Safety wrapper for initialization - moved to bottom to ensure all functions are defined
 if (document.readyState === 'loading') {

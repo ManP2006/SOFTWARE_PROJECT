@@ -1395,12 +1395,12 @@
                         <div class="flex-between" style="margin-bottom: 1.5rem;">
                             <h2 style="font-size: 1.5rem;">Leave Management</h2>
                             <div style="display: flex; gap: 0.75rem;">
-                                <button class="btn btn-primary" onclick="showAddLeaveTypeModal()">+ Add Leave
+                                <button class="btn btn-primary" id="add-leave-type-btn">+ Add Leave
                                     Type</button>
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 7fr 3fr; gap: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 6.2fr 3.8fr; gap: 1.5rem;">
 
                             <!-- Leave Requests -->
                             <div class="card p-0 overflow-hidden" style="display: flex; flex-direction: column;">
@@ -1439,7 +1439,7 @@
                                             <tr>
                                                 <th>Type</th>
                                                 <th style="text-align: center;">Category</th>
-                                                <th style="text-align: right;">Actions</th>
+                                                <th style="text-align: center;">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody id="admin-leave-types-body">
@@ -1906,7 +1906,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div id="rep-preview-body" style="max-height:320px; overflow-y:auto; overflow-x:auto;">
+                            <div id="rep-preview-body" style="max-height:320px; overflow-y:auto; overflow-x:hidden;">
                                 <!-- Dynamically populated by JS -->
                             </div>
                         </div>
@@ -2447,6 +2447,89 @@
                 <!-- Employee: Payslips Section -->
                 <section id="employee-payslips" class="view-section scroll-mode-content" style="display: none;">
                     <div class="page-module-container animate-fade-in">
+                        <div class="section-header mb-6">
+                            <h2 class="text-3xl gradient-text">My Payslips</h2>
+                            <p class="text-muted">View and download your monthly salary statements</p>
+                        </div>
+
+                        <div class="content-grid">
+                            <div class="flex-column gap-6">
+                                <div class="premium-card p-0 overflow-hidden">
+                                    <div class="p-4 border-b bg-gray-50 flex-between">
+                                        <h3 class="mb-0">Payment History</h3>
+                                        <div class="flex gap-2">
+                                            <select class="form-select"
+                                                style="width: auto; height: 32px; font-size: 0.8rem;">
+                                                <option>FY 2025-26</option>
+                                                <option>FY 2024-25</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="table-container" style="max-height: 500px;">
+                                        <table class="data-table w-full">
+                                            <thead>
+                                                <tr>
+                                                    <th>Month</th>
+                                                    <th>Date Paid</th>
+                                                    <th>Net Amount</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="emp-payslips-table-body">
+                                                <!-- Sample Data -->
+                                                <tr>
+                                                    <td class="font-medium">February 2026</td>
+                                                    <td>Mar 01, 2026</td>
+                                                    <td class="font-bold text-primary">₹ 65,000</td>
+                                                    <td><span class="badge badge-green">Paid</span></td>
+                                                    <td><button class="btn btn-primary compact-btn text-xs"
+                                                            onclick="window.showPayslip('PPS001', 'February 2026')">View</button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-medium">January 2026</td>
+                                                    <td>Feb 01, 2026</td>
+                                                    <td class="font-bold text-primary">₹ 65,000</td>
+                                                    <td><span class="badge badge-green">Paid</span></td>
+                                                    <td><button
+                                                            class="btn btn-outline compact-btn text-xs">Download</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-column gap-6">
+                                <div class="premium-card p-6 blur-card">
+                                    <h3 class="mb-4">Monthly Payslip Preview</h3>
+                                    <div class="text-center py-4">
+                                        <div class="text-muted text-sm mb-1" id="preview-month">February 2026</div>
+                                        <h1 class="text-4xl mb-4" id="preview-net-pay">₹ 65,000</h1>
+                                        <div class="badge badge-green">Salary Credited</div>
+                                    </div>
+
+                                    <div class="mt-6 pt-6 border-t flex-column gap-3">
+                                        <div class="flex-between">
+                                            <span class="text-sm text-muted">Total Earnings</span>
+                                            <span class="font-medium">₹ 72,500</span>
+                                        </div>
+                                        <div class="flex-between">
+                                            <span class="text-sm text-muted">Total Deductions</span>
+                                            <span class="font-medium text-red">₹ 7,500</span>
+                                        </div>
+                                        <div class="flex-between pt-2 border-t mt-2">
+                                            <span class="font-bold">Net Payable</span>
+                                            <span class="font-bold text-primary">₹ 65,000</span>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn btn-primary w-full mt-8"
+                                        onclick="window.showPayslip('PPS001', 'February 2026')">
+                                        Generate Full PDF
+                                    </button>
                         <div class="payslip-container-full">
                             <div class="payslip-header-flex">
                                 <div class="section-header">
@@ -3106,11 +3189,8 @@
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD:index.html
         </div>
     </div>
-=======
->>>>>>> c0cbb865c359f65bccd6089b82751930c8b4a9b4:public/index.html
 
                         <!-- ================= PAYROLL DETAIL MODAL ================= -->
                         <div id="payroll-detail-modal" class="modal-overlay hidden">
@@ -3215,7 +3295,6 @@
                                 </div>
 
                                 <div class="preview-modal-body"
-<<<<<<< HEAD:index.html
                                     style="padding: 0 !important; background: var(--bg-alt); overflow: hidden !important; height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center;">
                                     <div id="payslip-scaling-container"
                                         style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 1rem 0;">
@@ -3223,7 +3302,6 @@
                                             style="width: 210mm; height: 297mm; background: white; box-shadow: var(--shadow-xl); overflow: hidden; flex-shrink: 0;">
                                             <iframe id="payslip-iframe" src="about:blank"
                                                 style="width: 100%; height: 100%; border: none; display: block;"></iframe>
-=======
                                     style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
                                         <!-- Full-Fit Clean Document Preview (Zero-Border) -->
                                         <div class="clean-preview-root">
@@ -3234,7 +3312,6 @@
                                                         style="width: 100%; height: 100%; border: none; display: block;"></iframe>
                                                 </div>
                                             </div>
->>>>>>> c0cbb865c359f65bccd6089b82751930c8b4a9b4:public/index.html
                                         </div>
                                     </div>
                                 </div>

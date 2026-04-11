@@ -400,6 +400,8 @@ textarea {
     .content-grid {
         grid-template-columns: 1.8fr 1fr;
     }
+
+
 }
 
 /* --- Dashboard Refinements --- */
@@ -1087,37 +1089,20 @@ button,
 .data-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
     text-align: left;
 }
 
 .data-table th,
 .data-table td {
-    padding: 0.75rem;
+    padding: 0.75rem 1rem;
     text-align: left;
-    border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    font-size: 0.8125rem;
-}
-
-.data-table th:last-child,
-.data-table td:last-child {
-    border-right: none;
-}
-
-.data-table tr {
-    transition: background-color 0.2s var(--ease);
-}
-
-.data-table tbody tr:hover {
-    background: rgba(59, 130, 246, 0.04) !important;
-}
-
-.data-table tbody tr:nth-child(even) {
-    background: rgba(248, 250, 252, 0.4);
-}
-
-.data-table td {
+    border: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    line-height: 1.5;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .data-table th {
@@ -1126,25 +1111,263 @@ button,
     background: var(--bg-alt);
     text-transform: uppercase;
     font-size: 0.7rem;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     position: sticky;
     top: 0;
     z-index: 30;
-    /* Higher z-index to stay above body content */
-    border-bottom: 2px solid var(--primary);
+    border: 1px solid #e5e7eb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.data-table tr {
+    transition: background-color 0.15s var(--ease);
+}
+
+.data-table tbody tr:hover {
+    background: var(--surface-hover) !important;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background: rgba(248, 250, 252, 0.3);
+}
+
+.data-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* --- Table Container & Scrolling --- */
 /* Note: primary .table-container definition is in the Dashboard Layout section below */
 .table-container {
     overflow-y: auto;
-    overflow-x: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll */
     border-radius: var(--radius-md);
     border: 1px solid var(--border);
     background: var(--surface);
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Employee Management Specific Refinements */
+#admin-employees .data-table {
+    table-layout: fixed; /* Fixed width to fit container */
+    width: 100%;
+}
+
+#admin-employees .data-table th,
+#admin-employees .data-table td {
+    padding: 8px 10px;    /* Compact spacing */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+/* Proportional Column Widths (Normalized to 100%) */
+/* 1. Employee ID */
+#admin-employees .data-table th:nth-child(1),
+#admin-employees .data-table td:nth-child(1) { width: 8%; }
+
+/* 2. Name */
+#admin-employees .data-table th:nth-child(2),
+#admin-employees .data-table td:nth-child(2) { width: 15.5%; }
+
+/* 3. Role */
+#admin-employees .data-table th:nth-child(3),
+#admin-employees .data-table td:nth-child(3) { width: 12%; }
+
+/* 4. Department */
+#admin-employees .data-table th:nth-child(4),
+#admin-employees .data-table td:nth-child(4) { width: 9%; }
+
+/* 5. Status */
+#admin-employees .data-table th:nth-child(5),
+#admin-employees .data-table td:nth-child(5) { width: 7%; }
+
+/* 6. Tasks */
+#admin-employees .data-table th:nth-child(6),
+#admin-employees .data-table td:nth-child(6) { width: 7%; }
+
+/* 7. Manage */
+#admin-employees .data-table th:nth-child(7),
+#admin-employees .data-table td:nth-child(7) { width: 8.5%; }
+
+/* 8. Rating */
+#admin-employees .data-table th:nth-child(8),
+#admin-employees .data-table td:nth-child(8) { width: 7%; }
+
+/* 9. CTC */
+#admin-employees .data-table th:nth-child(9),
+#admin-employees .data-table td:nth-child(9) { width: 8.5%; }
+
+/* 10. CTC Breakdown */
+#admin-employees .data-table th:nth-child(10),
+#admin-employees .data-table td:nth-child(10) { width: 10%; }
+
+/* 11. Actions */
+#admin-employees .data-table th:nth-child(11),
+#admin-employees .data-table td:nth-child(11) { width: 9.5%; }
+
+.name-cell {
+    white-space: normal !important; /* Allow name/email stack */
+    line-height: 1.2 !important;
+}
+
+.name-cell .email {
+    display: block;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 1px;
+}
+
+.ctc-button, 
+#admin-employees .data-table .btn,
+#admin-leave .data-table .btn {
+    white-space: nowrap !important;
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+    min-width: 0 !important;
+    width: auto !important;
+}
+
+/* Leave Management Table Refinements */
+#admin-leave .data-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#admin-leave .data-table th,
+#admin-leave .data-table td {
+    vertical-align: middle;
+    text-align: left;
+    padding: 10px 14px;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+#admin-leave .card:nth-of-type(1) .data-table,
+#admin-leave .card:nth-of-type(2) .data-table {
+    table-layout: auto;
+}
+
+/* Leave Management Column Distribution */
+
+/* Leave Requests Distribution (Table 1) */
+#admin-leave .card:nth-of-type(1) .data-table th:nth-child(1),
+#admin-leave .card:nth-of-type(1) .data-table td:nth-child(1) { width: 18%; } /* Employee */
+#admin-leave .card:nth-of-type(1) .data-table th:nth-child(2),
+#admin-leave .card:nth-of-type(1) .data-table td:nth-child(2) { width: 20%; } /* Leave Type */
+#admin-leave .card:nth-of-type(1) .data-table th:nth-child(3),
+#admin-leave .card:nth-of-type(1) .data-table td:nth-child(3) { width: 20%; } /* Date Range */
+#admin-leave .card:nth-of-type(1) .data-table th:nth-child(4),
+#admin-leave .card:nth-of-type(1) .data-table td:nth-child(4) { width: 12%; } /* Duration */
+#admin-leave .card:nth-of-type(1) .data-table th:nth-child(5),
+#admin-leave .card:nth-of-type(1) .data-table td:nth-child(5) { width: 10%; } /* Status */
+#admin-leave .card:nth-of-type(1) .data-table th:nth-child(6),
+#admin-leave .card:nth-of-type(1) .data-table td:nth-child(6) { width: 12%; text-align: center; } /* Action */
+
+#admin-leave .card:nth-of-type(1) .data-table th,
+#admin-leave .card:nth-of-type(1) .data-table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Leave Types Column Distribution */
+#admin-leave .card:nth-of-type(2) .data-table th:nth-child(1),
+#admin-leave .card:nth-of-type(2) .data-table td:nth-child(1) { width: 50%; } /* Type */
+#admin-leave .card:nth-of-type(2) .data-table th:nth-child(2),
+#admin-leave .card:nth-of-type(2) .data-table td:nth-child(2) { width: 25%; text-align: center; } /* Category */
+#admin-leave .card:nth-of-type(2) .data-table th:nth-child(3),
+#admin-leave .card:nth-of-type(2) .data-table td:nth-child(3) { width: 25%; text-align: center; } /* Actions */
+
+.type-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.type-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.type-code {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.actions-cell {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+}
+
+.approve-btn, .reject-btn {
+    padding: 4px 6px !important;
+    font-size: 12px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.approve-btn {
+    background: #22c55e !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.reject-btn {
+    background: #ef4444 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.approve-btn:active, .reject-btn:active, .edit-btn:active, .delete-btn:active {
+    transform: scale(0.92);
+}
+
+.edit-btn, .delete-btn {
+    padding: 4px 6px !important;
+    font-size: 14px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none !important;
+}
+
+.edit-btn {
+    background: #3b82f6 !important;
+    color: #fff !important;
+}
+
+.delete-btn {
+    background: #ef4444 !important;
+    color: #fff !important;
 }
 
 /* Custom Webkit Scrollbar */
@@ -2059,6 +2282,7 @@ button,
 .ctc-table {
     width: 100% !important;
     border-collapse: collapse !important;
+    table-layout: fixed !important;
     font-size: 0.875rem !important;
     text-align: left !important;
 }
@@ -2066,17 +2290,20 @@ button,
 .ctc-table thead th {
     background: #f8fafc !important;
     /* slate-50 */
-    padding: 0.85rem 1rem !important;
+    padding: 0.75rem 1rem !important;
     font-weight: 600 !important;
     color: #475569 !important;
     /* slate-600 */
-    border-bottom: 1px solid #e2e8f0 !important;
+    border: 1px solid #e5e7eb !important;
     position: sticky !important;
     top: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .ctc-table tbody tr {
-    border-bottom: 1px solid #f1f5f9 !important;
+    border-bottom: 1px solid #e5e7eb !important;
     transition: background 0.2s ease !important;
 }
 
@@ -2094,6 +2321,10 @@ button,
     color: #1e293b !important;
     /* slate-800 */
     vertical-align: middle !important;
+    border: 1px solid #e5e7eb !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
 .ctc-section-header {
@@ -5494,19 +5725,24 @@ select.form-input {
 .form16-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 15px;
+    table-layout: fixed;
 }
 
 .form16-table th,
 .form16-table td {
-    border: 1px solid #333;
-    padding: 8px 12px;
+    padding: 10px 15px;
+    border: 1px solid #e5e7eb;
     text-align: left;
-    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .form16-table th {
-    background: #f5f5f5;
+    background-color: var(--bg-alt);
+    font-weight: bold;
+    color: var(--text-secondary);
+    border: 1px solid #e5e7eb;
 }
 
 .form16-grid {
