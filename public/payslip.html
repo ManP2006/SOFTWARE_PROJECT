@@ -3,388 +3,531 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Payslip - XYZ Private Limited</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Employee Payslip - PPS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @media print {
-            @page {
-                size: A4;
-                margin: 0;
-            }
-            body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .a4-page {
-                margin: 0;
-                box-shadow: none;
-                border: none;
-                width: 210mm;
-                height: 297mm;
-            }
+        :root {
+            --primary-blue: #0ea5e9;
+            --light-blue-bg: #dbeafe;
+            --text-dark: #1e293b;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #e8edf4;
+
+        * {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
             box-sizing: border-box;
         }
-        .a4-page {
-            /* True A4 ratio: 1:1.414 */
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            color: var(--text-dark);
+            overflow: hidden; /* Prevent internal scroll in iframe */
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none !important; }
+            .payslip-page { box-shadow: none !important; margin: 0 !important; border: none !important; }
+        }
+
+        .payslip-page {
             width: 210mm;
-            height: 297mm;
+            min-height: 297mm;
             background: white;
             position: relative;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            transform-origin: center center;
+            overflow: hidden;
         }
-        .page-header {
-            /* Solid blue header band — no gradient clip, so text stays inside */
-            position: relative;
-            width: 100%;
-            background: linear-gradient(120deg, #0369a1 0%, #0ea5e9 100%);
-            padding: 18px 40px 18px 40px;
+
+        /* Header Band */
+        .header-band {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 40px 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
+        }
+
+        .company-info h2 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .company-info p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .logo-box {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 1.35rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Title Section */
+        .title-section {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .title-section h1 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            display: inline-block;
+            border-bottom: 5px solid #1e293b;
+            padding-bottom: 12px;
+            color: #1e293b;
+        }
+
+        /* Employee Details Grid */
+        .employee-details {
+            padding: 0 70px;
+            margin-bottom: 50px;
+            display: grid;
+            grid-template-columns: 200px auto;
+            row-gap: 18px;
+            font-size: 1.1rem;
+        }
+
+        .detail-row {
+            display: contents;
+        }
+
+        .detail-label {
+            font-weight: 700;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .detail-value::before {
+            content: ":";
+            position: absolute;
+            left: 0;
+            font-weight: 700;
+        }
+
+        /* Tables Section */
+        .tables-container {
+            padding: 0 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
             z-index: 10;
         }
-        .page-header-text h1 {
-            font-size: 1.4rem;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.05rem;
+        }
+
+        th {
+            background-color: var(--light-blue-bg);
+            color: #1e40af;
+            text-align: left;
+            padding: 14px 18px;
             font-weight: 800;
-            color: white;
-            margin: 0;
-            letter-spacing: -0.02em;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            text-transform: uppercase;
+            border: 1px solid #bfdbfe;
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
         }
-        .page-header-text p {
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.95);
-            margin: 0;
-            line-height: 1.5;
+
+        td {
+            padding: 14px 18px;
+            border: 1px solid var(--border-color);
+            height: 50px;
         }
-        .page-header-logo {
-            width: 46px;
-            height: 46px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.18);
-            border: 2px solid rgba(255,255,255,0.35);
+
+        .text-right { text-align: right; }
+        .font-bold { font-weight: 800; }
+
+        .total-row td {
+            background-color: #f8fafc;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        /* Net Salary Box */
+        .net-salary-wrapper {
+            padding: 0 60px;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .net-salary-box {
+            display: flex;
+            border: 2px solid #bae6fd;
+            border-radius: 12px;
+            overflow: hidden;
+            width: 380px;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.08);
+        }
+
+        .net-label {
+            background-color: #f0f9ff;
+            color: #0369a1;
+            padding: 25px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            width: 55%;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1rem;
+        }
+
+        .net-value {
+            background: white;
+            padding: 25px;
             font-weight: 900;
-            color: white;
-            flex-shrink: 0;
-            letter-spacing: -0.04em;
+            font-size: 1.9rem;
+            text-align: right;
+            width: 45%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
         }
-        .blue-stripe-bottom {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 80px;
-            background: radial-gradient(circle at bottom right, #38bdf8 0%, #38bdf8 35%, transparent 35%);
-            z-index: 0;
-            pointer-events: none;
+        .net-value span { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px;}
+
+        /* Bottom Details */
+        .bottom-details {
+            padding: 0 60px;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
         }
+
+        .payment-info {
+            display: grid;
+            grid-template-columns: 200px auto;
+            row-gap: 12px;
+        }
+
+        /* Watermark & Decorations */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%); /* Removed rotation for a straight look */
+            transform: translate(-50%, -50%);
+            opacity: 0.04;
             z-index: 0;
+            width: 450px;
             pointer-events: none;
-            user-select: none;
-            opacity: 0.05; /* Faint watermark */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        }
+
+        .footer-stripe {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 380px;
+            height: 120px;
+            background-color: var(--primary-blue);
+            clip-path: polygon(100% 0, 15% 100%, 100% 100%);
+            z-index: 5;
+        }
+
+        .footer-text {
+            position: absolute;
+            bottom: 25px;
             width: 100%;
-            height: 100%;
-        }
-        .watermark img {
-            width: 650px; /* Increased size to be 'big' as requested */
-            height: auto;
-            object-fit: contain;
-            filter: grayscale(1); /* Ensure it doesn't clash with text colors */
-        }
-        .content {
-            position: relative;
-            z-index: 10;
-            padding: 24px 50px 32px 50px;
-            flex: 1;
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid #e2e8f0;
-            padding: 10px 16px;
-            text-align: left;
-        }
-        .table-header {
-            background-color: #dbeafe;
-            color: #1e3a8a;
+            justify-content: space-between;
+            padding: 0 60px;
+            font-size: 0.8rem;
+            color: #94a3b8;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.95rem;
+            z-index: 10;
+        }
+
+        .disclaimer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            font-style: italic;
+            margin-top: auto;
+            margin-bottom: 70px;
+            padding: 0 60px;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
 
-    <!-- Main A4 Paper -->
-    <div class="a4-page">
-        <!-- Solid Blue Header Band -->
-        <div class="page-header">
-            <div class="page-header-text">
-                <h1 id="comp-name">XYZ Private Limited</h1>
-                <div id="comp-address">
-                    <p>123 Tech Hub, HITEC City, Hyderabad, 500081</p>
-                    <p>India</p>
-                </div>
+    <div class="payslip-page" id="payslip-capture-area">
+        <!-- Blue Header Band -->
+        <header class="header-band">
+            <div class="company-info">
+                <h2 id="comp-name">XYZ Private Limited</h2>
+                <p id="comp-address">123 Tech Hub, HITEC City<br>Hyderabad, 500081</p>
             </div>
-            <div class="page-header-logo" id="comp-logo">XYZ</div>
+            <div class="logo-box" id="comp-logo">XPL</div>
+        </header>
+
+        <!-- Document Watermark -->
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 0;">
+             <h1 style="font-size: 12rem; font-weight: 900; color: #cbd5e1; opacity: 0.15; letter-spacing: 0.1em;">PPS</h1>
         </div>
 
+<<<<<<< HEAD:payslip.html
+        <div class="title-section">
+            <h1>Employee Pay Slip</h1>
+        </div>
+=======
         <!-- Decorative bottom & watermark -->
         <div class="blue-stripe-bottom"></div>
         <div class="watermark"><img src="../assets/images/logo.jpg" alt="PPS Logo"></div>
+>>>>>>> c0cbb865c359f65bccd6089b82751930c8b4a9b4:public/payslip.html
 
-        <div class="content">
-
-            <div class="mb-10 text-center border-b-2 border-slate-800 pb-2 mx-auto max-w-md">
-                <h2 class="text-2xl font-extrabold uppercase tracking-widest text-slate-800">Employee Pay Slip</h2>
+        <!-- Employee Information -->
+        <section class="employee-details">
+            <div class="detail-row">
+                <div class="detail-label">Period</div>
+                <div class="detail-value" id="pay-period">February 2026 | FY 2025-26</div>
             </div>
 
-            <!-- Employee Details Grid -->
-            <div class="grid grid-cols-12 gap-y-4 gap-x-8 mb-10 text-base">
-                <div class="col-span-3 font-semibold text-slate-700">Period</div>
-                <div class="col-span-9 text-slate-900">: <span id="pay-period">January 2030</span></div>
-                
-                <div class="col-span-3 font-semibold text-slate-700">Employee Name</div>
-                <div class="col-span-9 text-slate-900">: <span id="emp-name">Marceline Anderson</span></div>
-                
-                <div class="col-span-3 font-semibold text-slate-700">Position</div>
-                <div class="col-span-9 text-slate-900">: <span id="emp-position">Administrative Staff</span></div>
-                
-                <div class="col-span-3 font-semibold text-slate-700">Employee ID</div>
-                <div class="col-span-9 text-slate-900">: <span id="emp-id">Adm - 1234</span></div>
-                
-                <div class="col-span-3 font-semibold text-slate-700">Department</div>
-                <div class="col-span-9 text-slate-900">: <span id="emp-dept">Finance</span></div>
+            <div class="detail-row">
+                <div class="detail-label">Employee Name</div>
+                <div class="detail-value" id="emp-name">Aarav Sharma</div>
             </div>
 
-            <!-- Salary Table Container -->
-            <div class="flex gap-0 mb-8 items-stretch">
-                <!-- Earning Table -->
-                <div class="flex-1">
-                    <table class="h-full">
-                        <thead>
-                            <tr class="table-header">
-                                <th class="w-2/3">Earning</th>
-                                <th class="w-1/3">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="earning-body">
-                            <tr>
-                                <td>Basic Salary</td>
-                                <td class="text-right earning-val" data-val="35000">₹ 35,000</td>
-                            </tr>
-                            <tr>
-                                <td>House Rent Allowance</td>
-                                <td class="text-right earning-val" data-val="14000">₹ 14,000</td>
-                            </tr>
-                            <tr>
-                                <td>Education Allowance</td>
-                                <td class="text-right earning-val" data-val="2500">₹ 2,500</td>
-                            </tr>
-                            <tr>
-                                <td>L.T.A</td>
-                                <td class="text-right earning-val" data-val="5000">₹ 5,000</td>
-                            </tr>
-                            <tr>
-                                <td>Personal Allowance</td>
-                                <td class="text-right earning-val" data-val="8500">₹ 8,500</td>
-                            </tr>
-                            <tr>
-                                <td class="h-10">Entertainment Reimbursement</td>
-                                <td class="text-right earning-val" data-val="0"></td>
-                            </tr>
-                            <tr>
-                                <td class="h-10">Conveyance</td>
-                                <td class="text-right earning-val" data-val="0"></td>
-                            </tr>
-                            <tr class="font-bold bg-slate-50 uppercase text-xs">
-                                <td>Gross Income Total</td>
-                                <td class="text-right" id="gross-total">₹ 0</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Spacer/Divider -->
-                <div class="w-6"></div>
-
-                <!-- Deductions Table -->
-                <div class="flex-1 flex flex-col">
-                    <table class="mb-4">
-                        <thead>
-                            <tr class="table-header">
-                                <th class="w-2/3">Deductions</th>
-                                <th class="w-1/3">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="deduction-body">
-                            <tr>
-                                <td>PF</td>
-                                <td class="text-right deduction-val" data-val="1800">₹ 1,800</td>
-                            </tr>
-                            <tr>
-                                <td>ESI</td>
-                                <td class="text-right deduction-val" data-val="0">₹ 0</td>
-                            </tr>
-                            <tr>
-                                <td>Professional Tax</td>
-                                <td class="text-right deduction-val" data-val="200">₹ 200</td>
-                            </tr>
-                            <tr>
-                                <td class="h-10">Loans & Advances</td>
-                                <td class="text-right deduction-val" data-val="0"></td>
-                            </tr>
-                            <tr>
-                                <td class="h-10">Perquisites</td>
-                                <td class="text-right deduction-val" data-val="0"></td>
-                            </tr>
-                            <tr class="font-bold bg-slate-50">
-                                <td>Total Deductions</td>
-                                <td class="text-right" id="deduction-total">₹ 0</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="mt-auto border-2 border-sky-200 rounded-lg overflow-hidden flex">
-                        <div class="bg-sky-100 px-4 py-4 font-bold text-sky-900 uppercase text-sm flex items-center w-2/3">Net Salary</div>
-                        <div class="bg-white px-4 py-4 font-black text-right text-lg text-slate-900 w-1/3 border-l-2 border-sky-200" id="net-salary">₹ 0</div>
-                    </div>
-                </div>
+            <div class="detail-row">
+                <div class="detail-label">Position</div>
+                <div class="detail-value" id="emp-position">Frontend Developer</div>
             </div>
 
-            <!-- Footer Details -->
-            <div class="grid grid-cols-12 gap-y-2 gap-x-4 text-xs mb-20">
-                <div class="col-span-3 text-slate-500">Payment Method</div>
-                <div class="col-span-9 text-slate-800">: Arrowai Bank - <span id="bank-name">Marceline Anderson</span> <br> No. 123 456 7890</div>
-                
-                <div class="col-span-3 text-slate-500">Payment Date</div>
-                <div class="col-span-9 text-slate-800" id="pay-date">: January 31, 2030</div>
+            <div class="detail-row">
+                <div class="detail-label">Employee ID</div>
+                <div class="detail-value" id="emp-id">PPS001</div>
             </div>
 
-            <!-- Disclaimer -->
-            <div class="mt-auto pt-8 border-t border-slate-100">
-                <p class="text-center text-slate-400 text-xs italic tracking-wide">
-                    This is a computer-generated document. No signature is required.
-                </p>
-                <div class="mt-4 flex justify-between px-10 text-[10px] text-slate-300 uppercase font-medium">
-                    <span>Prime Payroll Solutions</span>
-                    <span>Confidential Document</span>
-                    <span>XYZ-001</span>
+            <div class="detail-row">
+                <div class="detail-label">Department</div>
+                <div class="detail-value" id="emp-dept">Engineering</div>
+            </div>
+        </section>
+
+        <!-- Tables Section -->
+        <div class="tables-container">
+            <!-- Earnings -->
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Earning</th>
+                            <th class="text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="earning-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                    <tfoot class="total-row">
+                        <tr>
+                            <td>Gross Income Total</td>
+                            <td class="text-right" id="gross-total">₹ 0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Deductions -->
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Deductions</th>
+                            <th class="text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deduction-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                    <tfoot class="total-row">
+                        <tr>
+                            <td>Total Deductions</td>
+                            <td class="text-right" id="deduction-total">₹ 0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Net Salary Section -->
+        <div class="net-salary-wrapper">
+            <div class="net-salary-box">
+                <div class="net-label">NET SALARY</div>
+                <div class="net-value">
+                    <span>₹</span>
+                    <div id="net-salary">0</div>
                 </div>
             </div>
         </div>
+
+        <!-- Bottom details -->
+        <section class="bottom-details">
+            <div class="payment-info">
+                <div class="detail-label">Payment Method</div>
+                <div class="detail-value" id="payment-method">Arrowai Bank - Aarav Sharma<br>No. 123 456 7890</div>
+                
+                <div class="detail-label">Payment Date</div>
+                <div class="detail-value" id="pay-date">01-Feb-2026</div>
+            </div>
+        </section>
+
+        <!-- Disclaimer -->
+        <p class="disclaimer">This is a computer-generated document. No signature is required.</p>
+
+        <!-- Decorations & Footer -->
+        <div class="footer-stripe"></div>
+        <footer class="footer-text">
+            <span>Prime Payroll Solutions</span>
+            <span>Confidential Document</span>
+            <span>XYZ-001</span>
+        </footer>
     </div>
 
     <script>
         function formatCurrency(num) {
-            return '₹ ' + new Intl.NumberFormat('en-IN').format(num);
-        }
-
-        function calculateTotals() {
-            let gross = 0;
-            document.querySelectorAll('.earning-val').forEach(el => {
-                gross += parseInt(el.getAttribute('data-val') || 0);
-            });
-            document.getElementById('gross-total').innerText = formatCurrency(gross);
-
-            let deductions = 0;
-            document.querySelectorAll('.deduction-val').forEach(el => {
-                deductions += parseInt(el.getAttribute('data-val') || 0);
-            });
-            document.getElementById('deduction-total').innerText = formatCurrency(deductions);
-
-            document.getElementById('net-salary').innerText = formatCurrency(gross - deductions);
+            return new Intl.NumberFormat('en-IN').format(num);
         }
 
         function populateData(data) {
+            if (!data) return;
+
+            // Company Info
             if (data.companyName) {
                 document.getElementById('comp-name').innerText = data.companyName;
-                document.title = 'Payslip - ' + data.companyName;
-                const initials = data.companyName.split(' ').map(w => w[0]).join('').substring(0, 3).toUpperCase();
-                document.getElementById('comp-logo').innerText = initials;
-                // Watermark handled by static img in HTML for PPS Logo
+                // Hardcode XPL as per reference image design if it fits the brand
+                document.getElementById('comp-logo').innerText = "XPL";
             }
             if (data.companyAddress) {
-                const parts = data.companyAddress.split(/[,\n]/).map(s => s.trim()).filter(Boolean);
-                const addrEl = document.getElementById('comp-address');
-                // Show max 2 lines to keep header tidy
-                const line1 = parts.slice(0, Math.ceil(parts.length / 2)).join(', ');
-                const line2 = parts.slice(Math.ceil(parts.length / 2)).join(', ');
-                addrEl.innerHTML = `<p>${line1}</p>${line2 ? `<p>${line2}</p>` : ''}`;
-            }
-            if (data.name) {
-                document.getElementById('emp-name').innerText = data.name;
-                document.getElementById('bank-name').innerText = data.name;
-            }
-            if (data.id) document.getElementById('emp-id').innerText = data.id;
-            if (data.position) document.getElementById('emp-position').innerText = data.position;
-            if (data.dept) document.getElementById('emp-dept').innerText = data.dept;
-            if (data.period) document.getElementById('pay-period').innerText = data.period;
-            if (data.date) document.getElementById('pay-date').innerText = ': ' + data.date;
-            
-            // Populate Earning amounts
-            if (data.salary) {
-                const s = data.salary;
-                const earningFields = document.querySelectorAll('.earning-val');
-                earningFields[0].setAttribute('data-val', s.basic || 0); earningFields[0].innerText = formatCurrency(s.basic || 0);
-                earningFields[1].setAttribute('data-val', s.hra || 0); earningFields[1].innerText = formatCurrency(s.hra || 0);
-                earningFields[2].setAttribute('data-val', s.edu || 0); earningFields[2].innerText = formatCurrency(s.edu || 0);
-                earningFields[3].setAttribute('data-val', s.lta || 0); earningFields[3].innerText = formatCurrency(s.lta || 0);
-                earningFields[4].setAttribute('data-val', s.special || 0); earningFields[4].innerText = formatCurrency(s.special || 0);
-                
-                const deductionFields = document.querySelectorAll('.deduction-val');
-                deductionFields[0].setAttribute('data-val', s.pf || 0); deductionFields[0].innerText = formatCurrency(s.pf || 0);
-                deductionFields[2].setAttribute('data-val', s.pt || 0); deductionFields[2].innerText = formatCurrency(s.pt || 0);
+                const parts = data.companyAddress.split(/[,\n]/);
+                const line1 = parts.slice(0, 2).join(', ').trim();
+                const line2 = parts.slice(2).join(', ').trim();
+                document.getElementById('comp-address').innerHTML = `${line1}${line2 ? '<br>' + line2 : ''}`;
             }
 
-            calculateTotals();
-        }
-        // Initialize with default values or localStorage
-        window.onload = () => {
-            const savedData = localStorage.getItem('pps-current-payslip');
-            if (savedData) {
-                populateData(JSON.parse(savedData));
-            } else {
-                calculateTotals();
+            // Employee Info
+            if (data.name) {
+                document.getElementById('emp-name').innerText = data.name;
+                document.getElementById('payment-method').innerHTML = `Arrowai Bank - ${data.name}<br>No. 123 456 7890`;
             }
+            if (data.id) document.getElementById('emp-id').innerText = data.id;
+            
+            // Clean Period Formatting (Avoid duplicating FY if already present)
+            if (data.period) {
+                let periodText = data.period;
+                if (!periodText.includes('FY')) {
+                    const fy = periodText.includes('2026') ? 'FY 2025-26' : 'FY 2024-25';
+                    periodText = `${periodText} | ${fy}`;
+                }
+                document.getElementById('pay-period').innerText = periodText;
+            }
+            
+            if (data.dept) document.getElementById('emp-dept').innerText = data.dept;
+            if (data.position) document.getElementById('emp-position').innerText = data.position;
+            
+            if (data.date) {
+                const d = new Date(data.date);
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                try {
+                    const formattedDate = `${String(d.getDate()).padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear()}`;
+                    if (!isNaN(d.getTime())) document.getElementById('pay-date').innerText = formattedDate;
+                    else document.getElementById('pay-date').innerText = data.date;
+                } catch(e) {
+                    document.getElementById('pay-date').innerText = data.date;
+                }
+            }
+
+            // Salary Rendering
+            if (data.salary) {
+                const s = data.salary;
+                
+                // Earnings Table
+                const earningItems = [
+                    { label: 'Basic Salary', val: s.basic },
+                    { label: 'House Rent Allowance', val: s.hra },
+                    { label: 'Education Allowance', val: s.edu },
+                    { label: 'L.T.A', val: s.lta },
+                    { label: 'Personal Allowance', val: s.special },
+                    { label: 'Entertainment Reimbursement', val: 0 },
+                    { label: 'Conveyance', val: 0 }
+                ];
+                
+                document.getElementById('earning-body').innerHTML = earningItems.map(item => `
+                    <tr>
+                        <td>${item.label}</td>
+                        <td class="text-right">${item.val ? '₹ ' + formatCurrency(item.val) : ''}</td>
+                    </tr>
+                `).join('');
+
+                // Deductions Table
+                const deductionItems = [
+                    { label: 'PF', val: s.pf },
+                    { label: 'ESI', val: 0 },
+                    { label: 'Professional Tax', val: s.pt },
+                    { label: 'Loans & Advances', val: 0 },
+                    { label: 'Perquisites', val: 0 }
+                ];
+
+                document.getElementById('deduction-body').innerHTML = deductionItems.map(item => `
+                    <tr>
+                        <td>${item.label}</td>
+                        <td class="text-right">${item.val ? '₹ ' + formatCurrency(item.val) : ''}</td>
+                    </tr>
+                `).join('');
+
+                const gross = s.gross || (s.basic + s.hra + s.edu + s.lta + s.special);
+                const ded = (s.pf + s.pt);
+                const net = s.net || (gross - ded);
+
+                document.getElementById('gross-total').innerText = '₹ ' + formatCurrency(gross);
+                document.getElementById('deduction-total').innerText = '₹ ' + formatCurrency(ded);
+                document.getElementById('net-salary').innerText = formatCurrency(net);
+            }
+        }
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'POPULATE_PAYSLIP') {
+                populateData(event.data.payload);
+                // Signal completion to parent
+                window.parent.postMessage({ type: 'PAYSLIP_LOADED' }, '*');
+            }
+        });
+
+        window.onload = () => {
+             const savedData = localStorage.getItem('pps-current-payslip');
+             if (savedData) {
+                 populateData(JSON.parse(savedData));
+                 window.parent.postMessage({ type: 'PAYSLIP_LOADED' }, '*');
+             }
         };
     </script>
 </body>

@@ -65,29 +65,41 @@ window.showToast = function (message, type = 'info') {
 };
 // --- Auth Storage & Remember Me Utility ---
 window.AuthStorage = {
-    getKeys: function(role) {
+    getKeys: function (role) {
         return {
             nameKey: role === 'employee' ? 'employee_remember_name' : 'admin_remember_name',
             emailKey: role === 'employee' ? 'employee_remember_email' : 'admin_remember_email'
         };
     },
-    saveCredentials: function(role, name, email) {
+    saveCredentials: function (role, name, email) {
         const keys = this.getKeys(role);
         localStorage.setItem(keys.nameKey, name);
         localStorage.setItem(keys.emailKey, email);
     },
-    getCredentials: function(role) {
+    getCredentials: function (role) {
         const keys = this.getKeys(role);
         return {
             name: localStorage.getItem(keys.nameKey) || '',
             email: localStorage.getItem(keys.emailKey) || ''
         };
     },
-    clearCredentials: function(role) {
+    clearCredentials: function (role) {
         const keys = this.getKeys(role);
         localStorage.removeItem(keys.nameKey);
         localStorage.removeItem(keys.emailKey);
     }
+};
+
+// --- Attendance Live Timer System ---
+// simulateCheckIn, simulateCheckOut, and startLiveTimer are defined further below
+// after the employees array is available.
+
+window.formatTime = function (ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds].map(v => v < 10 ? '0' + v : v).join(':');
 };
 
 // --- Logout System ---
@@ -242,8 +254,15 @@ window.initEmployeePortal = function (userName) {
     const now = new Date();
     const dayNums = getEl('dash-day-num');
     const monthYears = getEl('dash-month-year');
+    const dayNumsModern = getEl('dash-day-num-modern');
+    const monthYearsModern = getEl('dash-month-year-modern');
+
     if (dayNums) dayNums.textContent = now.getDate();
-    if (monthYears) monthYears.textContent = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
+    if (dayNumsModern) dayNumsModern.textContent = now.getDate();
+
+    const monthYearText = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
+    if (monthYears) monthYears.textContent = monthYearText;
+    if (monthYearsModern) monthYearsModern.textContent = monthYearText;
 
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${emp.monthlySalary.toLocaleString()}`;
     if (getEl('dash-emp-leave')) getEl('dash-emp-leave').textContent = `${emp.paidLeave + emp.sickLeave + 12} Days`; // Simulated
@@ -270,16 +289,22 @@ window.initEmployeePortal = function (userName) {
         getEl('prof-avatar-large').style.borderRadius = '50%';
     }
 
-    // 3. Attendance Simulation State
-    const isCheckedIn = localStorage.getItem(`pps-checkin-${emp.id}`);
+    // 3. Attendance Simulation State — uses CHECKIN_KEY set by simulateCheckIn
+    const savedTimestamp = localStorage.getItem('pps-active-checkin');
     const checkinBtn = getEl('btn-checkin');
     const checkoutBtn = getEl('btn-checkout');
     const timerEl = getEl('live-timer');
 
-    if (isCheckedIn) {
+    if (savedTimestamp) {
+        // Parse stored ms timestamp → show as readable punch-in time
+        const punchInDate = new Date(parseInt(savedTimestamp, 10));
+        const punchInTimeStr = punchInDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
         if (checkinBtn) checkinBtn.disabled = true;
         if (checkoutBtn) checkoutBtn.disabled = false;
-        if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = isCheckedIn;
+        if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = punchInTimeStr;
+
+        // Resume the live elapsed timer from actual punch-in moment
         window.startLiveTimer();
     } else {
         if (checkinBtn) checkinBtn.disabled = false;
@@ -303,25 +328,29 @@ window.initEmployeePortal = function (userName) {
     // Update main dashboard net salary card to be consistent
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${breakdown.net.toLocaleString()}`;
 
-    // 5. Payslip History Table Sync
+    // 5. Payslip History Table Sync (Refined for Modern Redesign)
     const tableBody = getEl('emp-payslips-table-body');
     if (tableBody) {
-        tableBody.innerHTML = `
+        const months = ["February 2026", "January 2026"];
+        const dates = ["Mar 01, 2026", "Feb 01, 2026"];
+
+        tableBody.innerHTML = months.map((month, i) => `
             <tr>
-                <td class="font-medium">February 2026</td>
-                <td>Mar 01, 2026</td>
-                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
-                <td><span class="badge badge-green">Paid</span></td>
-                <td><button class="btn btn-outline compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'February 2026')">View</button></td>
+                <td class="font-medium">${month}</td>
+                <td>${dates[i]}</td>
+                <td class="font-bold text-primary text-right">₹ ${breakdown.net.toLocaleString()}</td>
+                <td class="text-center"><span class="badge badge-green">Paid</span></td>
+                <td class="text-right">
+                    <button class="payslip-view-btn" onclick="window.showPayslip('${emp.id}', '${month}')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        View
+                    </button>
+                </td>
             </tr>
-            <tr>
-                <td class="font-medium">January 2026</td>
-                <td>Feb 01, 2026</td>
-                <td class="font-bold text-primary">₹ ${breakdown.net.toLocaleString()}</td>
-                <td><span class="badge badge-green">Paid</span></td>
-                <td><button class="btn btn-outline compact-btn text-xs" onclick="window.showPayslip('${emp.id}', 'January 2026')">View</button></td>
-            </tr>
-        `;
+        `).join('');
     }
 
     // 6. Persist for Standalone View
@@ -343,6 +372,46 @@ window.initEmployeePortal = function (userName) {
 
     // 7. Render dynamic tasks
     window.renderEmployeeTasks(emp.id);
+};
+
+window.showPayslip = function (empId, month) {
+    const emp = employees.find(e => String(e.id) === String(empId)) || employees[0];
+    const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
+
+    // Prepare data for the iframe
+    const payload = {
+        name: emp.name,
+        id: emp.id,
+        dept: emp.dept || 'Operations',
+        position: emp.position || 'Employee',
+        period: month,
+        date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
+        salary: breakdown,
+        companyName: 'Prime Payroll Solutions',
+        companyAddress: '123 Tech Hub, HITEC City, Hyderabad, 500081'
+    };
+
+    // Store in localStorage as backup
+    localStorage.setItem('pps-current-payslip', JSON.stringify(payload));
+
+    // Update Iframe
+    const iframe = getEl('payslip-iframe');
+    if (iframe) {
+        iframe.src = 'payslip.html?t=' + Date.now();
+        iframe.onload = () => {
+            iframe.contentWindow.postMessage({ type: 'POPULATE_PAYSLIP', payload }, '*');
+            // Trigger scaling after a small delay to ensure rendering
+            setTimeout(() => {
+                window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
+            }, 100);
+        };
+    }
+
+    getEl('payslip-modal')?.classList.remove('hidden');
+    // Also scale immediately in case iframe was already loaded
+    setTimeout(() => {
+        window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
+    }, 50);
 };
 
 window.renderEmployeeTasks = function (empId) {
@@ -554,6 +623,9 @@ window.closeModal = function (modalId) {
     if (modal) modal.classList.add('hidden');
 };
 
+// KEY used to persist the punch-in timestamp across page reloads
+const CHECKIN_KEY = 'pps-active-checkin';
+
 window.simulateCheckIn = function () {
     const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
     const now = new Date();
@@ -563,12 +635,20 @@ window.simulateCheckIn = function () {
     localStorage.setItem(`pps-checkin-${emp.id}`, time);
     localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, now.getTime());
 
+    // Persist the exact punch-in moment
+    localStorage.setItem(CHECKIN_KEY, now.toString());
+
+    // Update UI
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = true;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = false;
-    if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = time;
+    if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = timeStr;
+
+    // Show 00:00:00 immediately, then start counting
+    const timerEl = getEl('live-timer');
+    if (timerEl) timerEl.textContent = '00:00:00';
 
     window.startLiveTimer();
-    alert('Punched in successfully at ' + time);
+    window.showToast('Punched in at ' + timeStr, 'success');
 };
 
 window.simulateCheckOut = function () {
@@ -592,12 +672,30 @@ window.simulateCheckOut = function () {
     localStorage.removeItem(`pps-checkin-${emp.id}`);
     localStorage.removeItem(`pps-checkin-timestamp-${emp.id}`);
 
+    // Calculate total work time from stored punch-in
+    const savedTimestamp = localStorage.getItem(CHECKIN_KEY);
+    let totalTimeStr = '00:00:00';
+    if (savedTimestamp) {
+        const elapsed = now - parseInt(savedTimestamp, 10);
+        const h = Math.floor(elapsed / 3600000);
+        const m = Math.floor((elapsed % 3600000) / 60000);
+        const s = Math.floor((elapsed % 60000) / 1000);
+        totalTimeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // Clear persisted state
+    localStorage.removeItem(CHECKIN_KEY);
+
+    // Update UI
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = false;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = true;
-    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = time;
+    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = timeStr;
 
-    if (window.timerInterval) clearInterval(window.timerInterval);
-    alert('Punched out successfully at ' + time);
+    // Show the final total worked time on the timer display
+    const timerEl = getEl('live-timer');
+    if (timerEl) timerEl.textContent = totalTimeStr;
+
+    window.showToast(`Punched out at ${timeStr}  |  Total work time: ${totalTimeStr}`, 'info');
 };
 
 window.startLiveTimer = function () {
@@ -704,7 +802,7 @@ window.showView = function (viewId) {
     } else if (viewId === 'admin-payroll') {
         if (window.renderPayrollTable) window.renderPayrollTable();
     } else if (viewId === 'admin-leave') {
-        if (window.renderAdminLeaveTypes) window.renderAdminLeaveTypes();
+        if (window.initAdminLeaveModule) window.initAdminLeaveModule();
     }
 
     if (viewId === 'shared-settings') {
@@ -761,12 +859,12 @@ window.renderEmployeeTable = function () {
         tr.setAttribute('data-id', emp.id);
         tr.innerHTML = `
             <td data-label="Employee ID"><span class="emp-id">${emp.id}</span></td>
-            <td data-label="Name">
+            <td data-label="Name" class="name-cell">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="avatar-sm" style="background: var(--primary-light); color: var(--primary);">${initials}</div>
                     <div>
                         <div class="font-medium">${emp.name}</div>
-                        <div class="text-xs text-muted">${emp.email}</div>
+                        <div class="text-xs text-muted email">${emp.email}</div>
                     </div>
                 </div>
             </td>
@@ -786,12 +884,12 @@ window.renderEmployeeTable = function () {
                 <span class="font-medium">₹${(emp.ctc / 100000).toFixed(2)} LPA</span>
             </td>
             <td data-label="CTC Breakdown">
-                <button class="btn btn-outline compact-btn text-xs" onclick="window.showCTCBreakdown('${emp.id}')">CTC Breakdown</button>
+                <button class="btn btn-outline compact-btn text-xs ctc-button" onclick="window.showCTCBreakdown('${emp.id}')">CTC Breakdown</button>
             </td>
             <td>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="icon-btn edit-btn" aria-label="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                    <button class="icon-btn text-red delete-btn" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                <div style="display: flex; gap: 0.5rem;" class="action-buttons-cell">
+                    <button class="icon-btn edit-btn" data-action="edit-employee" data-id="${emp.id}" aria-label="Edit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
+                    <button class="icon-btn text-red delete-btn" data-action="delete-employee" data-id="${emp.id}" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                 </div>
             </td>
         `;
@@ -818,21 +916,63 @@ window.updateDashboardStats = function () {
 };
 
 window.getNextId = function () {
-    return `PPS${String(employees.length + 1).padStart(3, '0')}`;
+    if (employees.length === 0) return 'PPS001';
+    const ids = employees.map(e => parseInt(e.id.replace('PPS', '')) || 0);
+    const max = Math.max(...ids);
+    return `PPS${String(max + 1).padStart(3, '0')}`;
+};
+
+window.getNextLeaveTypeId = function () {
+    if (leaveTypes.length === 0) return 'LT001';
+    const ids = leaveTypes.map(lt => parseInt(lt.id.replace('LT', '')) || 0);
+    const max = Math.max(...ids);
+    return `LT${String(max + 1).padStart(3, '0')}`;
 };
 
 window.showAddEmployeeModal = function () {
     const employeeModal = getEl('employee-modal');
     const addEmployeeForm = getEl('add-employee-form');
-    const editEmpIndexInput = getEl('edit-emp-index');
-    const modalTitleEl = getEl('modal-title');
+    const editEmpIdInput = getEl('edit-emp-index');
+    const modalTitleEl = getEl('employee-modal-title');
     const nextEmpIdDisplay = getEl('next-emp-id');
+
     if (addEmployeeForm) addEmployeeForm.reset();
-    if (editEmpIndexInput) editEmpIndexInput.value = '';
+    if (editEmpIdInput) editEmpIdInput.value = '';
     if (modalTitleEl) modalTitleEl.textContent = 'Add New Employee';
     if (getEl('emp-id-label')) getEl('emp-id-label').textContent = 'Assigning ID:';
     if (nextEmpIdDisplay) nextEmpIdDisplay.textContent = window.getNextId();
     if (employeeModal) employeeModal.classList.remove('hidden');
+};
+
+window.editEmployee = function (id) {
+    const emp = employees.find(e => e.id === id);
+    if (!emp) return;
+
+    const employeeModal = getEl('employee-modal');
+    const editEmpIdInput = getEl('edit-emp-index');
+    const modalTitleEl = getEl('employee-modal-title');
+    const nextEmpIdDisplay = getEl('next-emp-id');
+
+    if (modalTitleEl) modalTitleEl.textContent = 'Edit Employee';
+    if (getEl('emp-id-label')) getEl('emp-id-label').textContent = 'Assigned ID:';
+    if (nextEmpIdDisplay) nextEmpIdDisplay.textContent = id;
+    if (editEmpIdInput) editEmpIdInput.value = id;
+
+    if (getEl('new-emp-name')) getEl('new-emp-name').value = emp.name;
+    if (getEl('new-emp-email')) getEl('new-emp-email').value = emp.email;
+    if (getEl('new-emp-role')) getEl('new-emp-role').value = emp.role;
+    if (getEl('new-emp-dept')) getEl('new-emp-dept').value = emp.dept;
+    if (getEl('new-emp-status')) getEl('new-emp-status').value = emp.status;
+    if (getEl('new-emp-ctc')) getEl('new-emp-ctc').value = emp.ctc;
+
+    if (employeeModal) employeeModal.classList.remove('hidden');
+};
+
+let rowToDelete = null;
+window.confirmDeleteEmployee = function (id) {
+    rowToDelete = id;
+    const deleteModal = getEl('delete-modal');
+    if (deleteModal) deleteModal.classList.remove('hidden');
 };
 
 window.updatePayrollAnalytics = function () {
@@ -882,6 +1022,7 @@ function initApp() {
         window.loadEmployees();
         window.loadPayrolls();
         window.initPayrollModule();
+        window.initAttendanceModule();
     } catch (err) {
         console.error('Initialization Error:', err);
     }
@@ -937,24 +1078,28 @@ function initApp() {
     }
 
     // Role Modal - Re-query to include dynamic buttons
-    const attachOpenModalHandlers = () => {
-        const openModalButtons = queryAll('.open-modal');
-        openModalButtons.forEach(btn => {
-            btn.onclick = (e) => {
-                e.preventDefault();
-                if (modal) modal.classList.remove('hidden');
-            };
-        });
-    };
-    attachOpenModalHandlers();
+    // Robust Modal Triggers using Event Delegation
+    document.addEventListener('click', (e) => {
+        const openBtn = e.target.closest('.open-modal');
+        if (openBtn) {
+            e.preventDefault();
+            const targetModal = getEl('role-modal');
+            if (targetModal) targetModal.classList.remove('hidden');
+        }
 
-    if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+        // Close modal if clicking overlay
+        if (e.target.id === 'role-modal') {
+            e.target.classList.add('hidden');
+        }
 
-    roleBtns.forEach(btn => btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const role = btn.getAttribute('data-role');
-        if (role) showAuthView(role);
-    }));
+        // Role Selection Handling
+        const roleBtn = e.target.closest('.role-card[data-role]');
+        if (roleBtn) {
+            e.preventDefault();
+            const role = roleBtn.getAttribute('data-role');
+            if (role) showAuthView(role);
+        }
+    });
 
     function hydrateCredentials(role) {
         if (getEl('email')) getEl('email').value = '';
@@ -1070,55 +1215,49 @@ function initApp() {
     // --- Employee Management Event Listeners ---
     // (renderEmployeeTable, updateDashboardStats, getNextId, showAddEmployeeModal are now global)
 
+    // --- Enhanced Listener Setup ---
     if (addEmployeeBtn) {
-        addEmployeeBtn.addEventListener('click', () => window.showAddEmployeeModal());
-    }
-
-    if (cancelEmployeeBtn) {
-        cancelEmployeeBtn.addEventListener('click', () => { if (employeeModal) employeeModal.classList.add('hidden'); });
-    }
-
-    if (employeeModal) {
-        employeeModal.addEventListener('click', (e) => {
-            if (e.target === employeeModal) employeeModal.classList.add('hidden');
+        addEmployeeBtn.addEventListener('click', (e) => {
+            console.log('Add Employee clicked');
+            window.showAddEmployeeModal();
         });
     }
 
-    // Global listener for Edit/Delete icons
-    document.addEventListener('click', (e) => {
-        const row = e.target.closest('tr');
-        if (!row) return;
-        const id = row.getAttribute('data-id') || row.querySelector('.emp-id')?.textContent;
-        if (!id) return;
+    const addLeaveTypeBtn = getEl('add-leave-type-btn');
+    if (addLeaveTypeBtn) {
+        addLeaveTypeBtn.addEventListener('click', (e) => {
+            console.log('Add Leave Type clicked');
+            window.showAddLeaveTypeModal();
+        });
+    }
 
-        // Delete action
-        if (e.target.closest('.delete-btn') || e.target.closest('.text-red')) {
-            rowToDelete = id;
-            if (deleteModal) deleteModal.classList.remove('hidden');
-        }
+    // Event Delegation for Tables
+    if (employeeTableBody) {
+        employeeTableBody.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+            const id = btn.getAttribute('data-id');
+            console.log(`Employee Table Action: ${action} for ID: ${id}`);
 
-        // Edit action
-        if (e.target.closest('.edit-btn') || (e.target.closest('.icon-btn') && !e.target.closest('.text-red'))) {
-            const emp = employees.find(e => e.id === id);
-            if (!emp) return;
+            if (action === 'edit-employee') window.editEmployee(id);
+            if (action === 'delete-employee') window.confirmDeleteEmployee(id);
+        });
+    }
 
-            isEditing = true;
-            editRow = id;
+    const leaveTypeTableBody = getEl('admin-leave-types-body');
+    if (leaveTypeTableBody) {
+        leaveTypeTableBody.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+            const id = btn.getAttribute('data-id');
+            console.log(`Leave Type Table Action: ${action} for ID: ${id}`);
 
-            if (getEl('new-emp-name')) getEl('new-emp-name').value = emp.name;
-            if (getEl('new-emp-email')) getEl('new-emp-email').value = emp.email;
-            if (getEl('new-emp-role')) getEl('new-emp-role').value = emp.role;
-            if (getEl('new-emp-dept')) getEl('new-emp-dept').value = emp.dept;
-            if (getEl('new-emp-status')) getEl('new-emp-status').value = emp.status;
-            if (getEl('new-emp-ctc')) getEl('new-emp-ctc').value = emp.ctc;
-            if (editEmpIndexInput) editEmpIndexInput.value = id;
-            if (modalTitleEl) modalTitleEl.textContent = 'Edit Employee';
-            if (getEl('emp-id-label')) getEl('emp-id-label').textContent = 'Assigned ID:';
-            if (nextEmpIdDisplay) nextEmpIdDisplay.textContent = id;
-
-            if (employeeModal) employeeModal.classList.remove('hidden');
-        }
-    });
+            if (action === 'edit-leave-type') window.showAddLeaveTypeModal(id);
+            if (action === 'delete-leave-type') window.deleteLeaveType(id);
+        });
+    }
 
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', () => {
@@ -1126,6 +1265,7 @@ function initApp() {
                 employees = employees.filter(e => e.id !== rowToDelete);
                 window.saveEmployees();
                 rowToDelete = null;
+                if (window.showToast) window.showToast('Employee deleted successfully.', 'success');
             }
             if (deleteModal) deleteModal.classList.add('hidden');
         });
@@ -1145,10 +1285,11 @@ function initApp() {
             const ctc = parseInt(getEl('new-emp-ctc').value) || 0;
             const editId = editEmpIndexInput ? editEmpIndexInput.value : '';
 
-            if (isEditing && editId) {
+            if (editId) {
                 const index = employees.findIndex(e => e.id === editId);
                 if (index !== -1) {
                     employees[index] = { ...employees[index], name, email, role, dept: department, status, ctc, monthlySalary: Math.round(ctc / 12 / 1.15) };
+                    if (window.showToast) window.showToast('Employee updated successfully.', 'success');
                 }
             } else {
                 const newEmp = {
@@ -1156,10 +1297,11 @@ function initApp() {
                     name, email, role, dept: department, status, ctc,
                     monthlySalary: Math.round(ctc / 12 / 1.15),
                     dailyWage: Math.round(ctc / 12 / 30),
-                    present: 20, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4,
-                    assignedTasks: 0, completedTasks: 0
+                    present: 22, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4,
+                    assignedTasks: 0, completedTasks: 0, taskList: []
                 };
                 employees.unshift(newEmp);
+                if (window.showToast) window.showToast('Employee added successfully.', 'success');
             }
 
             window.saveEmployees();
@@ -2088,7 +2230,13 @@ window.showPayslip = function (empId, month) {
     let p = payrolls.find(x => x.empId === empId && x.month === month);
     const emp = employees.find(x => x.id === empId);
 
-    if (!p && !emp) return;
+    if (!p && !emp) {
+        window.showToast('Employee record not found.', 'error');
+        return;
+    }
+
+    // Show professional feedback
+    window.showToast('Generating secure payslip preview...', 'info');
 
     // Synthetic record if missing
     if (!p) {
@@ -2137,9 +2285,16 @@ window.showPayslip = function (empId, month) {
         iframe.src = 'payslip.html?t=' + Date.now();
     }
 
-    getEl('payslip-modal')?.classList.remove('hidden');
-    // Ensure scaling is applied after the modal is visible and layout is calculated
-    setTimeout(window.autoScalePayslip, 50);
+    // Small delay to feel more professional and allow iframe to start loading
+    setTimeout(() => {
+        getEl('payslip-modal')?.classList.remove('hidden');
+        window.autoScalePayslip();
+        window.showToast('Payslip generated successfully.', 'success');
+    }, 400);
+};
+
+window.autoScalePayslip = function () {
+    window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
 };
 
 /**
@@ -2152,38 +2307,33 @@ window.showPayslip = function (empId, month) {
  */
 window.autoScaleViewer = function (containerId, modalId) {
     const modal = document.getElementById(modalId);
-    const root = modal?.querySelector('.clean-preview-root');
+    const body = modal?.querySelector('.preview-modal-body');
     const container = document.getElementById(containerId);
     const modalWindow = modal?.querySelector('.preview-modal-window');
 
-    if (!root || !container || !modalWindow) return;
+    if (!body || !container || !modalWindow) return;
 
-    // 'Breathing Room' Buffer: ensures document is comfortably 'reduced' in size
-    const margin = 8;
-    const availableW = root.getBoundingClientRect().width - (margin * 2);
-    const availableH = root.getBoundingClientRect().height - (margin * 2);
+    // Use the modal body as the viewport reference
+    const availableW = body.offsetWidth - 40;
+    const availableH = body.offsetHeight - 40;
 
-    // Dynamic Document Dimensions: detect natural size of content (card/frame)
-    const card = container.querySelector('.clean-document-frame');
-
-    // Fallback logic for hidden elements or slow rendering
-    const docW = card?.offsetWidth || 800;
-    const docH = card?.offsetHeight || 900;
+    // A4 Dimensions: 210mm x 297mm (approx 794px x 1123px at 96dpi)
+    const docW = 794;
+    const docH = 1123;
 
     // Scaling ratio logic: ensure full visibility without scroll
-    // Multiply available height by 0.95 to give a small safety buffer
-    let scale = Math.min(availableW / docW, (availableH * 0.95) / docH);
+    let scale = Math.min(availableW / docW, availableH / docH);
 
     // Safety Fallback: Don't let it get microscopically small or over-scale
-    scale = Math.min(Math.max(scale, 0.4), 1.0);
+    scale = Math.min(Math.max(scale, 0.3), 1.0);
 
-    // Apply transform and ensure it's centered in its own layout box
+    // Apply transform and ensure it's centered
     container.style.transform = `scale(${scale})`;
     container.style.transformOrigin = 'center center';
 
-    // Tight-fit Modal Width: ensure the modal isn't unnecessarily wide
-    const tightWidth = Math.floor(docW * scale) + 40;
-    modalWindow.style.width = `min(90vw, ${tightWidth}px)`;
+    // Tight-fit Modal Width for visual balance
+    const tightWidth = Math.floor(docW * scale) + 60;
+    modalWindow.style.width = `min(95vw, ${tightWidth}px)`;
 };
 
 // Global Resize Listener for all Previews
@@ -2197,7 +2347,7 @@ window.addEventListener('resize', () => {
     });
 });
 
-window.printPayslipIframe = function () {
+window.printPayslip = function () {
     const iframe = getEl('payslip-iframe');
     if (iframe && iframe.contentWindow) {
         iframe.contentWindow.print();
@@ -2462,12 +2612,19 @@ window.loadEmployees = function () {
     const savedLeaveTypes = localStorage.getItem('pps-leave-types');
     if (savedLeaveTypes) {
         leaveTypes = JSON.parse(savedLeaveTypes);
+        // Migrations: Ensure all have category/code
+        leaveTypes = leaveTypes.map(lt => ({
+            ...lt,
+            code: lt.code || lt.id.replace('LT', ''),
+            category: lt.category || (lt.isPaid ? 'Paid' : 'Unpaid'),
+            desc: lt.desc || lt.name
+        }));
     } else {
         leaveTypes = [
-            { id: 'LT001', name: 'Privilege Leave', isPaid: true },
-            { id: 'LT002', name: 'Sick Leave', isPaid: true },
-            { id: 'LT003', name: 'Casual Leave', isPaid: true },
-            { id: 'LT004', name: 'Loss of Pay (Unpaid)', isPaid: false }
+            { id: 'LT001', name: 'Privilege Leave', code: 'PL', isPaid: true, category: 'Paid', desc: 'Annual earned leave' },
+            { id: 'LT002', name: 'Sick Leave', code: 'SL', isPaid: true, category: 'Paid', desc: 'For medical issues' },
+            { id: 'LT003', name: 'Casual Leave', code: 'CL', isPaid: true, category: 'Paid', desc: 'For personal contingencies' },
+            { id: 'LT004', name: 'Loss of Pay', code: 'LOP', isPaid: false, category: 'Unpaid', desc: 'Leave without pay' }
         ];
         localStorage.setItem('pps-leave-types', JSON.stringify(leaveTypes));
     }
@@ -2609,6 +2766,7 @@ window.saveLeaveData = function () {
     localStorage.setItem('pps-leave-requests', JSON.stringify(leaveRequests));
     window.renderAdminLeaveTypes?.();
     window.renderAdminLeaveRequests?.();
+    window.renderAdminLeaveCalendar?.();
     window.renderEmployeeLeaveBalance?.();
     window.renderEmployeeLeaveHistory?.();
 };
@@ -2810,13 +2968,13 @@ window.showTaskManagementModal = function (empId) {
     if (!emp) return;
 
     if (!emp.taskList) emp.taskList = [];
-    
+
     getEl('task-assign-emp-id').value = empId;
     getEl('task-modal-emp-name').textContent = `Manage Tasks - ${emp.name}`;
     getEl('task-modal-emp-id').textContent = `Employee ID: ${emp.id}`;
-    
+
     window.renderAdminTaskList(empId);
-    
+
     const modal = getEl('task-management-modal');
     if (modal) modal.classList.remove('hidden');
 };
@@ -2834,7 +2992,7 @@ window.renderAdminTaskList = function (empId) {
 
     const listContainer = getEl('admin-task-list-container');
     const countsEl = getEl('task-modal-counts');
-    
+
     if (!emp.taskList || emp.taskList.length === 0) {
         listContainer.innerHTML = '<div class="text-center text-muted p-4">No tasks assigned yet.</div>';
         if (countsEl) countsEl.textContent = '0 / 0 Completed';
@@ -2855,7 +3013,7 @@ window.renderAdminTaskList = function (empId) {
     sortedTasks.forEach(task => {
         const badgeColor = task.priority === 'High' ? 'badge-red' : (task.priority === 'Medium' ? 'badge-orange' : 'badge-blue');
         const statusBadge = task.completed ? '<span class="badge badge-green">Completed</span>' : '<span class="badge badge-yellow">Pending</span>';
-        
+
         html += `
             <div class="p-3 mb-3 border rounded-lg ${task.completed ? 'bg-gray-50 opacity-70' : 'bg-white'}">
                 <div class="flex-between">
@@ -3025,7 +3183,7 @@ function updateAttSummary() {
 }
 
 let attendanceInitialized = false;
-function initAttendanceModule() {
+window.initAttendanceModule = function () {
     if (attendanceInitialized) {
         renderAttendanceTable();
         return;
@@ -3276,7 +3434,7 @@ window.showView = function (viewId) {
         initAttendanceModule();
     }
     if (viewId === 'admin-leave') {
-        initAdminLeaveModule();
+        window.initAdminLeaveModule();
     }
     if (viewId === 'admin-bonuses') {
         initBonusesDeductionsModule();
@@ -3288,7 +3446,16 @@ window.showView = function (viewId) {
 
 // --- Leave Management Logic ---
 let adminLeaveInitialized = false;
-function initAdminLeaveModule() {
+window.initAdminLeaveModule = function () {
+    // Fix: Relocate modals to <body> if they're trapped inside hidden parent containers
+    // (The payslip-modal area has malformed HTML that causes browser parsers to nest these modals inside it)
+    ['leave-type-modal', 'apply-leave-modal', 'bonus-deduction-modal'].forEach(modalId => {
+        const modal = getEl(modalId);
+        if (modal && modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+    });
+
     if (adminLeaveInitialized) {
         window.renderAdminLeaveTypes();
         window.renderAdminLeaveRequests();
@@ -3301,24 +3468,42 @@ function initAdminLeaveModule() {
     if (typeForm) {
         typeForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const idInput = getEl('edit-leave-type-id').value;
-            const name = getEl('leave-type-name').value;
-            const code = getEl('leave-type-code').value;
+            const idInput = getEl('edit-leave-type-id').value.trim();
+            const name = getEl('leave-type-name').value.trim();
+            const code = getEl('leave-type-code').value.trim();
             const category = getEl('leave-type-category').value;
-            const description = getEl('leave-type-desc').value;
+            const description = getEl('leave-type-desc').value.trim();
             const isPaid = category === 'Paid';
 
+            // Validate required fields
+            if (!name || !code) {
+                window.showToast('Please fill in all required fields.', 'warning');
+                return;
+            }
+
+            // Check for duplicate leave code (excluding current item when editing)
+            const duplicateCode = leaveTypes.find(t => t.code.toLowerCase() === code.toLowerCase() && t.id !== idInput);
+            if (duplicateCode) {
+                window.showToast(`Leave ID "${code}" is already used by "${duplicateCode.name}". Please use a unique ID.`, 'error');
+                return;
+            }
+
             if (idInput) {
+                // Edit existing leave type
                 const type = leaveTypes.find(t => t.id === idInput);
                 if (type) {
                     type.name = name;
                     type.code = code;
+                    type.category = category;
                     type.isPaid = isPaid;
-                    type.description = description;
+                    type.desc = description;
                 }
+                window.showToast(`"${name}" leave type updated successfully.`, 'success');
             } else {
-                const newId = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
-                leaveTypes.push({ id: newId, name, code, isPaid, description });
+                // Add new leave type
+                const newId = window.getNextLeaveTypeId();
+                leaveTypes.push({ id: newId, name, code, isPaid, category, desc: description });
+                window.showToast(`"${name}" leave type created successfully.`, 'success');
             }
 
             window.saveLeaveData();
@@ -3330,7 +3515,7 @@ function initAdminLeaveModule() {
     window.renderAdminLeaveRequests();
     window.renderAdminLeaveCalendar();
     adminLeaveInitialized = true;
-}
+};
 
 window.renderAdminLeaveCalendar = function () {
     const container = getEl('admin-leave-calendar-container');
@@ -3420,16 +3605,19 @@ window.renderAdminLeaveTypes = function () {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>
-                <div class="font-medium text-sm no-wrap-truncate" title="${lt.name}">${lt.name}</div>
-                <div class="text-xs text-muted">${lt.code || lt.id}</div>
+                <div class="type-cell">
+                    <span class="type-name" title="${lt.name}">${lt.name}</span>
+                    <span class="type-code">${lt.code}</span>
+                    <span class="text-xs text-muted" style="display:block;margin-top:2px;">${lt.desc}</span>
+                </div>
             </td>
             <td style="text-align: center;">
-                <span class="badge ${lt.isPaid ? 'badge-green' : 'badge-red'}" style="font-size: 0.65rem; padding: 2px 6px;">${lt.isPaid ? 'Paid' : 'Unpaid'}</span>
+                <span class="badge ${lt.category === 'Paid' ? 'badge-green' : 'badge-red'}" style="font-size: 0.65rem; padding: 2px 6px;">${lt.category}</span>
             </td>
-            <td style="text-align: right;">
-                <div style="display: flex; gap: 0.3rem; justify-content: flex-end;">
-                    <button class="icon-btn edit-btn" aria-label="Edit" onclick="showAddLeaveTypeModal('${lt.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                    ${lt.id !== 'LT001' && lt.id !== 'LT002' ? `<button class="icon-btn delete-btn" aria-label="Delete" onclick="deleteLeaveType('${lt.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>` : ''}
+            <td>
+                <div class="actions-cell">
+                    <button class="btn edit-btn" data-action="edit-leave-type" data-id="${lt.id}">✎</button>
+                    <button class="btn delete-btn" data-action="delete-leave-type" data-id="${lt.id}">🗑</button>
                 </div>
             </td>
         `;
@@ -3531,7 +3719,10 @@ window.showAddLeaveTypeModal = function (id = null) {
     const form = getEl('leave-type-form');
     if (form) form.reset();
 
+    const submitBtn = getEl('leave-type-submit-btn');
+
     if (id) {
+        // Edit mode — pre-fill all fields with existing leave type data
         const type = leaveTypes.find(t => t.id === id);
         if (type) {
             getEl('leave-type-modal-title').textContent = 'Edit Leave Type';
@@ -3539,27 +3730,37 @@ window.showAddLeaveTypeModal = function (id = null) {
             getEl('edit-leave-type-id').value = type.id;
             getEl('leave-type-name').value = type.name;
             getEl('leave-type-code').value = type.code || '';
-            getEl('leave-type-category').value = type.isPaid ? 'Paid' : 'Unpaid';
-            getEl('leave-type-desc').value = type.description || '';
+            getEl('leave-type-category').value = type.category || (type.isPaid ? 'Paid' : 'Unpaid');
+            getEl('leave-type-desc').value = type.desc || type.description || '';
+            if (submitBtn) submitBtn.textContent = 'Update';
         }
     } else {
+        // Add mode — auto-generate ID and leave code
         getEl('leave-type-modal-title').textContent = 'Add Leave Type';
-        const newId = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
+        const newId = window.getNextLeaveTypeId();
         getEl('leave-type-id-display').textContent = newId;
         getEl('edit-leave-type-id').value = '';
+        if (submitBtn) submitBtn.textContent = 'Create Leave';
     }
 
     modal.classList.remove('hidden');
+
+    // Click outside modal to close
+    modal.onclick = function (e) {
+        if (e.target === modal) window.closeLeaveTypeModal();
+    };
 };
 
 window.closeLeaveTypeModal = function () {
-    getEl('leave-type-modal')?.classList.add('hidden');
+    const modal = getEl('leave-type-modal');
+    if (modal) modal.classList.add('hidden');
 };
 
 window.deleteLeaveType = function (id) {
     if (confirm('Are you sure you want to delete this leave type? Past requests will not be affected.')) {
         leaveTypes = leaveTypes.filter(t => t.id !== id);
         window.saveLeaveData();
+        if (window.showToast) window.showToast('Leave type deleted.', 'success');
     }
 };
 
@@ -3607,19 +3808,19 @@ window.renderAdminLeaveRequests = function () {
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>
+            <td class="employee-cell">
                 <div class="font-medium">${emp.name}</div>
-                <div class="text-xs text-muted">${empId}</div>
+                <div class="employee-id">${empId}</div>
             </td>
             <td><span class="text-sm">${leaveTypeName}</span></td>
             <td><span class="text-sm">${dateRange}</span></td>
             <td style="text-align: center;">${days} Day${days > 1 ? 's' : ''}</td>
             <td style="text-align: center;">${statusBadge}</td>
-            <td style="text-align: center;">
+            <td>
                 ${req.status === 'Pending' ? `
-                    <div style="display: flex; gap: 0.4rem; justify-content: center;">
-                        <button class="btn compact-btn text-xs" style="background:#22c55e;color:#fff;border:none;" onclick="updateLeaveStatus('${req.id}', 'Approved')">Approve</button>
-                        <button class="btn compact-btn text-xs" style="background:#ef4444;color:#fff;border:none;" onclick="updateLeaveStatus('${req.id}', 'Rejected')">Reject</button>
+                    <div class="action-buttons">
+                        <button class="btn approve-btn" onclick="updateLeaveStatus('${req.id}', 'Approved')">✔</button>
+                        <button class="btn reject-btn" onclick="updateLeaveStatus('${req.id}', 'Rejected')">✖</button>
                     </div>
                 ` : `
                     <span class="text-xs text-muted">Processed</span>
@@ -4702,101 +4903,6 @@ window.downloadReport = function (empId, reportType, format) {
         document.body.removeChild(link);
     }
 };
-
-window.renderAdminLeaveTypes = function () {
-    const tbody = getEl('admin-leave-types-body');
-    const dropdown = getEl('emp-leave-type-select');
-
-    if (!tbody) return;
-
-    if (leaveTypes.length === 0) {
-        // Pre-populate with some default leave types for demonstration
-        leaveTypes.push({ id: 'LT001', name: 'Sick Leave', code: 'SL', category: 'Paid', desc: 'For medical emergencies' });
-        leaveTypes.push({ id: 'LT002', name: 'Casual Leave', code: 'CL', category: 'Paid', desc: 'For personal contingencies' });
-        leaveTypes.push({ id: 'LT003', name: 'Loss of Pay', code: 'LOP', category: 'Unpaid', desc: 'Leave without pay' });
-    }
-
-    let html = '';
-    let dropHtml = '';
-
-    leaveTypes.forEach(lt => {
-        const badgeColor = lt.category === 'Paid' ? 'badge-blue' : 'badge-orange';
-        html += `
-            <tr>
-                <td>
-                    <div class="font-bold">${lt.name}</div>
-                    <div class="text-xs text-muted">${lt.code} - ${lt.desc || 'No description'}</div>
-                </td>
-                <td style="text-align: center;"><span class="badge ${badgeColor}">${lt.category}</span></td>
-                <td style="text-align: right;">
-                    <button class="icon-btn text-red delete-btn" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
-                </td>
-            </tr>
-        `;
-        dropHtml += `<option value="${lt.name}">${lt.name} (${lt.category})</option>`;
-    });
-
-    tbody.innerHTML = html;
-    if (dropdown) dropdown.innerHTML = dropHtml;
-};
-
-window.showAddLeaveTypeModal = function () {
-    const form = getEl('leave-type-form');
-    if (form) form.reset();
-
-    const idDisplay = getEl('leave-type-id-display');
-    if (idDisplay) idDisplay.textContent = 'LT' + String(leaveTypes.length + 1).padStart(3, '0');
-
-    getEl('leave-type-modal')?.classList.remove('hidden');
-};
-
-window.closeLeaveTypeModal = function () {
-    getEl('leave-type-modal')?.classList.add('hidden');
-};
-
-// Event listener setup for Leave Type Form submission
-document.addEventListener('DOMContentLoaded', () => {
-    const leaveForm = getEl('leave-type-form');
-    if (leaveForm) {
-        leaveForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const submitBtn = leaveForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Saving...';
-            submitBtn.disabled = true;
-
-            const newType = {
-                id: 'LT' + String(leaveTypes.length + 1).padStart(3, '0'),
-                name: getEl('leave-type-name').value,
-                code: getEl('leave-type-code').value,
-                category: getEl('leave-type-category').value,
-                desc: getEl('leave-type-desc').value
-            };
-
-            // Mock backend validation and assignment request
-            new Promise(resolve => {
-                setTimeout(() => {
-                    leaveTypes.push(newType);
-                    resolve();
-                }, 500); // simulate network delay
-            }).then(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-
-                leaveForm.reset();
-                window.closeLeaveTypeModal();
-                window.renderAdminLeaveTypes();
-
-                if (window.showToast) window.showToast('Leave Type added successfully!', 'success');
-            }).catch(err => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                if (window.showToast) window.showToast('Failed to add Leave Type.', 'error');
-            });
-        });
-    }
-});
 
 // Final Safety wrapper for initialization - moved to bottom to ensure all functions are defined
 if (document.readyState === 'loading') {
