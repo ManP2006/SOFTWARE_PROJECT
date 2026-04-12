@@ -627,8 +627,13 @@ window.closeModal = function (modalId) {
 const CHECKIN_KEY = 'pps-active-checkin';
 
 window.simulateCheckIn = function () {
-    const now = Date.now();
-    const timeStr = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Save both display time and precise timestamp
+    localStorage.setItem(`pps-checkin-${emp.id}`, time);
+    localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, now.getTime());
 
     // Persist the exact punch-in moment
     localStorage.setItem(CHECKIN_KEY, now.toString());
@@ -647,14 +652,25 @@ window.simulateCheckIn = function () {
 };
 
 window.simulateCheckOut = function () {
-    const now = Date.now();
-    const timeStr = new Date(now).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // Stop the running interval first
-    if (window.timerInterval) {
-        clearInterval(window.timerInterval);
-        window.timerInterval = null;
+    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Calculate and format total work hours as 00:00:00
+    let savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
+    if (savedTime) {
+        const startTimestamp = parseInt(savedTime);
+        const diff = Math.max(0, Date.now() - startTimestamp);
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        const formattedTotal = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        
+        if (getEl('live-work-hours')) getEl('live-work-hours').textContent = formattedTotal;
     }
+
+    // Clear session states
+    localStorage.removeItem(`pps-checkin-${emp.id}`);
+    localStorage.removeItem(`pps-checkin-timestamp-${emp.id}`);
 
     // Calculate total work time from stored punch-in
     const savedTimestamp = localStorage.getItem(CHECKIN_KEY);
@@ -683,29 +699,31 @@ window.simulateCheckOut = function () {
 };
 
 window.startLiveTimer = function () {
-    // Clear any previous interval
-    if (window.timerInterval) {
-        clearInterval(window.timerInterval);
-        window.timerInterval = null;
+    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    if (window.timerInterval) clearInterval(window.timerInterval);
+    
+    // Retrieve timestamp or default to now if missing (migration)
+    let savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
+    const startTimestamp = savedTime ? parseInt(savedTime) : Date.now();
+    if (!savedTime) {
+        localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, startTimestamp);
     }
 
-    // Read the punch-in time from localStorage
-    const savedTimestamp = localStorage.getItem(CHECKIN_KEY);
-    if (!savedTimestamp) return; // Nothing to count if not punched in
-
-    const punchInTime = parseInt(savedTimestamp, 10);
-
-    window.timerInterval = setInterval(() => {
-        const elapsed = Date.now() - punchInTime;
-        const h = Math.floor(elapsed / 3600000);
-        const m = Math.floor((elapsed % 3600000) / 60000);
-        const s = Math.floor((elapsed % 60000) / 1000);
+    const updateTimer = () => {
+        const now = Date.now();
+        const diff = Math.max(0, now - startTimestamp);
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
 
         const timerEl = getEl('live-timer');
         if (timerEl) {
             timerEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }
-    }, 1000);
+    };
+    
+    updateTimer(); // Initial call to avoid 1-second delay
+    window.timerInterval = setInterval(updateTimer, 1000);
 };
 
 window.simulateLeaveSubmit = function (event) {
