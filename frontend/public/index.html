@@ -9,8 +9,25 @@
         content="Streamline salary processing, automate tax calculations, and manage employee payments with our comprehensive payroll solution.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../src/styles/styles.css?v=12">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../src/styles/global.css?v=14">
+    <!-- Tailwind CSS for React Components -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
 <body>
@@ -2026,86 +2043,91 @@
                 <!-- Employee: Overview Section -->
                 <section id="employee-overview" class="view-section scroll-mode-content" style="display: none;">
                     <div class="page-module-container animate-fade-in">
-                        <!-- Welcome Hero — Ultra-Minimal Enterprise Header -->
-                        <div class="emp-page-header pb-6 mb-8 border-b" style="padding-top: 0.5rem;">
-                            <div class="flex-between flex-wrap gap-6">
-                                <div class="flex-align gap-5">
-                                    <div class="emp-avatar"
-                                        style="width: 60px; height: 60px; border-radius: 50%; background: var(--surface); color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-                                        <span id="emp-avatar-initials">TM</span>
-                                    </div>
-                                    <div>
-                                        <div class="flex-align mb-1">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                                stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round"
-                                                stroke-linejoin="round" class="mr-2">
-                                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                                            </svg>
-                                            <p class="text-xs font-semibold text-muted uppercase tracking-widest"
-                                                id="dash-month-year" style="letter-spacing: 0.08em;">APRIL 2026</p>
-                                        </div>
-                                        <h1 class="text-3xl font-bold mb-1"
-                                            style="letter-spacing: -0.02em; color: var(--text);">
-                                            Good morning, <span id="welcome-employee-name">Team Member</span>
-                                        </h1>
-                                        <p class="text-sm text-muted">Manage your payroll, attendance, and leave
-                                            requests effortlessly.</p>
-                                    </div>
+                        <!-- Ultra-Minimal Enterprise Welcome Hero -->
+                        <div
+                            class="emp-welcome-hero flex-between flex-wrap gap-6 border-b pb-6 mb-8 mt-2 welcome-section">
+                            <div class="flex-align gap-5 user-profile" style="cursor: pointer;"
+                                onclick="window.location.href='profile.html'">
+                                <div class="emp-hero-avatar relative">
+                                    <span id="emp-avatar-initials">TM</span>
+                                    <img src="" class="avatar-img hidden absolute inset-0" id="emp-avatar-img-main"
+                                        style="display: none;" />
                                 </div>
-                                <div class="flex-align gap-3">
-                                    <button class="btn btn-outline hover-lift" onclick="showView('employee-leave')"
-                                        style="border-radius: 8px; font-weight: 500; font-size: 0.875rem; padding: 0.5rem 1rem; height: 38px; border-color: var(--border-high-contrast);">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
+                                <div class="emp-hero-content">
+                                    <div class="flex-align mb-1 gap-2">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5" class="text-primary">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        <span class="text-xs font-bold text-muted uppercase tracking-widest label-date"
+                                            id="dash-month-year">APRIL 2026</span>
+                                    </div>
+                                    <h1 class="text-3xl font-bold mb-1 headline-text">
+                                        <span class="greeting-text">Good morning</span>, <span
+                                            id="welcome-employee-name" class="text-primary">Team Member</span>
+                                    </h1>
+                                    <p class="text-sm text-secondary">Manage your payroll, attendance, and leave
+                                        requests efficiently.</p>
+                                </div>
+                            </div>
+                            <!-- Actions & Date Setup -->
+                            <div class="top-right-section flex-column align-end" style="gap: 8px;">
+                                <div class="top-actions flex-align" style="gap: 10px;">
+                                    <button class="btn btn-outline saas-btn compact-btn font-medium"
+                                        style="font-size: 13px;" onclick="showView('employee-leave')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                         </svg>
                                         Request Leave
                                     </button>
-                                    <button class="btn btn-primary hover-lift" onclick="showView('employee-attendance')"
-                                        style="border-radius: 8px; font-weight: 500; font-size: 0.875rem; padding: 0.5rem 1rem; height: 38px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.15);">
-                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
+                                    <button class="btn btn-primary saas-btn-glow saas-btn compact-btn font-medium"
+                                        style="font-size: 13px;" onclick="showView('employee-attendance')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
                                             <circle cx="12" cy="12" r="10"></circle>
                                             <polyline points="12 6 12 12 16 14"></polyline>
                                         </svg>
                                         Punch In
                                     </button>
                                 </div>
-                            </div>
-                            <div style="display: none;">
-                                <!-- Hidden bindings for JS dependencies -->
-                                <span id="dash-day-num"></span>
+                                <div class="date-day-box" id="hero-date-box">
+                                    <div class="day-text" id="hero-day-text">Day</div>
+                                    <div class="date-text" id="hero-date-text">Date Month Year</div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Info Cards -->
-                        <div class="stats-grid">
-                            <div class="premium-card p-6 animate-slide-up delay-100">
+                        <div style="display: none;">
+                            <span id="dash-day-num"></span>
+                        </div>
+
+                        <!-- Info Cards Grid -->
+                        <div class="saas-stats-grid mb-8">
+                            <!-- Salary -->
+                            <div class="saas-stat-card animate-slide-up delay-100">
                                 <div class="flex-between mb-4">
-                                    <div class="stat-icon"
-                                        style="background: var(--primary-light); color: var(--primary);">
+                                    <div class="saas-icon-box bg-primary-light text-primary">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2">
                                             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                                         </svg>
                                     </div>
-                                    <span class="badge badge-green">Last Paid</span>
+                                    <span class="pill-badge pill-green">Paid</span>
                                 </div>
-                                <span class="text-muted text-sm">Monthly Net Salary</span>
-                                <h2 class="mb-0 mt-1" id="dash-emp-salary">₹ 65,000</h2>
-                                <p class="text-xs text-muted mt-2">Expected on 1st April</p>
+                                <span class="text-muted text-sm font-medium block">Monthly Net Salary</span>
+                                <h2 class="saas-stat-value mb-0 mt-1" id="dash-emp-salary">₹ 65,000</h2>
+                                <p class="text-xs text-muted mt-2 tracking-wide font-medium">Expected on 1st April</p>
                             </div>
 
-                            <div class="premium-card p-6 animate-slide-up delay-200">
+                            <!-- Leave Balance -->
+                            <div class="saas-stat-card animate-slide-up delay-200">
                                 <div class="flex-between mb-4">
-                                    <div class="stat-icon"
-                                        style="background: var(--warning-light); color: var(--warning);">
+                                    <div class="saas-icon-box bg-warning-light text-warning">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2">
                                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -2114,99 +2136,144 @@
                                             <line x1="3" y1="10" x2="21" y2="10"></line>
                                         </svg>
                                     </div>
-                                    <span class="badge badge-orange">Balance</span>
+                                    <span class="pill-badge pill-orange">Balance</span>
                                 </div>
-                                <span class="text-muted text-sm">Leave Balance</span>
-                                <h2 class="mb-0 mt-1" id="dash-emp-leave">14 Days</h2>
-                                <p class="text-xs text-muted mt-2">2 Requests pending</p>
+                                <span class="text-muted text-sm font-medium block">Leave Balance</span>
+                                <h2 class="saas-stat-value mb-0 mt-1" id="dash-emp-leave">14 Days</h2>
+                                <p class="text-xs text-muted mt-2 tracking-wide font-medium">2 Requests pending</p>
                             </div>
 
-                            <div class="premium-card p-6 animate-slide-up delay-300">
+                            <!-- Performance -->
+                            <div class="saas-stat-card animate-slide-up delay-300">
                                 <div class="flex-between mb-4">
-                                    <div class="stat-icon"
-                                        style="background: var(--success-light); color: var(--success);">
+                                    <div class="saas-icon-box bg-success-light text-success">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2">
                                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                         </svg>
                                     </div>
-                                    <span class="badge badge-blue">Performance</span>
+                                    <span class="pill-badge pill-blue">Performance</span>
                                 </div>
-                                <span class="text-muted text-sm">Rating (%)</span>
-                                <h2 class="mb-0 mt-1" id="dash-emp-rating">0.0%</h2>
-                                <p class="text-xs text-muted mt-2" id="dash-emp-task-counts">0 / 0 Tasks Completed</p>
+                                <span class="text-muted text-sm font-medium block">Rating (%)</span>
+                                <h2 class="saas-stat-value mb-0 mt-1" id="dash-emp-rating">0.0%</h2>
+                                <p class="text-xs text-muted mt-2 tracking-wide font-medium" id="dash-emp-task-counts">0
+                                    / 0 Tasks Completed</p>
                             </div>
 
-                            <div class="premium-card p-6 animate-slide-up delay-400">
+                            <!-- Notifications -->
+                            <div class="saas-stat-card animate-slide-up delay-400">
                                 <div class="flex-between mb-4">
-                                    <div class="stat-icon"
-                                        style="background: var(--danger-light); color: var(--danger);">
+                                    <div class="saas-icon-box bg-danger-light text-danger">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2">
                                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                                         </svg>
                                     </div>
-                                    <span class="badge badge-red">New</span>
+                                    <span class="pill-badge pill-red">New</span>
                                 </div>
-                                <span class="text-muted text-sm">Recent Notifications</span>
-                                <h2 class="mb-0 mt-1">4</h2>
-                                <p class="text-xs text-muted mt-2">1 Important announcement</p>
+                                <span class="text-muted text-sm font-medium block">Recent Notifications</span>
+                                <h2 class="saas-stat-value mb-0 mt-1">4</h2>
+                                <p class="text-xs text-muted mt-2 tracking-wide font-medium">1 Important announcement
+                                </p>
                             </div>
                         </div>
 
                         <!-- Main Content Grid -->
-                        <div class="content-grid mt-8">
-                            <div class="flex-column gap-6">
-                                <div class="premium-card p-0 overflow-hidden">
-                                    <div class="p-4 border-b bg-gray-50 flex-between">
-                                        <h3 class="mb-0">Upcoming Tasks</h3>
-                                        <button class="btn btn-ghost compact-btn text-primary">View All</button>
+                        <div class="dashboard-grid">
+                            <!-- Left side panel -->
+                            <div class="left-panel">
+                                <!-- Upcoming Tasks Column -->
+                                <div class="saas-card p-0 overflow-hidden flex-column">
+                                    <div class="p-4 border-b bg-surface flex-between" style="align-items: center;">
+                                        <h3 class="mb-0 text-[16px] font-semibold">Upcoming Tasks</h3>
+                                        <button
+                                            class="btn btn-ghost compact-btn text-primary font-medium hover:bg-primary-light"
+                                            style="font-size: 13px; padding: 4px 8px; margin: 0;">View All</button>
                                     </div>
-                                    <div class="p-0" id="emp-tasks-container">
-                                        <div class="p-6 text-center text-muted text-sm" id="emp-tasks-loading">Loading
-                                            assigned tasks...</div>
+                                    <div class="upcoming-tasks relative" id="emp-tasks-container">
+                                        <!-- Empty State -->
+                                        <div class="saas-empty-state upcoming-tasks-content" id="emp-tasks-empty">
+                                            <div class="empty-icon-wrap"
+                                                style="margin-bottom: 12px; margin-inline: auto;">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <path d="M9 11l3 3L22 4"></path>
+                                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                            <h4 class="mb-1 text-sm font-bold text-text">No active tasks</h4>
+                                            <p class="text-xs text-muted m-0">You have completed all your assigned
+                                                tasks.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Actions Moved to Left panel -->
+                                <div class="saas-card p-4">
+                                    <h3 class="mb-3 text-[15px] font-semibold">Quick Actions</h3>
+                                    <div class="quick-actions">
+                                        <button class="btn btn-outline text-text font-medium quick-action-btn"
+                                            style="font-size: 13px;"
+                                            onclick="showView('employee-leave')">Apply Leave</button>
+                                        <button class="btn btn-outline text-text font-medium quick-action-btn"
+                                            style="font-size: 13px;"
+                                            onclick="showPayslipFromDashboard()">View Payslip</button>
+                                        <button class="btn btn-outline text-text font-medium quick-action-btn"
+                                            style="font-size: 13px;"
+                                            onclick="showView('employee-attendance')">Mark Attendance</button>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="flex-column gap-6">
-                                <div class="premium-card p-6">
-                                    <h3 class="mb-4">Upcoming Holidays</h3>
-                                    <div class="flex-column gap-4">
-                                        <div class="flex-align">
-                                            <div class="date-badge mr-3"
-                                                style="width: 45px; text-align: center; background: var(--bg-alt); padding: 5px; border-radius: 8px;">
-                                                <div class="text-xs font-bold text-primary">MAR</div>
-                                                <div class="text-lg font-bold">29</div>
+                            <!-- Right panel stack -->
+                            <div class="right-panel">
+                                <!-- Holidays -->
+                                <div class="saas-card p-4">
+                                    <h3 class="mb-3 text-[15px] font-semibold">Upcoming Holidays</h3>
+                                    <div class="flex-column gap-1">
+                                        <div class="holiday-item saas-event-row transition-colors"
+                                            style="border: none;">
+                                            <div
+                                                class="holiday-date saas-date-badge flex-column flex-align bg-bg-alt rounded-md border text-center">
+                                                <span class="date-month text-primary uppercase font-bold"
+                                                    style="font-size: 10px;">MAR</span>
+                                                <span class="date-day font-bold" style="font-size: 15px;">29</span>
                                             </div>
-                                            <div>
-                                                <div class="font-medium text-sm">Holi Festival</div>
-                                                <div class="text-xs text-muted">Sunday</div>
+                                            <div class="holiday-text">
+                                                <div class="font-semibold text-[13px] text-text">Holi Festival</div>
+                                                <div class="text-[12px] font-medium text-muted mt-0.5">Sunday</div>
                                             </div>
                                         </div>
-                                        <div class="flex-align">
-                                            <div class="date-badge mr-3"
-                                                style="width: 45px; text-align: center; background: var(--bg-alt); padding: 5px; border-radius: 8px;">
-                                                <div class="text-xs font-bold text-primary">APR</div>
-                                                <div class="text-lg font-bold">10</div>
+                                        <div class="holiday-item saas-event-row transition-colors"
+                                            style="border: none;">
+                                            <div
+                                                class="holiday-date saas-date-badge flex-column flex-align bg-bg-alt rounded-md border text-center">
+                                                <span class="date-month text-primary uppercase font-bold"
+                                                    style="font-size: 10px;">APR</span>
+                                                <span class="date-day font-bold" style="font-size: 15px;">10</span>
                                             </div>
-                                            <div>
-                                                <div class="font-medium text-sm">Good Friday</div>
-                                                <div class="text-xs text-muted">Friday</div>
+                                            <div class="holiday-text">
+                                                <div class="font-semibold text-[13px] text-text">Good Friday</div>
+                                                <div class="text-[12px] font-medium text-muted mt-0.5">Friday</div>
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="btn btn-outline w-full mt-6" onclick="showHolidayCalendar()">View
-                                        Holiday Calendar</button>
+                                    <button class="btn btn-outline w-full mt-3 saas-btn compact-btn font-medium"
+                                        style="font-size: 12px; padding: 6px;" onclick="showHolidayCalendar()">View
+                                        Calendar</button>
                                 </div>
 
-                                <div class="premium-card p-6 glass-card" style="border: 2px dashed var(--border);">
-                                    <h3 class="mb-2">Need Help?</h3>
-                                    <p class="text-xs text-muted mb-4">Contact HR for any queries regarding your payroll
-                                        or leave.</p>
-                                    <button class="btn btn-primary compact-btn w-full">Contact HR Support</button>
+                                <!-- Need Help -->
+                                <div class="saas-card need-help border bg-primary-light border-primary-light">
+                                    <h3 class="mb-1 text-[15px] font-bold text-primary">Need Help?</h3>
+                                    <p class="text-[12px] font-medium text-text-secondary opacity-80 leading-tight">Got
+                                        a payroll issue or stuck on a leave request? Reach out to HR.</p>
+                                    <button
+                                        class="btn btn-primary compact-btn saas-btn font-medium shadow-sm outline-none"
+                                        style="font-size: 13px; padding: 8px;">Contact Support</button>
                                 </div>
                             </div>
                         </div>
@@ -2215,30 +2282,114 @@
 
                 <!-- Employee: Profile Section -->
                 <section id="employee-profile" class="view-section scroll-mode-content" style="display: none;">
-                    <div class="page-module-container animate-fade-in"
-                        style="max-width: 900px; margin: 0 auto; padding-top: 1rem;">
+                    <div class="page-module-container animate-fade-in" style="width: 100%; padding-top: 1rem;">
                         <!-- Employee Info Card -->
-                        <div class="emp-profile-card">
+                        <div class="emp-profile-card saas-profile-sys profile-card" id="profile-container">
+                            <!-- HEADER: Avatar + Name + Quick Info -->
                             <div class="emp-profile-header">
-                                <div class="emp-profile-left">
-                                    <div class="emp-profile-avatar" id="prof-avatar-large">TM</div>
+                                <div class="emp-profile-left relative">
+                                    <div class="emp-profile-avatar-module relative"
+                                        style="cursor: pointer; z-index: 10;" onclick="window.togglePhotoMenu(event)"
+                                        title="Click to view or change photo">
+                                        <div class="emp-profile-avatar shadow-sm profile-photo-hover"
+                                            id="prof-avatar-large">
+                                            <span id="prof-avatar-text" style="pointer-events: none;">TM</span>
+                                        </div>
+                                        <img id="prof-avatar-img" class="hidden profile-photo-hover" src=""
+                                            alt="Profile Photo"
+                                            style="position: absolute; top: 0; left: 0; border-radius: 50%; width: 100%; height: 100%; object-fit: cover; z-index: 2;">
+
+                                        <!-- Photo Options Popup -->
+                                        <div id="photo-options-popup" class="photo-popup hidden" style="z-index: 9999;">
+                                            <div class="photo-popup-option" onclick="window.viewProfilePhoto(event)">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                                View Photo
+                                            </div>
+                                            <div class="photo-popup-option"
+                                                onclick="document.getElementById('avatar-upload').click(); event.stopPropagation(); window.togglePhotoMenu(event);">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <path
+                                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                                    </path>
+                                                    <circle cx="12" cy="13" r="4"></circle>
+                                                </svg>
+                                                Change Photo
+                                            </div>
+                                        </div>
+
+                                        <!-- Edit Mode: Camera Overlay -->
+                                        <div id="prof-avatar-overlay" class="profile-edit-ui hidden"
+                                            onclick="document.getElementById('avatar-upload').click(); event.stopPropagation();"
+                                            title="Change Photo">
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white"
+                                                stroke-width="2">
+                                                <path
+                                                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                                </path>
+                                                <circle cx="12" cy="13" r="4"></circle>
+                                            </svg>
+                                        </div>
+                                        <input type="file" id="avatar-upload" class="hidden"
+                                            accept="image/png, image/jpeg, image/webp"
+                                            onchange="window.previewProfileImage(event)">
+                                    </div>
                                     <div>
-                                        <h3 class="emp-profile-name" id="prof-name-large">Team Member</h3>
-                                        <p class="emp-profile-role" id="prof-role-large">Designation</p>
-                                        <p class="emp-profile-dept text-muted mt-1" style="font-size: 0.85rem;"
-                                            id="prof-dept-large">Department</p>
+                                        <!-- View Mode: Display Name -->
+                                        <div class="profile-view-ui">
+                                            <h3 class="emp-profile-name" id="prof-name-large">Team Member</h3>
+                                        </div>
+                                        <!-- Edit Mode: Editable Name -->
+                                        <div class="profile-edit-ui hidden mb-2">
+                                            <label class="prof-field-label">Full Name <span
+                                                    class="prof-editable-badge">Editable</span></label>
+                                            <input type="text" id="edit-prof-name"
+                                                class="form-input saas-input font-bold text-lg p-2"
+                                                placeholder="Your Full Name">
+                                            <span class="prof-field-error hidden" id="err-prof-name">Name is
+                                                required</span>
+                                        </div>
+
+                                        <div class="flex-align text-muted text-sm gap-2 mt-1">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="12" cy="7" r="4"></circle>
+                                            </svg>
+                                            <span id="prof-role-large">Designation</span>
+                                            <span class="mx-1">•</span>
+                                            <span id="prof-dept-large">Department</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="emp-profile-right">
+                                <div class="emp-profile-right flex-col justify-center">
                                     <div class="emp-detail-group">
                                         <div class="emp-detail-item">
                                             <span class="emp-detail-label">Employee ID</span>
-                                            <span class="emp-detail-value" id="prof-id">---</span>
+                                            <div class="flex-align gap-2">
+                                                <svg class="prof-lock-icon" width="12" height="12" viewBox="0 0 24 24"
+                                                    fill="none" stroke="var(--text-muted)" stroke-width="2">
+                                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                                </svg>
+                                                <span class="emp-detail-value locked-text" id="prof-id">---</span>
+                                            </div>
                                         </div>
                                         <div class="emp-detail-item">
                                             <span class="emp-detail-label">Joining Date</span>
-                                            <span class="emp-detail-value" id="prof-joining">---</span>
+                                            <div class="flex-align gap-2">
+                                                <svg class="prof-lock-icon" width="12" height="12" viewBox="0 0 24 24"
+                                                    fill="none" stroke="var(--text-muted)" stroke-width="2">
+                                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                                </svg>
+                                                <span class="emp-detail-value locked-text" id="prof-joining">---</span>
+                                            </div>
                                         </div>
                                         <div class="emp-detail-item" style="min-width: 80px;">
                                             <span class="emp-detail-label">Status</span>
@@ -2252,51 +2403,352 @@
 
                             <div class="emp-profile-divider"></div>
 
-                            <div class="emp-profile-body">
-                                <div class="emp-detail-grid">
-                                    <!-- Contact Info -->
-                                    <div class="emp-detail-item">
-                                        <span class="emp-detail-label">Email Address</span>
-                                        <span class="emp-detail-value" id="prof-email">---</span>
-                                    </div>
-                                    <div class="emp-detail-item">
-                                        <span class="emp-detail-label">Phone Number</span>
-                                        <span class="emp-detail-value" id="prof-phone">---</span>
-                                    </div>
-                                    <div class="emp-detail-item">
-                                        <span class="emp-detail-label">Location</span>
-                                        <span class="emp-detail-value" id="prof-loc">---</span>
-                                    </div>
+                            <!-- BODY: Detail Grid -->
+                            <div class="emp-profile-body profile-content">
+                                <div class="profile-sections">
+                                    <div class="profile-section-col">
+                                        <!-- Section: Contact Information -->
+                                        <div class="prof-section-header">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="var(--primary)" stroke-width="2">
+                                                <path
+                                                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                                </path>
+                                                <polyline points="22,6 12,13 2,6"></polyline>
+                                            </svg>
+                                            <span>Contact Information</span>
+                                        </div>
+                                        <div class="emp-detail-grid">
+                                            <!-- Email (Locked) -->
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Email Address 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text"
+                                                        id="prof-email">---</span>
+                                                </div>
+                                            </div>
+                                            <!-- Phone (Editable) -->
+                                            <div class="emp-detail-item editable-field"
+                                                title="Click Edit Profile to modify">
+                                                <span class="emp-detail-label">Phone Number ✏️</span>
+                                                <div class="profile-view-ui mt-1">
+                                                    <span class="emp-detail-value" id="prof-phone">---</span>
+                                                </div>
+                                                <div class="profile-edit-ui hidden mt-1">
+                                                    <input type="text" id="edit-prof-phone"
+                                                        class="form-input saas-input p-2" placeholder="+91 00000 00000">
+                                                    <span class="prof-field-error hidden" id="err-prof-phone">Enter a
+                                                        valid phone number</span>
+                                                </div>
+                                            </div>
+                                            <!-- Location (Editable) -->
+                                            <div class="emp-detail-item editable-field"
+                                                title="Click Edit Profile to modify">
+                                                <span class="emp-detail-label">Location ✏️</span>
+                                                <div class="profile-view-ui mt-1">
+                                                    <span class="emp-detail-value" id="prof-loc">---</span>
+                                                </div>
+                                                <div class="profile-edit-ui hidden mt-1">
+                                                    <input type="text" id="edit-prof-loc"
+                                                        class="form-input saas-input p-2" placeholder="City, Country">
+                                                    <span class="prof-field-error hidden" id="err-prof-loc">Location is
+                                                        required</span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                    <!-- Bank Info -->
-                                    <div class="emp-detail-item" style="margin-top: 1rem;">
-                                        <span class="emp-detail-label">Bank Name</span>
-                                        <span class="emp-detail-value">HDFC Bank Ltd.</span>
+                                        <!-- Section: Personal Details -->
+                                        <div class="prof-section-header" style="margin-top: 1.75rem;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="var(--primary)" stroke-width="2">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="12" cy="7" r="4"></circle>
+                                            </svg>
+                                            <span>Personal Details</span>
+                                        </div>
+                                        <div class="emp-detail-grid">
+                                            <!-- Date of Birth (Editable) -->
+                                            <div class="emp-detail-item editable-field"
+                                                title="Click Edit Profile to modify">
+                                                <span class="emp-detail-label">Date of Birth ✏️</span>
+                                                <div class="profile-view-ui mt-1">
+                                                    <span class="emp-detail-value" id="prof-dob">15 Aug 1995</span>
+                                                </div>
+                                                <div class="profile-edit-ui hidden mt-1">
+                                                    <input type="date" id="edit-prof-dob"
+                                                        class="form-input saas-input p-2" value="1995-08-15">
+                                                </div>
+                                            </div>
+                                            <!-- Gender (Editable) -->
+                                            <div class="emp-detail-item editable-field"
+                                                title="Click Edit Profile to modify">
+                                                <span class="emp-detail-label">Gender ✏️</span>
+                                                <div class="profile-view-ui mt-1">
+                                                    <span class="emp-detail-value" id="prof-gender">Male</span>
+                                                </div>
+                                                <div class="profile-edit-ui hidden mt-1">
+                                                    <select id="edit-prof-gender" class="form-input saas-input p-2">
+                                                        <option value="Male" selected>Male</option>
+                                                        <option value="Female">Female</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <!-- Address (Editable) -->
+                                            <div class="emp-detail-item editable-field"
+                                                title="Click Edit Profile to modify">
+                                                <span class="emp-detail-label">Address ✏️</span>
+                                                <div class="profile-view-ui mt-1">
+                                                    <span class="emp-detail-value" id="prof-address">123 Tech Park,
+                                                        Hyderabad</span>
+                                                </div>
+                                                <div class="profile-edit-ui hidden mt-1">
+                                                    <input type="text" id="edit-prof-address"
+                                                        class="form-input saas-input p-2" placeholder="Full Address">
+                                                </div>
+                                            </div>
+                                            <!-- Emergency Contact Name (Editable) -->
+                                            <div class="emp-detail-item editable-field"
+                                                title="Click Edit Profile to modify">
+                                                <span class="emp-detail-label">Emergency Contact Name ✏️</span>
+                                                <div class="profile-view-ui mt-1">
+                                                    <span class="emp-detail-value" id="prof-emg-name">Arun Kumar</span>
+                                                </div>
+                                                <div class="profile-edit-ui hidden mt-1">
+                                                    <input type="text" id="edit-prof-emg-name"
+                                                        class="form-input saas-input p-2" placeholder="Contact Name">
+                                                </div>
+                                            </div>
+                                            <!-- Alternate Phone Number (Editable) -->
+                                            <div class="emp-detail-item editable-field"
+                                                title="Click Edit Profile to modify">
+                                                <span class="emp-detail-label">Alternate Phone Number ✏️</span>
+                                                <div class="profile-view-ui mt-1">
+                                                    <span class="emp-detail-value" id="prof-emg-phone">+91 98765
+                                                        43210</span>
+                                                </div>
+                                                <div class="profile-edit-ui hidden mt-1">
+                                                    <input type="text" id="edit-prof-emg-phone"
+                                                        class="form-input saas-input p-2" placeholder="Contact Number">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- End Contact Col -->
+
+                                    <div class="profile-section-col">
+                                        <!-- Section: Employment Details -->
+                                        <div class="prof-section-header" style="margin-top: 1.75rem;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="var(--primary)" stroke-width="2">
+                                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                            </svg>
+                                            <span>Employment Details</span>
+                                            <span class="prof-locked-badge profile-edit-ui hidden"
+                                                style="margin-left: auto;">All Locked</span>
+                                        </div>
+                                        <div class="emp-detail-grid">
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Designation 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text"
+                                                        id="prof-designation">---</span>
+                                                </div>
+                                            </div>
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Department 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text"
+                                                        id="prof-department">---</span>
+                                                </div>
+                                            </div>
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">CTC 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text" id="prof-ctc">---</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Section: Professional Details -->
+                                        <div class="prof-section-header" style="margin-top: 1.75rem;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="var(--primary)" stroke-width="2">
+                                                <path
+                                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                                </path>
+                                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                            </svg>
+                                            <span>Professional Details</span>
+                                            <span class="prof-locked-badge profile-edit-ui hidden"
+                                                style="margin-left: auto;">All Locked</span>
+                                        </div>
+                                        <div class="emp-detail-grid">
+                                            <!-- Employee Type -->
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Employee Type 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text">Full-time</span>
+                                                </div>
+                                            </div>
+                                            <!-- Work Location -->
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Work Location 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text">Office</span>
+                                                </div>
+                                            </div>
+                                            <!-- Shift Timing -->
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Shift Timing 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text">10:00 AM - 07:00
+                                                        PM</span>
+                                                </div>
+                                            </div>
+                                            <!-- Experience -->
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Experience 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text">2 Years</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- End Employment Col -->
+
+                                    <div class="profile-section-col">
+                                        <!-- Section: Bank Details -->
+                                        <div class="prof-section-header" style="margin-top: 1.75rem;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                stroke="var(--primary)" stroke-width="2">
+                                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                            </svg>
+                                            <span>Bank Details</span>
+                                            <span class="prof-locked-badge profile-edit-ui hidden"
+                                                style="margin-left: auto;">Admin Only</span>
+                                        </div>
+                                        <div class="emp-detail-grid">
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Bank Name 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text">HDFC Bank Ltd.</span>
+                                                </div>
+                                            </div>
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">Account No. 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text">XXXX XXXX 5542</span>
+                                                </div>
+                                            </div>
+                                            <div class="emp-detail-item non-editable-field">
+                                                <span class="emp-detail-label">IFSC Code 🔒</span>
+                                                <div class="flex-align gap-2 mt-1">
+                                                    <span class="emp-detail-value locked-text">HDFC0001245</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Section: Account Settings -->
+                                            <div class="prof-section-header" style="margin-top: 1.75rem;">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                    stroke="var(--primary)" stroke-width="2">
+                                                    <path
+                                                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
+                                                    </path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                                <span>Account Settings</span>
+                                            </div>
+                                            <div class="emp-detail-grid">
+                                                <!-- Change Password (Editable) -->
+                                                <div class="emp-detail-item editable-field"
+                                                    title="Click Edit Profile to modify">
+                                                    <span class="emp-detail-label">Change Password ✏️</span>
+                                                    <div class="profile-view-ui mt-1">
+                                                        <span class="emp-detail-value"
+                                                            id="prof-password">********</span>
+                                                    </div>
+                                                    <div class="profile-edit-ui hidden mt-1">
+                                                        <input type="password" id="edit-prof-password"
+                                                            class="form-input saas-input p-2"
+                                                            placeholder="New Password">
+                                                    </div>
+                                                </div>
+                                                <!-- Update Phone Number (Editable) -->
+                                                <div class="emp-detail-item editable-field"
+                                                    title="Click Edit Profile to modify">
+                                                    <span class="emp-detail-label">Update Phone No. ✏️</span>
+                                                    <div class="profile-view-ui mt-1">
+                                                        <span class="emp-detail-value" id="prof-update-phone">+91 00000
+                                                            00000</span>
+                                                    </div>
+                                                    <div class="profile-edit-ui hidden mt-1">
+                                                        <input type="text" id="edit-prof-update-phone"
+                                                            class="form-input saas-input p-2"
+                                                            placeholder="New Phone No">
+                                                    </div>
+                                                </div>
+                                                <!-- Update Address (Editable) -->
+                                                <div class="emp-detail-item editable-field"
+                                                    title="Click Edit Profile to modify">
+                                                    <span class="emp-detail-label">Update Address ✏️</span>
+                                                    <div class="profile-view-ui mt-1">
+                                                        <span class="emp-detail-value" id="prof-update-address">Current
+                                                            Address</span>
+                                                    </div>
+                                                    <div class="profile-edit-ui hidden mt-1">
+                                                        <input type="text" id="edit-prof-update-address"
+                                                            class="form-input saas-input p-2" placeholder="New Address">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!-- End Bank Section -->
+                                    </div><!-- End Profile Sections Grid -->
+                                </div>
+
+                                <!-- FOOTER: Edit / Save / Cancel Actions -->
+                                <div class="flex-end gap-3 transition-colors" id="profile-footer-bar"
+                                    style="padding: 1rem 0 0 0; border: none; background: transparent;">
+                                    <div class="profile-view-ui">
+                                        <button class="btn btn-outline hover-lift saas-btn transition-transform"
+                                            id="btn-edit-profile" onclick="window.toggleProfileEditMode()">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7">
+                                                </path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z">
+                                                </path>
+                                            </svg>
+                                            Edit Profile
+                                        </button>
                                     </div>
-                                    <div class="emp-detail-item" style="margin-top: 1rem;">
-                                        <span class="emp-detail-label">Account No.</span>
-                                        <span class="emp-detail-value">XXXX XXXX 5542</span>
-                                    </div>
-                                    <div class="emp-detail-item" style="margin-top: 1rem;">
-                                        <span class="emp-detail-label">IFSC Code</span>
-                                        <span class="emp-detail-value">HDFC0001245</span>
+                                    <div class="profile-edit-ui hidden flex-align gap-3" id="profile-edit-actions">
+                                        <button class="btn btn-ghost saas-btn" id="btn-cancel-profile"
+                                            onclick="window.toggleProfileEditMode()">Cancel</button>
+                                        <button class="btn btn-primary saas-btn saas-btn-glow" id="save-profile-btn"
+                                            onclick="window.saveProfileUpdates()">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path
+                                                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z">
+                                                </path>
+                                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                                <polyline points="7 3 7 8 15 8"></polyline>
+                                            </svg>
+                                            <span id="save-btn-text">Save Changes</span>
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="emp-profile-footer">
-                                <button class="btn btn-outline hover-lift" style="border-radius: 8px;">Edit
-                                    Profile</button>
-                            </div>
-
-                            <!-- Hidden Data Bindings -->
-                            <div style="display: none;">
-                                <span id="prof-name"></span>
-                                <span id="prof-role"></span>
-                                <span id="prof-dept"></span>
+                                <!-- Hidden Data Bindings -->
+                                <div style="display: none;">
+                                    <span id="prof-name"></span>
+                                    <span id="prof-role"></span>
+                                    <span id="prof-dept"></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </section>
 
                 <!-- Employee: Attendance Section -->
@@ -2348,9 +2800,9 @@
                             <div class="premium-card p-0 overflow-hidden">
                                 <div class="p-4 border-b bg-gray-50 flex-between">
                                     <h3 class="mb-0">Attendance History</h3>
-                                    <select class="form-select" style="width: auto; height: 32px; font-size: 0.8rem;">
-                                        <option>March 2026</option>
-                                        <option>February 2026</option>
+                                    <select class="form-select" id="emp-att-month-filter"
+                                        style="width: auto; height: 32px; font-size: 0.8rem;"
+                                        onchange="window.onEmpAttMonthChange()">
                                     </select>
                                 </div>
                                 <div class="table-container" style="max-height: 400px;">
@@ -2362,17 +2814,11 @@
                                                 <th>Check Out</th>
                                                 <th>Status</th>
                                                 <th>Work Hours</th>
+                                                <th>Overtime</th>
                                             </tr>
                                         </thead>
                                         <tbody id="emp-attendance-history-body">
-                                            <!-- Sample Data -->
-                                            <tr>
-                                                <td>Mar 24, 2026</td>
-                                                <td id="live-checkin-time">09:02 AM</td>
-                                                <td id="live-checkout-time">--:--</td>
-                                                <td><span class="badge badge-green">Present</span></td>
-                                                <td id="live-work-hours">--:--:--</td>
-                                            </tr>
+                                            <!-- Dynamically populated -->
                                         </tbody>
                                     </table>
                                 </div>
@@ -2380,7 +2826,52 @@
 
                             <div class="premium-card p-6 text-center animate-fade-in delay-200">
                                 <h3 class="mb-2" id="live-timer">00:00:00</h3>
-                                <p class="text-muted text-sm mb-6">Current Work Hours Today</p>
+                                <p class="text-muted text-sm mb-4">Current Work Hours Today</p>
+
+                                <!-- 6-Hour Requirement Progress -->
+                                <div class="mb-5 px-4 text-left">
+                                    <div class="flex-between mb-1" style="font-size: 0.75rem;">
+                                        <span class="text-muted" id="att-req-text">Worked: 0h 0m</span>
+                                        <span class="font-bold text-orange">6h required</span>
+                                    </div>
+                                    <div class="progress-bar-bg"
+                                        style="height: 6px; background: var(--bg-alt); border-radius: 3px;">
+                                        <div id="att-req-progress" class="progress-bar-fill"
+                                            style="width: 0%; height: 100%; background: var(--orange); border-radius: 3px; transition: width 0.5s ease;">
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-muted mt-2 text-center" id="att-warn-text">You must complete
+                                        6 working hours today</p>
+                                </div>
+
+                                <!-- Today's Session Info -->
+                                <div class="flex-between mb-4 px-2" style="gap: 1rem;">
+                                    <div class="text-center">
+                                        <span class="text-xs text-muted block">Check In</span>
+                                        <span class="font-bold text-sm" id="live-checkin-time">--:--</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <span class="text-xs text-muted block">Check Out</span>
+                                        <span class="font-bold text-sm" id="live-checkout-time">--:--</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <span class="text-xs text-muted block">Total</span>
+                                        <span class="font-bold text-sm text-primary"
+                                            id="live-work-hours">00:00:00</span>
+                                    </div>
+                                </div>
+                                <!-- Overtime Indicator (hidden by default) -->
+                                <div id="overtime-indicator" class="mb-4 px-4 text-left" style="display: none;">
+                                    <div class="flex-between mb-1" style="font-size: 0.75rem;">
+                                        <span class="font-bold text-green" id="overtime-label">🎉 Overtime: 0h 0m</span>
+                                        <span class="badge badge-green" style="font-size: 0.65rem; padding: 2px 8px;">Bonus Earned</span>
+                                    </div>
+                                </div>
+
+                                <!-- Punch Out Warning (hidden by default) -->
+                                <div id="punch-out-warning" class="mb-3 px-4" style="display: none;">
+                                    <p class="text-xs text-orange text-center font-bold">⚠ Minimum 6 hours required to punch out</p>
+                                </div>
 
                                 <div class="flex-column gap-3">
                                     <button class="btn btn-primary w-full" id="btn-checkin" onclick="simulateCheckIn()">
@@ -2428,6 +2919,25 @@
                     </div>
                 </section>
 
+                <!-- Early Exit Block Modal -->
+                <div id="early-exit-block-modal" class="modal-overlay hidden" style="z-index: 999;">
+                    <div class="modal saas-modal-content" style="max-width: 420px; width: 90%; margin: 8rem auto; border-radius: 16px; text-align: center;">
+                        <div class="p-6">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                            <h3 class="mb-2 text-xl font-bold">Cannot Punch Out</h3>
+                            <p class="text-muted text-sm mb-4">You must complete <strong>6 working hours</strong> before punching out, or apply for leave.</p>
+                            <div class="flex-column gap-3">
+                                <button class="btn btn-primary w-full" onclick="document.getElementById('early-exit-block-modal').classList.add('hidden'); window.showView('employee-leave');">
+                                    Apply for Leave
+                                </button>
+                                <button class="btn btn-outline w-full" onclick="document.getElementById('early-exit-block-modal').classList.add('hidden');">
+                                    Go Back
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Employee: Payslips Section -->
                 <section id="employee-payslips" class="view-section scroll-mode-content" style="display: none;">
                     <div class="page-module-container animate-fade-in">
@@ -2436,168 +2946,134 @@
                             <p class="text-muted">View and download your monthly salary statements</p>
                         </div>
 
-                        <div class="content-grid">
-                            <div class="flex-column gap-6">
-                                <div class="premium-card p-0 overflow-hidden">
-                                    <div class="p-4 border-b bg-gray-50 flex-between">
-                                        <h3 class="mb-0">Payment History</h3>
-                                        <div class="flex gap-2">
-                                            <select class="form-select"
-                                                style="width: auto; height: 32px; font-size: 0.8rem;">
-                                                <option>FY 2025-26</option>
-                                                <option>FY 2024-25</option>
-                                            </select>
-                                        </div>
+                        <div class="content-wrapper w-full">
+                            <div class="premium-card p-0 overflow-hidden w-full">
+                                <div class="p-5 border-b bg-gray-50 flex-between">
+                                    <h3 class="mb-0">Payment History</h3>
+                                    <div class="flex gap-2">
+                                        <select class="form-select saas-input"
+                                            style="width: min-content; height: 36px; font-size: 0.9rem; padding: 0 1rem; border-radius: 8px;">
+                                            <option>FY 2025-26</option>
+                                            <option>FY 2024-25</option>
+                                        </select>
                                     </div>
-                                    <div class="table-container" style="max-height: 500px;">
-                                        <table class="data-table w-full">
-                                            <thead>
-                                                <tr>
-                                                    <th>Month</th>
-                                                    <th>Date Paid</th>
-                                                    <th>Net Amount</th>
-                                                    <th>Status</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="emp-payslips-table-body">
-                                                <!-- Sample Data -->
-                                                <tr>
-                                                    <td class="font-medium">February 2026</td>
-                                                    <td>Mar 01, 2026</td>
-                                                    <td class="font-bold text-primary">₹ 65,000</td>
-                                                    <td><span class="badge badge-green">Paid</span></td>
-                                                    <td><button class="btn btn-primary compact-btn text-xs"
-                                                            onclick="window.showPayslip('PPS001', 'February 2026')">View</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="font-medium">January 2026</td>
-                                                    <td>Feb 01, 2026</td>
-                                                    <td class="font-bold text-primary">₹ 65,000</td>
-                                                    <td><span class="badge badge-green">Paid</span></td>
-                                                    <td><button
-                                                            class="btn btn-outline compact-btn text-xs">Download</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                </div>
+                                <div class="table-container" style="max-height: 600px; overflow-y: auto;">
+                                    <table class="data-table w-full saas-payslip-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="padding: 1.25rem 1rem;">Month</th>
+                                                <th style="padding: 1.25rem 1rem;">Date Paid</th>
+                                                <th style="padding: 1.25rem 1rem;">Net Amount</th>
+                                                <th style="padding: 1.25rem 1rem;">Status</th>
+                                                <th style="padding: 1.25rem 1rem;" class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="emp-payslips-table-body">
+                                            <!-- Maintained rows -->
+                                            <tr style="height: 64px;">
+                                                <td class="font-medium" style="padding: 1rem;">February 2026</td>
+                                                <td style="padding: 1rem;">Mar 01, 2026</td>
+                                                <td class="font-bold text-primary" style="padding: 1rem;">₹ 65,000</td>
+                                                <td style="padding: 1rem;"><span class="badge badge-green">Paid</span></td>
+                                                <td style="padding: 1rem; text-align: right;">
+                                                    <button class="btn view-payslip-btn" onclick="window.openPayslipModal('February 2026', '₹ 65,000')">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                        View
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr style="height: 64px;">
+                                                <td class="font-medium" style="padding: 1rem;">January 2026</td>
+                                                <td style="padding: 1rem;">Feb 01, 2026</td>
+                                                <td class="font-bold text-primary" style="padding: 1rem;">₹ 65,000</td>
+                                                <td style="padding: 1rem;"><span class="badge badge-green">Paid</span></td>
+                                                <td style="padding: 1rem; text-align: right;">
+                                                    <button class="btn view-payslip-btn" onclick="window.openPayslipModal('January 2026', '₹ 65,000')">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                        View
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="flex-column gap-6">
-                                <div class="premium-card p-6 blur-card">
-                                    <h3 class="mb-4">Monthly Payslip Preview</h3>
-                                    <div class="text-center py-4">
-                                        <div class="text-muted text-sm mb-1" id="preview-month">February 2026</div>
-                                        <h1 class="text-4xl mb-4" id="preview-net-pay">₹ 65,000</h1>
-                                        <div class="badge badge-green">Salary Credited</div>
-                                    </div>
-
-                                    <div class="mt-6 pt-6 border-t flex-column gap-3">
-                                        <div class="flex-between">
-                                            <span class="text-sm text-muted">Total Earnings</span>
-                                            <span class="font-medium">₹ 72,500</span>
-                                        </div>
-                                        <div class="flex-between">
-                                            <span class="text-sm text-muted">Total Deductions</span>
-                                            <span class="font-medium text-red">₹ 7,500</span>
-                                        </div>
-                                        <div class="flex-between pt-2 border-t mt-2">
-                                            <span class="font-bold">Net Payable</span>
-                                            <span class="font-bold text-primary">₹ 65,000</span>
-                                        </div>
-                                    </div>
-
-                                    <button class="btn btn-primary w-full mt-8"
-                                        onclick="window.showPayslip('PPS001', 'February 2026')">
-                                        Generate Full PDF
+                        <!-- MODAL: Payslip Detail -->
+                        <div id="payslip-modal" class="modal-overlay hidden" style="z-index: 999; display: none;">
+                            <div class="modal saas-modal-content payslip-modal-content" style="max-width: 500px; width: 100%; margin: 4rem auto; border-radius: 16px;">
+                                <div class="modal-header flex-between p-5 border-b" style="border-bottom: 1px solid var(--border);">
+                                    <h3 class="mb-0 text-xl font-bold">Payslip Details</h3>
+                                    <button class="modal-close bg-transparent border-none cursor-pointer" onclick="document.getElementById('payslip-modal').style.display='none'">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
                                     </button>
-                                    <div class="payslip-container-full">
-                                        <div class="payslip-header-flex">
-                                            <div class="section-header">
-                                                <h2 class="text-3xl gradient-text mb-1">My Payslips</h2>
-                                                <p class="text-muted">View and download your monthly salary statements
-                                                </p>
-                                            </div>
-                                            <div class="flex gap-3">
-                                                <select class="form-select"
-                                                    style="width: auto; height: 40px; font-size: 0.875rem; min-width: 140px;">
-                                                    <option>FY 2025-26</option>
-                                                    <option>FY 2024-25</option>
-                                                </select>
-                                            </div>
+                                </div>
+                                <div class="modal-body p-6">
+                                    <div class="text-center mb-6">
+                                        <h2 class="text-2xl font-bold mb-1" id="ps-modal-month">Month Year</h2>
+                                        <div class="badge badge-green inline-block">Salary Credited</div>
+                                    </div>
+                                    
+                                    <div class="payslip-details-grid grid gap-4 mb-6">
+                                        <div class="flex-between">
+                                            <span class="text-muted">Employee Name</span>
+                                            <span class="font-bold" id="ps-modal-name">Man Patel</span>
                                         </div>
-
-                                        <div class="payslip-table-card animate-slide-up delay-100">
-                                            <div class="p-5 border-b bg-gray-50/50 flex-between">
-                                                <h3 class="mb-0 text-sm font-bold uppercase tracking-wider text-muted">
-                                                    Payment
-                                                    History</h3>
-                                                <span class="text-xs text-muted">Showing last 12 months</span>
-                                            </div>
-                                            <div class="payslip-table-wrapper">
-                                                <table class="payslip-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="col-month">Month</th>
-                                                            <th class="col-date">Date Paid</th>
-                                                            <th class="col-amount">Net Amount</th>
-                                                            <th class="col-status">Status</th>
-                                                            <th class="col-action">Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="emp-payslips-table-body">
-                                                        <!-- Dynamic Content from script.js -->
-                                                        <tr>
-                                                            <td class="font-medium">February 2026</td>
-                                                            <td>Mar 01, 2026</td>
-                                                            <td class="font-bold text-primary text-right">₹ 65,000</td>
-                                                            <td class="text-center"><span
-                                                                    class="badge badge-green">Paid</span></td>
-                                                            <td class="text-right">
-                                                                <button class="payslip-view-btn"
-                                                                    onclick="window.showPayslipFromDashboard()">
-                                                                    <svg width="14" height="14" viewBox="0 0 24 24"
-                                                                        fill="none" stroke="currentColor"
-                                                                        stroke-width="2.5">
-                                                                        <path
-                                                                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
-                                                                        </path>
-                                                                        <circle cx="12" cy="12" r="3"></circle>
-                                                                    </svg>
-                                                                    View
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="font-medium">January 2026</td>
-                                                            <td>Feb 01, 2026</td>
-                                                            <td class="font-bold text-primary text-right">₹ 65,000</td>
-                                                            <td class="text-center"><span
-                                                                    class="badge badge-green">Paid</span></td>
-                                                            <td class="text-right">
-                                                                <button class="payslip-view-btn"
-                                                                    onclick="window.showPayslipFromDashboard()">
-                                                                    <svg width="14" height="14" viewBox="0 0 24 24"
-                                                                        fill="none" stroke="currentColor"
-                                                                        stroke-width="2.5">
-                                                                        <path
-                                                                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
-                                                                        </path>
-                                                                        <circle cx="12" cy="12" r="3"></circle>
-                                                                    </svg>
-                                                                    View
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                        <div class="flex-between">
+                                            <span class="text-muted">Present Days</span>
+                                            <span class="font-bold" id="ps-modal-days">0 / 22</span>
+                                        </div>
+                                        <div class="flex-between">
+                                            <span class="text-muted">Overtime Hours</span>
+                                            <span class="font-bold text-green" id="ps-modal-ot-hrs">0.0 hrs</span>
                                         </div>
                                     </div>
+                                    
+                                    <div class="breakdown-box p-4 rounded-xl border mb-6 bg-gray-50" style="background: var(--bg-alt); border: 1px solid var(--border);">
+                                        <div class="flex-between mb-3">
+                                            <span class="text-muted">Base Salary (Monthly)</span>
+                                            <span class="font-medium" id="ps-modal-basic">₹ 0</span>
+                                        </div>
+                                        <div class="flex-between mb-3">
+                                            <span class="text-muted">Allowances</span>
+                                            <span class="font-medium" id="ps-modal-allowances">₹ 0</span>
+                                        </div>
+                                        <div class="flex-between mb-3">
+                                            <span class="text-muted text-green">Overtime Bonus (1.5x)</span>
+                                            <span class="font-medium text-green" id="ps-modal-overtime">+ ₹ 0</span>
+                                        </div>
+                                        <div class="flex-between mb-3 pb-3 border-b">
+                                            <span class="text-muted text-red">Leave Deductions</span>
+                                            <span class="font-medium text-red" id="ps-modal-deductions">- ₹ 0</span>
+                                        </div>
+                                        <div class="flex-between mt-3">
+                                            <span class="text-lg font-bold">Net Salary</span>
+                                            <span class="text-xl font-bold text-primary" id="ps-modal-net">₹ 0</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary w-full p-3 font-bold flex-center" style="border-radius: 8px;">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7 10 12 15 17 10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        Download PDF
+                                    </button>
                                 </div>
+                            </div>
+                        </div>
                 </section>
 
                 <!-- Employee: Leave Section -->
@@ -3188,77 +3664,579 @@
         </div>
     </div>
 
-            <!-- ================= PAYROLL DETAIL MODAL ================= -->
-            <div id="payroll-detail-modal" class="modal-overlay hidden">
-                <div class="modal" style="max-width: 600px;">
-                    <div class="modal-header">
-                        <div>
-                            <h2 id="pd-emp-name">Employee Name</h2>
-                            <p class="text-xs text-muted" id="pd-emp-id">PPS000</p>
+    <!-- ================= PAYROLL DETAIL MODAL ================= -->
+    <div id="payroll-detail-modal" class="modal-overlay hidden">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="pd-emp-name">Employee Name</h2>
+                    <p class="text-xs text-muted" id="pd-emp-id">PPS000</p>
+                </div>
+                <div class="badge badge-purple" id="pd-month-fy">Month / FY</div>
+            </div>
+
+            <div class="modal-body py-4">
+                <div class="grid-cols-2 gap-6">
+                    <!-- Earnings -->
+                    <div>
+                        <h4 class="font-bold text-sm mb-3 uppercase tracking-wider text-green-dark">
+                            Earnings</h4>
+                        <div class="flex-column gap-2 text-sm border-b pb-3 mb-3">
+                            <div class="flex-between"><span>Basic Salary</span><span class="font-medium"
+                                    id="pd-basic">₹0</span></div>
+                            <div class="flex-between"><span>Allowances</span><span class="font-medium"
+                                    id="pd-allow">₹0</span></div>
+                            <div class="flex-between text-blue"><span>Bonuses</span><span class="font-medium"
+                                    id="pd-bonus">₹0</span></div>
                         </div>
-                        <div class="badge badge-purple" id="pd-month-fy">Month / FY</div>
-                    </div>
-
-                    <div class="modal-body py-4">
-                        <div class="grid-cols-2 gap-6">
-                            <!-- Earnings -->
-                            <div>
-                                <h4 class="font-bold text-sm mb-3 uppercase tracking-wider text-green-dark">
-                                    Earnings</h4>
-                                <div class="flex-column gap-2 text-sm border-b pb-3 mb-3">
-                                    <div class="flex-between"><span>Basic Salary</span><span class="font-medium"
-                                            id="pd-basic">₹0</span></div>
-                                    <div class="flex-between"><span>Allowances</span><span class="font-medium"
-                                            id="pd-allow">₹0</span></div>
-                                    <div class="flex-between text-blue"><span>Bonuses</span><span class="font-medium"
-                                            id="pd-bonus">₹0</span></div>
-                                </div>
-                                <div class="flex-between font-bold">
-                                    <span>Gross Salary</span><span id="pd-gross">₹0</span>
-                                </div>
-                            </div>
-
-                            <!-- Deductions -->
-                            <div>
-                                <h4 class="font-bold text-sm mb-3 uppercase tracking-wider text-red-dark">
-                                    Deductions</h4>
-                                <div class="flex-column gap-2 text-sm border-b pb-3 mb-3">
-                                    <div class="flex-between text-red"><span>Tax (TDS)</span><span class="font-medium"
-                                            id="pd-tds">₹0</span></div>
-                                    <div class="flex-between"><span>Other Deductions</span><span class="font-medium"
-                                            id="pd-other-ded">₹0</span></div>
-                                </div>
-                                <div class="flex-between font-bold text-red">
-                                    <span>Total Deductions</span><span id="pd-total-ded">₹0</span>
-                                </div>
-                            </div>
-
-                        <!-- Final Net -->
-                        <div class="mt-6 p-4 bg-gray-50 rounded-lg border flex-between">
-                            <span class="font-bold text-lg">Net Salary Payable</span>
-                            <h3 class="text-xl text-green" id="pd-net">₹0</h3>
+                        <div class="flex-between font-bold">
+                            <span>Gross Salary</span><span id="pd-gross">₹0</span>
                         </div>
                     </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline" onclick="closePayrollDetailModal()">Close</button>
-                        <button type="button" class="btn btn-secondary" id="pd-view-payslip-btn">View
-                            Payslip</button>
-                        <button type="button" class="btn btn-primary" id="pd-view-form16-btn">View Form
-                            16</button>
+                    <!-- Deductions -->
+                    <div>
+                        <h4 class="font-bold text-sm mb-3 uppercase tracking-wider text-red-dark">
+                            Deductions</h4>
+                        <div class="flex-column gap-2 text-sm border-b pb-3 mb-3">
+                            <div class="flex-between text-red"><span>Tax (TDS)</span><span class="font-medium"
+                                    id="pd-tds">₹0</span></div>
+                            <div class="flex-between"><span>Other Deductions</span><span class="font-medium"
+                                    id="pd-other-ded">₹0</span></div>
+                        </div>
+                        <div class="flex-between font-bold text-red">
+                            <span>Total Deductions</span><span id="pd-total-ded">₹0</span>
+                        </div>
+                    </div>
+
+                    <!-- Final Net -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg border flex-between">
+                        <span class="font-bold text-lg">Net Salary Payable</span>
+                        <h3 class="text-xl text-green" id="pd-net">₹0</h3>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closePayrollDetailModal()">Close</button>
+                    <button type="button" class="btn btn-secondary" id="pd-view-payslip-btn">View
+                        Payslip</button>
+                    <button type="button" class="btn btn-primary" id="pd-view-form16-btn">View Form
+                        16</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="payslip-print-modal" class="modal-overlay preview-modal-overlay hidden">
+            <div class="modal preview-modal-window">
+                <div class="preview-modal-header no-print">
+                    <div>
+                        <h3 class="font-bold text-lg">Payslip Download</h3>
+                        <p class="text-xs text-muted mt-0.5">Secure Document Viewer</p>
+                    </div>
+                    <div class="flex-align gap-3">
+                        <button class="btn btn-primary compact-btn" onclick="printPayslipIframe()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" style="margin-right: 6px;">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2">
+                                </path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            Print / Download PDF
+                        </button>
+                        <button class="icon-btn" onclick="closePayslipModal()" style="color: var(--text-muted);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="preview-modal-body"
+                    style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
+                    <!-- Full-Fit Clean Document Preview (Zero-Border) -->
+                    <div class="clean-preview-root">
+                        <div id="payslip-scaling-container" class="clean-scaling-container">
+                            <div class="clean-document-frame"
+                                style="width: 210mm; height: 297mm; background: white; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+                                <iframe id="payslip-iframe" src="about:blank"
+                                    style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="form16-modal" class="modal-overlay preview-modal-overlay hidden">
+            <div class="modal preview-modal-window" style="background: #f1f5f9 !important;">
+                <div class="preview-modal-header no-print">
+                    <div>
+                        <h3 class="font-bold text-lg">Form 16 Preview</h3>
+                        <p class="text-xs text-muted mt-0.5">Tax Certificate Viewer</p>
+                    </div>
+                    <div class="flex-align gap-3">
+                        <button class="btn btn-primary compact-btn" onclick="window.print()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" style="margin-right: 6px;">
+                                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2">
+                                </path>
+                                <rect x="6" y="14" width="12" height="8"></rect>
+                            </svg>
+                            Print Form 16
+                        </button>
+                        <button class="icon-btn" onclick="closeForm16Modal()" style="color: var(--text-muted);">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="preview-modal-body">
+                    <div class="document-viewer-frame" style="padding: 3rem !important;">
+
+                        <div class="form16-document" style="border: none; background: transparent;">
+                            <!-- Page 1: PART A -->
+                            <div class="f16-document-page" id="f16-page-1">
+                                <div class="form16-header">
+                                    <h2 style="font-size: 1.25rem; font-weight: 800; margin: 0;">FORM
+                                        NO. 16</h2>
+                                    <p style="font-size: 0.85rem; font-weight: 600; margin: 5px 0;">[See
+                                        rule 31(1)(a)]</p>
+                                    <p style="font-size: 1rem; font-weight: bold; margin-top: 15px;">
+                                        PART A</p>
+                                    <p style="font-size: 0.85rem;">Certificate under section 203 of the
+                                        Income-tax Act, 1961
+                                        for tax
+                                        deducted at source on salary</p>
+                                </div>
+
+                                <div class="form16-section">
+                                    <div class="form16-grid">
+                                        <div class="form16-grid-item span-2">
+                                            <span class="form16-label">Name and Address of the
+                                                Employer</span>
+                                            <div class="form16-value"
+                                                style="height: auto; white-space: pre-wrap; font-weight: 600;">
+                                                PPS Software
+                                                Solutions Pvt Ltd,
+                                                123 Tech Hub, HITEC City, Hyderabad, 500081</div>
+                                        </div>
+                                        <div class="form16-grid-item span-2">
+                                            <span class="form16-label">Name and Address of the
+                                                Employee</span>
+                                            <div class="form16-value" style="height: auto; white-space: pre-wrap;"
+                                                id="f16-emp-full-details">
+                                                <strong id="f16-emp-name">Aarav Sharma</strong><br>
+                                                <span id="f16-emp-address">Engineering, PPS
+                                                    Software</span>
+                                            </div>
+                                        </div>
+                                        <div class="form16-grid-item">
+                                            <span class="form16-label">PAN of the Deductor</span>
+                                            <div class="form16-value">ABCDE1234F</div>
+                                        </div>
+                                        <div class="form16-grid-item">
+                                            <span class="form16-label">TAN of the Deductor</span>
+                                            <div class="form16-value">HYDP12345G</div>
+                                        </div>
+                                        <div class="form16-grid-item">
+                                            <span class="form16-label">PAN of the Employee</span>
+                                            <div class="form16-value" id="f16-emp-pan">ABCDE1234F</div>
+                                        </div>
+                                        <div class="form16-grid-item">
+                                            <span class="form16-label">Employee ID / Designation</span>
+                                            <div class="form16-value">
+                                                <span id="f16-emp-id">PPS001</span> | <span id="f16-emp-designation">Sr.
+                                                    Engineer</span>
+                                            </div>
+                                        </div>
+                                        <div class="form16-grid-item">
+                                            <span class="form16-label">Financial Year</span>
+                                            <div class="form16-value" id="f16-fy">2025-26</div>
+                                        </div>
+                                        <div class="form16-grid-item">
+                                            <span class="form16-label">Assessment Year</span>
+                                            <div class="form16-value" id="f16-ay">2026-27</div>
+                                        </div>
+                                        <div class="form16-grid-item span-2">
+                                            <span class="form16-label">Period with the Employer</span>
+                                            <div class="form16-value" id="f16-period">01-Apr-2025 to
+                                                31-Mar-2026</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form16-section">
+                                    <p class="form16-section-title">Summary of tax paid/deposited as per
+                                        the TDS statement
+                                        filed for
+                                        the relevant quarters</p>
+                                    <table class="form16-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Quarter</th>
+                                                <th>Receipt Numbers of TDS Statement</th>
+                                                <th>Amount of Tax Deducted (₹)</th>
+                                                <th>Amount of Tax Deposited (₹)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="f16-tds-summary"></tbody>
+                                        <tfoot>
+                                            <tr style="font-weight: bold; background: #f8fafc;">
+                                                <td colspan="2">Total (₹)</td>
+                                                <td id="f16-total-deducted">0</td>
+                                                <td id="f16-total-deposited">0</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Page 2: PART B -->
+                            <div class="f16-document-page f16-page-break" id="f16-page-2">
+                                <div class="form16-header">
+                                    <p style="font-size: 1rem; font-weight: bold; margin: 0;">PART B
+                                        (Annexure)</p>
+                                    <p style="font-size: 0.85rem;">Details of Salary Paid and any other
+                                        Income and Tax
+                                        Deducted</p>
+                                </div>
+
+                                <div class="form16-section">
+                                    <table class="form16-table no-stripe">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 70%;">1. Gross Salary</td>
+                                                <td id="f16-gross-salary" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left: 2rem;">(a) Salary as per
+                                                    provisions contained in
+                                                    section
+                                                    17(1)</td>
+                                                <td id="f16-sec17-1" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left: 2rem;">(b) Value of perquisites
+                                                    under section 17(2)
+                                                </td>
+                                                <td id="f16-sec17-2" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left: 2rem;">(c) Profits in lieu of
+                                                    salary under section
+                                                    17(3)
+                                                </td>
+                                                <td id="f16-sec17-3" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2. Less: Allowances to the extent exempt under
+                                                    section 10</td>
+                                                <td id="f16-exempt-10" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr class="bg-light-grey font-bold">
+                                                <td>3. Total Salary (1 - 2)</td>
+                                                <td id="f16-total-salary" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>4. Deductions under section 16</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left: 2rem;">(a) Standard Deduction
+                                                    under section 16(ia)
+                                                </td>
+                                                <td id="f16-std-ded" class="text-right">₹50,000</td>
+                                            </tr>
+                                            <tr class="bg-light-grey font-bold">
+                                                <td>5. Income chargeable under the head "Salaries" (3 -
+                                                    4)</td>
+                                                <td id="f16-taxable-salary" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr>
+                                                <td>6. Deductions under Chapter VI-A (80C, 80D, etc.)
+                                                </td>
+                                                <td id="f16-chapter-via" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr class="bg-dark font-bold text-white">
+                                                <td>7. Total Taxable Income (5 - 6)</td>
+                                                <td id="f16-total-taxable-income" class="text-right">₹0
+                                                </td>
+                                            </tr>
+                                            <tr class="font-bold">
+                                                <td>8. Tax Payable on Total Income</td>
+                                                <td id="f16-tax-payable" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr class="font-bold">
+                                                <td>9. Less: Total TDS Deducted and Deposited</td>
+                                                <td id="f16-tds-subtracted" class="text-right">₹0</td>
+                                            </tr>
+                                            <tr class="bg-primary-light font-bold">
+                                                <td>10. Net Tax Payable / (Refund)</td>
+                                                <td id="f16-net-tax-payable" class="text-right">₹0</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="form16-signature">
+                                    <div class="sig-grid">
+                                        <div class="sig-item">
+                                            <span class="sig-label">Date:</span>
+                                            <span id="f16-current-date-final">--/--/----</span>
+                                        </div>
+                                        <div class="sig-item">
+                                            <span class="sig-label">Place:</span>
+                                            <span id="f16-place">Hyderabad, TS</span>
+                                        </div>
+                                        <div class="sig-item text-right">
+                                            <div class="sig-box">
+                                                Signature of Employer / Authorized Signatory
+                                            </div>
+                                            <div style="margin-top: 0.5rem; font-weight: 700;" id="f16-signatory">
+                                                Finance
+                                                Manager
+                                            </div>
+                                            <div class="text-xs text-muted">PPS Software Solutions</div>
+                                        </div>
+                                        <div class="text-xs text-muted">PPS Software Solutions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div id="payslip-modal" class="modal-overlay preview-modal-overlay hidden">
+            <!-- ================= ADD/EDIT LEAVE TYPE MODAL ================= -->
+            <div id="leave-type-modal" class="modal-overlay hidden">
+                <div class="modal" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h2 id="leave-type-modal-title">Add Leave Type</h2>
+                        <div class="modal-id-badge">
+                            <span class="modal-id-label">ID:</span>
+                            <strong class="modal-id-value" id="leave-type-id-display">LT005</strong>
+                        </div>
+                    </div>
+
+                    <form id="leave-type-form">
+                        <input type="hidden" id="edit-leave-type-id" value="">
+
+                        <div class="form-row">
+                            <label class="form-label">Leave Type Name</label>
+                            <input type="text" id="leave-type-name" class="form-input" placeholder="e.g. Sick Leave"
+                                required>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Leave Code</label>
+                            <input type="text" id="leave-type-code" class="form-input" placeholder="e.g. SL, CL, PL"
+                                required>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Category</label>
+                            <select id="leave-type-category" class="form-select" required>
+                                <option value="Paid">Paid</option>
+                                <option value="Unpaid">Unpaid</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label">Description (Optional)</label>
+                            <textarea id="leave-type-desc" class="form-input" style="height: 80px; resize: none;"
+                                placeholder="Brief details about this leave type..."></textarea>
+                        </div>
+
+                        <div class="modal-footer" style="margin-top: 2rem;">
+                            <button type="button" class="btn btn-outline"
+                                onclick="closeLeaveTypeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Leave Type</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ================= APPLY LEAVE MODAL (EMPLOYEE) ================= -->
+            <div id="apply-leave-modal" class="modal-overlay hidden">
+                <div class="modal" style="max-width: 450px;">
+                    <div class="modal-header">
+                        <h2>Apply for Leave</h2>
+                    </div>
+
+                    <form id="apply-leave-form">
+                        <div class="form-row">
+                            <label class="form-label">Leave Type</label>
+                            <select id="emp-leave-type-select" class="form-select" required>
+                                <!-- Rendered via JS -->
+                            </select>
+                        </div>
+
+                        <div class="form-row" style="margin-top: 1rem;">
+                            <label class="form-label">Duration</label>
+                            <select id="leave-duration" class="form-select" required>
+                                <option value="Full Day">Full Day</option>
+                                <option value="Half Day">Half Day</option>
+                                <option value="Early Exit">Early Exit</option>
+                            </select>
+                        </div>
+
+                        <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" id="leave-start-date" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">End Date</label>
+                                <input type="date" id="leave-end-date" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="margin-top: 1rem;">
+                            <label class="form-label">Reason</label>
+                            <textarea id="leave-reason" class="form-input" rows="3"
+                                placeholder="Brief reason for your leave..." required></textarea>
+                        </div>
+
+                        <div class="modal-footer" style="margin-top: 2rem;">
+                            <button type="button" class="btn btn-outline"
+                                onclick="closeApplyLeaveModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ================= EARLY EXIT BLOCK MODAL ================= -->
+            <div id="early-exit-block-modal" class="modal-overlay hidden" style="z-index: 1500;">
+                <div class="modal" style="max-width: 400px; text-align: center;">
+                    <div class="mb-4">
+                        <div
+                            style="background: rgba(239,68,68,0.1); color: var(--red); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <h2 class="mb-2">Minimum Hours Not Met</h2>
+                    <p class="text-muted mb-6" style="font-size: 0.95rem;">You must complete a minimum of 6 working
+                        hours today. If you need to leave early, please submit an Early Exit request for admin approval.
+                    </p>
+
+                    <div class="flex-column gap-3">
+                        <button type="button" class="btn btn-primary w-full"
+                            onclick="closeModal('early-exit-block-modal'); window.showApplyLeaveModal({ isEarlyExit: true });">Apply
+                            for Early Exit</button>
+                        <button type="button" class="btn btn-outline border-none w-full"
+                            onclick="closeModal('early-exit-block-modal')">Cancel Punch Out</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bonus-deduction-modal" class="modal-overlay hidden">
+                <div class="modal" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2 id="bd-modal-title">Create New Entry</h2>
+                    </div>
+
+                    <form id="bd-form">
+                        <input type="hidden" id="bd-edit-id" value="">
+
+                        <div class="form-row">
+                            <label class="form-label">Employee</label>
+                            <select id="bd-employee-select" class="form-select" required>
+                                <!-- Populated via JS -->
+                            </select>
+                        </div>
+
+                        <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Type</label>
+                                <select id="bd-type-select" class="form-select" required>
+                                    <option value="Bonus">Bonus</option>
+                                    <option value="Deduction">Deduction</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select id="bd-category-select" class="form-select" required>
+                                    <option value="Performance Bonus">Performance Bonus</option>
+                                    <option value="Overtime">Overtime</option>
+                                    <option value="Late Penalty">Late Penalty</option>
+                                    <option value="Tax Adjustment">Tax Adjustment</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="margin-top: 1rem;">
+                            <label class="form-label">Title / Note</label>
+                            <input type="text" id="bd-title" class="form-input"
+                                placeholder="e.g. Q1 Reward, March Overtime" required>
+                        </div>
+
+                        <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">Amount (₹)</label>
+                                <input type="number" id="bd-amount" class="form-input" placeholder="0" required min="1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Effective Month</label>
+                                <div class="flex-align gap-2">
+                                    <select id="bd-month-select" class="form-select" required>
+                                        <option value="01">Jan</option>
+                                        <option value="02">Feb</option>
+                                        <option value="03">Mar</option>
+                                        <option value="04">Apr</option>
+                                        <option value="05">May</option>
+                                        <option value="06">Jun</option>
+                                        <option value="07">Jul</option>
+                                        <option value="08">Aug</option>
+                                        <option value="09">Sep</option>
+                                        <option value="10">Oct</option>
+                                        <option value="11">Nov</option>
+                                        <option value="12">Dec</option>
+                                    </select>
+                                    <select id="bd-year-select" class="form-select" required>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row" style="margin-top: 1rem;">
+                            <label class="form-label">Entry Date</label>
+                            <input type="date" id="bd-date" class="form-input" required>
+                        </div>
+
+                        <div class="modal-footer" style="margin-top: 2rem;">
+                            <button type="button" class="btn btn-outline"
+                                onclick="closeBonusDeductionModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Adjustment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="report-view-modal" class="modal-overlay preview-modal-overlay hidden">
                 <div class="modal preview-modal-window">
                     <div class="preview-modal-header no-print">
                         <div>
-                            <h3 class="font-bold text-lg">Payslip Preview</h3>
-                            <p class="text-xs text-muted mt-0.5">Secure Document Viewer</p>
+                            <h3 id="rep-modal-title" class="font-bold text-lg">Report Title</h3>
+                            <p id="rep-modal-subtitle" class="text-xs text-muted mt-0.5">Report Subtitle
+                            </p>
                         </div>
                         <div class="flex-align gap-3">
-                            <button class="btn btn-primary compact-btn" onclick="printPayslipIframe()">
+                            <button class="btn btn-primary compact-btn" id="rep-modal-download-btn">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" style="margin-right: 6px;">
                                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -3267,53 +4245,11 @@
                                     </path>
                                     <rect x="6" y="14" width="12" height="8"></rect>
                                 </svg>
-                                Print / Download PDF
+                                Print / Download
                             </button>
-                            <button class="icon-btn" onclick="closePayslipModal()" style="color: var(--text-muted);">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="preview-modal-body"
-                        style="padding: 0 !important; background: transparent !important; overflow: hidden !important;">
-                        <!-- Full-Fit Clean Document Preview (Zero-Border) -->
-                        <div class="clean-preview-root">
-                            <div id="payslip-scaling-container" class="clean-scaling-container">
-                                <div class="clean-document-frame"
-                                    style="width: 210mm; height: 297mm; background: white; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-                                    <iframe id="payslip-iframe" src="about:blank"
-                                        style="width: 100%; height: 100%; border: none; display: block;"></iframe>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="form16-modal" class="modal-overlay preview-modal-overlay hidden">
-                <div class="modal preview-modal-window" style="background: #f1f5f9 !important;">
-                    <div class="preview-modal-header no-print">
-                        <div>
-                            <h3 class="font-bold text-lg">Form 16 Preview</h3>
-                            <p class="text-xs text-muted mt-0.5">Tax Certificate Viewer</p>
-                        </div>
-                        <div class="flex-align gap-3">
-                            <button class="btn btn-primary compact-btn" onclick="window.print()">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" style="margin-right: 6px;">
-                                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                    <path
-                                        d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2">
-                                    </path>
-                                    <rect x="6" y="14" width="12" height="8"></rect>
-                                </svg>
-                                Print Form 16
-                            </button>
-                            <button class="icon-btn" onclick="closeForm16Modal()" style="color: var(--text-muted);">
+                            <button class="icon-btn"
+                                onclick="document.getElementById('report-view-modal').classList.add('hidden')"
+                                style="color: var(--text-muted);">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -3324,447 +4260,154 @@
                     </div>
 
                     <div class="preview-modal-body">
-                        <div class="document-viewer-frame" style="padding: 3rem !important;">
-
-                            <div class="form16-document" style="border: none; background: transparent;">
-                                <!-- Page 1: PART A -->
-                                <div class="f16-document-page" id="f16-page-1">
-                                    <div class="form16-header">
-                                        <h2 style="font-size: 1.25rem; font-weight: 800; margin: 0;">FORM
-                                            NO. 16</h2>
-                                        <p style="font-size: 0.85rem; font-weight: 600; margin: 5px 0;">[See
-                                            rule 31(1)(a)]</p>
-                                        <p style="font-size: 1rem; font-weight: bold; margin-top: 15px;">
-                                            PART A</p>
-                                        <p style="font-size: 0.85rem;">Certificate under section 203 of the
-                                            Income-tax Act, 1961
-                                            for tax
-                                            deducted at source on salary</p>
-                                    </div>
-
-                                    <div class="form16-section">
-                                        <div class="form16-grid">
-                                            <div class="form16-grid-item span-2">
-                                                <span class="form16-label">Name and Address of the
-                                                    Employer</span>
-                                                <div class="form16-value"
-                                                    style="height: auto; white-space: pre-wrap; font-weight: 600;">
-                                                    PPS Software
-                                                    Solutions Pvt Ltd,
-                                                    123 Tech Hub, HITEC City, Hyderabad, 500081</div>
-                                            </div>
-                                            <div class="form16-grid-item span-2">
-                                                <span class="form16-label">Name and Address of the
-                                                    Employee</span>
-                                                <div class="form16-value" style="height: auto; white-space: pre-wrap;"
-                                                    id="f16-emp-full-details">
-                                                    <strong id="f16-emp-name">Aarav Sharma</strong><br>
-                                                    <span id="f16-emp-address">Engineering, PPS
-                                                        Software</span>
-                                                </div>
-                                            </div>
-                                            <div class="form16-grid-item">
-                                                <span class="form16-label">PAN of the Deductor</span>
-                                                <div class="form16-value">ABCDE1234F</div>
-                                            </div>
-                                            <div class="form16-grid-item">
-                                                <span class="form16-label">TAN of the Deductor</span>
-                                                <div class="form16-value">HYDP12345G</div>
-                                            </div>
-                                            <div class="form16-grid-item">
-                                                <span class="form16-label">PAN of the Employee</span>
-                                                <div class="form16-value" id="f16-emp-pan">ABCDE1234F</div>
-                                            </div>
-                                            <div class="form16-grid-item">
-                                                <span class="form16-label">Employee ID / Designation</span>
-                                                <div class="form16-value">
-                                                    <span id="f16-emp-id">PPS001</span> | <span
-                                                        id="f16-emp-designation">Sr.
-                                                        Engineer</span>
-                                                </div>
-                                            </div>
-                                            <div class="form16-grid-item">
-                                                <span class="form16-label">Financial Year</span>
-                                                <div class="form16-value" id="f16-fy">2025-26</div>
-                                            </div>
-                                            <div class="form16-grid-item">
-                                                <span class="form16-label">Assessment Year</span>
-                                                <div class="form16-value" id="f16-ay">2026-27</div>
-                                            </div>
-                                            <div class="form16-grid-item span-2">
-                                                <span class="form16-label">Period with the Employer</span>
-                                                <div class="form16-value" id="f16-period">01-Apr-2025 to
-                                                    31-Mar-2026</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form16-section">
-                                        <p class="form16-section-title">Summary of tax paid/deposited as per
-                                            the TDS statement
-                                            filed for
-                                            the relevant quarters</p>
-                                        <table class="form16-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Quarter</th>
-                                                    <th>Receipt Numbers of TDS Statement</th>
-                                                    <th>Amount of Tax Deducted (₹)</th>
-                                                    <th>Amount of Tax Deposited (₹)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="f16-tds-summary"></tbody>
-                                            <tfoot>
-                                                <tr style="font-weight: bold; background: #f8fafc;">
-                                                    <td colspan="2">Total (₹)</td>
-                                                    <td id="f16-total-deducted">0</td>
-                                                    <td id="f16-total-deposited">0</td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <!-- Page 2: PART B -->
-                                <div class="f16-document-page f16-page-break" id="f16-page-2">
-                                    <div class="form16-header">
-                                        <p style="font-size: 1rem; font-weight: bold; margin: 0;">PART B
-                                            (Annexure)</p>
-                                        <p style="font-size: 0.85rem;">Details of Salary Paid and any other
-                                            Income and Tax
-                                            Deducted</p>
-                                    </div>
-
-                                    <div class="form16-section">
-                                        <table class="form16-table no-stripe">
-                                            <tbody>
-                                                <tr>
-                                                    <td style="width: 70%;">1. Gross Salary</td>
-                                                    <td id="f16-gross-salary" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding-left: 2rem;">(a) Salary as per
-                                                        provisions contained in
-                                                        section
-                                                        17(1)</td>
-                                                    <td id="f16-sec17-1" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding-left: 2rem;">(b) Value of perquisites
-                                                        under section 17(2)
-                                                    </td>
-                                                    <td id="f16-sec17-2" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding-left: 2rem;">(c) Profits in lieu of
-                                                        salary under section
-                                                        17(3)
-                                                    </td>
-                                                    <td id="f16-sec17-3" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2. Less: Allowances to the extent exempt under
-                                                        section 10</td>
-                                                    <td id="f16-exempt-10" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr class="bg-light-grey font-bold">
-                                                    <td>3. Total Salary (1 - 2)</td>
-                                                    <td id="f16-total-salary" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>4. Deductions under section 16</td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="padding-left: 2rem;">(a) Standard Deduction
-                                                        under section 16(ia)
-                                                    </td>
-                                                    <td id="f16-std-ded" class="text-right">₹50,000</td>
-                                                </tr>
-                                                <tr class="bg-light-grey font-bold">
-                                                    <td>5. Income chargeable under the head "Salaries" (3 -
-                                                        4)</td>
-                                                    <td id="f16-taxable-salary" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>6. Deductions under Chapter VI-A (80C, 80D, etc.)
-                                                    </td>
-                                                    <td id="f16-chapter-via" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr class="bg-dark font-bold text-white">
-                                                    <td>7. Total Taxable Income (5 - 6)</td>
-                                                    <td id="f16-total-taxable-income" class="text-right">₹0
-                                                    </td>
-                                                </tr>
-                                                <tr class="font-bold">
-                                                    <td>8. Tax Payable on Total Income</td>
-                                                    <td id="f16-tax-payable" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr class="font-bold">
-                                                    <td>9. Less: Total TDS Deducted and Deposited</td>
-                                                    <td id="f16-tds-subtracted" class="text-right">₹0</td>
-                                                </tr>
-                                                <tr class="bg-primary-light font-bold">
-                                                    <td>10. Net Tax Payable / (Refund)</td>
-                                                    <td id="f16-net-tax-payable" class="text-right">₹0</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <div class="form16-signature">
-                                        <div class="sig-grid">
-                                            <div class="sig-item">
-                                                <span class="sig-label">Date:</span>
-                                                <span id="f16-current-date-final">--/--/----</span>
-                                            </div>
-                                            <div class="sig-item">
-                                                <span class="sig-label">Place:</span>
-                                                <span id="f16-place">Hyderabad, TS</span>
-                                            </div>
-                                            <div class="sig-item text-right">
-                                                <div class="sig-box">
-                                                    Signature of Employer / Authorized Signatory
-                                                </div>
-                                                <div style="margin-top: 0.5rem; font-weight: 700;" id="f16-signatory">
-                                                    Finance
-                                                    Manager
-                                                </div>
-                                                <div class="text-xs text-muted">PPS Software Solutions</div>
-                                            </div>
-                                            <div class="text-xs text-muted">PPS Software Solutions</div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div id="rep-modal-body-container" class="document-viewer-frame"
+                            style="max-width: 1000px !important;">
+                            <div id="rep-modal-body" style="padding: 0;">
+                                <!-- Content will be injected by JS -->
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- ================= ADD/EDIT LEAVE TYPE MODAL ================= -->
-                <div id="leave-type-modal" class="modal-overlay hidden">
-                    <div class="modal" style="max-width: 400px;">
-                        <div class="modal-header">
-                            <h2 id="leave-type-modal-title">Add Leave Type</h2>
-                            <div class="modal-id-badge">
-                                <span class="modal-id-label">ID:</span>
-                                <strong class="modal-id-value" id="leave-type-id-display">LT005</strong>
-                            </div>
-                        </div>
-
-                        <form id="leave-type-form">
-                            <input type="hidden" id="edit-leave-type-id" value="">
-
-                            <div class="form-row">
-                                <label class="form-label">Leave Type Name</label>
-                                <input type="text" id="leave-type-name" class="form-input" placeholder="e.g. Sick Leave"
-                                    required>
-                            </div>
-
-                            <div class="form-row">
-                                <label class="form-label">Leave Code</label>
-                                <input type="text" id="leave-type-code" class="form-input" placeholder="e.g. SL, CL, PL"
-                                    required>
-                            </div>
-
-                            <div class="form-row">
-                                <label class="form-label">Category</label>
-                                <select id="leave-type-category" class="form-select" required>
-                                    <option value="Paid">Paid</option>
-                                    <option value="Unpaid">Unpaid</option>
-                                </select>
-                            </div>
-
-                            <div class="form-row">
-                                <label class="form-label">Description (Optional)</label>
-                                <textarea id="leave-type-desc" class="form-input" style="height: 80px; resize: none;"
-                                    placeholder="Brief details about this leave type..."></textarea>
-                            </div>
-
-                            <div class="modal-footer" style="margin-top: 2rem;">
-                                <button type="button" class="btn btn-outline"
-                                    onclick="closeLeaveTypeModal()">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Leave Type</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- ================= APPLY LEAVE MODAL (EMPLOYEE) ================= -->
-                <div id="apply-leave-modal" class="modal-overlay hidden">
-                    <div class="modal" style="max-width: 450px;">
-                        <div class="modal-header">
-                            <h2>Apply for Leave</h2>
-                        </div>
-
-                        <form id="apply-leave-form">
-                            <div class="form-row">
-                                <label class="form-label">Leave Type</label>
-                                <select id="emp-leave-type-select" class="form-select" required>
-                                    <!-- Rendered via JS -->
-                                </select>
-                            </div>
-
-                            <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Start Date</label>
-                                    <input type="date" id="leave-start-date" class="form-input" required>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">End Date</label>
-                                    <input type="date" id="leave-end-date" class="form-input" required>
-                                </div>
-                            </div>
-
-                            <div class="form-row" style="margin-top: 1rem;">
-                                <label class="form-label">Reason</label>
-                                <textarea id="leave-reason" class="form-input" rows="3"
-                                    placeholder="Brief reason for your leave..." required></textarea>
-                            </div>
-
-                            <div class="modal-footer" style="margin-top: 2rem;">
-                                <button type="button" class="btn btn-outline"
-                                    onclick="closeApplyLeaveModal()">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Submit Request</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div id="bonus-deduction-modal" class="modal-overlay hidden">
-                    <div class="modal" style="max-width: 500px;">
-                        <div class="modal-header">
-                            <h2 id="bd-modal-title">Create New Entry</h2>
-                        </div>
-
-                        <form id="bd-form">
-                            <input type="hidden" id="bd-edit-id" value="">
-
-                            <div class="form-row">
-                                <label class="form-label">Employee</label>
-                                <select id="bd-employee-select" class="form-select" required>
-                                    <!-- Populated via JS -->
-                                </select>
-                            </div>
-
-                            <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Type</label>
-                                    <select id="bd-type-select" class="form-select" required>
-                                        <option value="Bonus">Bonus</option>
-                                        <option value="Deduction">Deduction</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Category</label>
-                                    <select id="bd-category-select" class="form-select" required>
-                                        <option value="Performance Bonus">Performance Bonus</option>
-                                        <option value="Overtime">Overtime</option>
-                                        <option value="Late Penalty">Late Penalty</option>
-                                        <option value="Tax Adjustment">Tax Adjustment</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="form-row" style="margin-top: 1rem;">
-                                <label class="form-label">Title / Note</label>
-                                <input type="text" id="bd-title" class="form-input"
-                                    placeholder="e.g. Q1 Reward, March Overtime" required>
-                            </div>
-
-                            <div class="grid-cols-2 form-row" style="margin-top: 1rem;">
-                                <div class="form-group">
-                                    <label class="form-label">Amount (₹)</label>
-                                    <input type="number" id="bd-amount" class="form-input" placeholder="0" required
-                                        min="1">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Effective Month</label>
-                                    <div class="flex-align gap-2">
-                                        <select id="bd-month-select" class="form-select" required>
-                                            <option value="01">Jan</option>
-                                            <option value="02">Feb</option>
-                                            <option value="03">Mar</option>
-                                            <option value="04">Apr</option>
-                                            <option value="05">May</option>
-                                            <option value="06">Jun</option>
-                                            <option value="07">Jul</option>
-                                            <option value="08">Aug</option>
-                                            <option value="09">Sep</option>
-                                            <option value="10">Oct</option>
-                                            <option value="11">Nov</option>
-                                            <option value="12">Dec</option>
-                                        </select>
-                                        <select id="bd-year-select" class="form-select" required>
-                                            <option value="2025">2025</option>
-                                            <option value="2026">2026</option>
-                                            <option value="2027">2027</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-row" style="margin-top: 1rem;">
-                                <label class="form-label">Entry Date</label>
-                                <input type="date" id="bd-date" class="form-input" required>
-                            </div>
-
-                            <div class="modal-footer" style="margin-top: 2rem;">
-                                <button type="button" class="btn btn-outline"
-                                    onclick="closeBonusDeductionModal()">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Adjustment</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div id="report-view-modal" class="modal-overlay preview-modal-overlay hidden">
-                    <div class="modal preview-modal-window">
-                        <div class="preview-modal-header no-print">
-                            <div>
-                                <h3 id="rep-modal-title" class="font-bold text-lg">Report Title</h3>
-                                <p id="rep-modal-subtitle" class="text-xs text-muted mt-0.5">Report Subtitle
-                                </p>
-                            </div>
-                            <div class="flex-align gap-3">
-                                <button class="btn btn-primary compact-btn" id="rep-modal-download-btn">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" style="margin-right: 6px;">
-                                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                                        <path
-                                            d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2">
-                                        </path>
-                                        <rect x="6" y="14" width="12" height="8"></rect>
-                                    </svg>
-                                    Print / Download
-                                </button>
-                                <button class="icon-btn"
-                                    onclick="document.getElementById('report-view-modal').classList.add('hidden')"
-                                    style="color: var(--text-muted);">
-                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="preview-modal-body">
-                            <div id="rep-modal-body-container" class="document-viewer-frame"
-                                style="max-width: 1000px !important;">
-                                <div id="rep-modal-body" style="padding: 0;">
-                                    <!-- Content will be injected by JS -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-        </div>
+            <!-- Profile Photo Lightbox Modal -->
+            <div id="photo-lightbox-modal" class="modal-overlay hidden" onclick="window.closePhotoLightbox()"
+                style="z-index: 9999; background: rgba(0,0,0,0.85); display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; justify-content: center; align-items: center;">
+                <div class="lightbox-content" onclick="event.stopPropagation()"
+                    style="position: relative; display: flex; justify-content: center; align-items: center;">
+                    <button onclick="window.closePhotoLightbox()"
+                        style="position: absolute; top: -48px; right: -8px; color: white; background: rgba(255,255,255,0.15); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;"
+                        onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <img id="lightbox-img" class="hidden" src="" alt="Profile Photo Full"
+                        style="max-width: 350px; max-height: 350px; border-radius: 50%; box-shadow: 0 20px 60px rgba(0,0,0,0.5); object-fit: cover; aspect-ratio: 1; display: none;">
+                    <div id="lightbox-placeholder" class="emp-profile-avatar"
+                        style="width: 250px; height: 250px; font-size: 5rem; display: none; align-items: center; justify-content: center; border-radius: 50%; background: var(--primary-light, #e0e7ff); color: var(--primary, #3b82f6);">
+                        <span id="lightbox-text">TM</span>
+                    </div>
+                </div>
+            </div>
 
-        <script src="../src/js/script.js?v=789"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        </div>
+    </div>
+
+    <script>
+        // --- Profile Photo Interaction System ---
+        window.togglePhotoMenu = function (e) {
+            if (e) e.stopPropagation();
+
+            // Safe edit-mode check — guard against missing element
+            var editActions = document.getElementById('profile-edit-actions');
+            if (editActions && !editActions.classList.contains('hidden')) {
+                return; // In edit mode, do nothing
+            }
+
+            var popup = document.getElementById('photo-options-popup');
+            if (!popup) return;
+
+            if (popup.classList.contains('hidden')) {
+                popup.classList.remove('hidden');
+                // Delay adding outside-click listener to avoid immediate close
+                setTimeout(function () {
+                    document.addEventListener('click', window.closePhotoMenuOutside);
+                }, 10);
+            } else {
+                window.closePhotoMenu();
+            }
+        };
+
+        window.closePhotoMenu = function () {
+            var popup = document.getElementById('photo-options-popup');
+            if (popup && !popup.classList.contains('hidden')) {
+                popup.classList.add('hidden');
+            }
+            document.removeEventListener('click', window.closePhotoMenuOutside);
+        };
+
+        window.closePhotoMenuOutside = function (e) {
+            var module = document.querySelector('.emp-profile-avatar-module');
+            if (module && !module.contains(e.target)) {
+                window.closePhotoMenu();
+            }
+        };
+
+        window.viewProfilePhoto = function (e) {
+            if (e) { e.stopPropagation(); e.preventDefault(); }
+            window.closePhotoMenu();
+
+            var lightbox = document.getElementById('photo-lightbox-modal');
+            var lightboxImg = document.getElementById('lightbox-img');
+            var lightboxPlaceholder = document.getElementById('lightbox-placeholder');
+            var lightboxText = document.getElementById('lightbox-text');
+
+            if (!lightbox || !lightboxImg) return;
+
+            var currentImg = document.getElementById('prof-avatar-img');
+            var currentText = document.getElementById('prof-avatar-text');
+
+            // Check if a real image is loaded (not just empty src)
+            var hasImage = currentImg && !currentImg.classList.contains('hidden') && currentImg.src && !currentImg.src.endsWith('/');
+
+            if (hasImage) {
+                lightboxImg.src = currentImg.src;
+                lightboxImg.classList.remove('hidden');
+                lightboxImg.style.display = 'block';
+                if (lightboxPlaceholder) lightboxPlaceholder.style.display = 'none';
+            } else {
+                lightboxImg.classList.add('hidden');
+                lightboxImg.style.display = 'none';
+                if (lightboxPlaceholder) {
+                    lightboxPlaceholder.style.display = 'flex';
+                    lightboxPlaceholder.style.alignItems = 'center';
+                    lightboxPlaceholder.style.justifyContent = 'center';
+                    lightboxPlaceholder.style.background = 'var(--primary-light, #e0e7ff)';
+                    lightboxPlaceholder.style.color = 'var(--primary, #3b82f6)';
+                    lightboxPlaceholder.style.borderRadius = '50%';
+                }
+                if (currentText && lightboxText) lightboxText.textContent = currentText.textContent;
+            }
+
+            lightbox.classList.remove('hidden');
+            lightbox.style.display = 'flex';
+        };
+
+        window.closePhotoLightbox = function () {
+            var modal = document.getElementById('photo-lightbox-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+        };
+
+        // ESC key closes lightbox
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                window.closePhotoLightbox();
+                window.closePhotoMenu();
+            }
+        });
+    </script>
+
+    <div id="payslip-react-root" style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;">
+        <!-- React will replace this content -->
+    </div>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- React Components & Portal Bundle (Professional System) -->
+    <script type="text/babel" src="../src/components/payslip/PayslipModal.jsx"></script>
+    <script type="text/babel" src="../src/App.jsx"></script>
+    <script type="text/babel" src="../src/main.jsx"></script>
+
+    <script src="../src/utils/script.js?v=790"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
 
 </html>

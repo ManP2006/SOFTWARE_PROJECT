@@ -4,23 +4,23 @@ window.queryAll = (selector) => document.querySelectorAll(selector);
 
 // --- Global Data & State ---
 const defaultEmployees = [
-    { id: 'PPS001', name: 'Aarav Sharma', email: 'aarav@pps.com', role: 'Frontend Developer', dept: 'Engineering', status: 'Active', dailyWage: 2500, monthlySalary: 65000, ctc: 900000, present: 22, absent: 1, halfDay: 1, paidLeave: 1, unpaidLeave: 0, sickLeave: 0, wfh: 1, totalWorking: 26, holidays: 4, assignedTasks: 25, completedTasks: 22 },
-    { id: 'PPS002', name: 'Ishaan Gupta', email: 'ishaan@pps.com', role: 'Backend Developer', dept: 'Engineering', status: 'Active', dailyWage: 2200, monthlySalary: 58000, ctc: 800000, present: 21, absent: 0, halfDay: 2, paidLeave: 2, unpaidLeave: 0, sickLeave: 1, wfh: 2, totalWorking: 26, holidays: 4, assignedTasks: 20, completedTasks: 18 },
-    { id: 'PPS003', name: 'Ananya Iyer', email: 'ananya@pps.com', role: 'UI/UX Designer', dept: 'Design', status: 'Active', dailyWage: 2800, monthlySalary: 72000, ctc: 1000000, present: 23, absent: 0, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 15, completedTasks: 15 },
-    { id: 'PPS004', name: 'Vihaan Reddy', email: 'vihaan@pps.com', role: 'Full Stack Developer', dept: 'Engineering', status: 'Active', dailyWage: 2700, monthlySalary: 70000, ctc: 970000, present: 23, absent: 0, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 1, wfh: 1, totalWorking: 26, holidays: 4, assignedTasks: 30, completedTasks: 28 },
-    { id: 'PPS005', name: 'Saanvi Malhotra', email: 'saanvi@pps.com', role: 'QA Engineer', dept: 'Quality', status: 'Active', dailyWage: 2400, monthlySalary: 62000, ctc: 860000, present: 20, absent: 2, halfDay: 1, paidLeave: 1, unpaidLeave: 1, sickLeave: 0, wfh: 3, totalWorking: 26, holidays: 4, assignedTasks: 40, completedTasks: 35 },
-    { id: 'PPS006', name: 'Advait Joshi', email: 'advait@pps.com', role: 'Devops Engineer', dept: 'Engineering', status: 'Active', dailyWage: 2300, monthlySalary: 60000, ctc: 830000, present: 24, absent: 0, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 12, completedTasks: 11 },
-    { id: 'PPS007', name: 'Kyra Nair', email: 'kyra@pps.com', role: 'Product Manager', dept: 'Product', status: 'Active', dailyWage: 2600, monthlySalary: 68000, ctc: 940000, present: 22, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 1, totalWorking: 26, holidays: 4, assignedTasks: 10, completedTasks: 9 },
-    { id: 'PPS008', name: 'Reyansh Verma', email: 'reyansh@pps.com', role: 'Data Scientist', dept: 'Analytics', status: 'Active', dailyWage: 2300, monthlySalary: 60000, ctc: 830000, present: 24, absent: 0, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 18, completedTasks: 17 },
-    { id: 'PPS009', name: 'Diya Saxena', email: 'diya@pps.com', role: 'Mobile App Developer', dept: 'Engineering', status: 'Active', dailyWage: 1800, monthlySalary: 45000, ctc: 620000, present: 19, absent: 3, halfDay: 2, paidLeave: 1, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 22, completedTasks: 19 },
-    { id: 'PPS010', name: 'Kabir Singh', email: 'kabir@pps.com', role: 'Backend Developer', dept: 'Engineering', status: 'Active', dailyWage: 2000, monthlySalary: 52000, ctc: 720000, present: 21, absent: 1, halfDay: 0, paidLeave: 2, unpaidLeave: 0, sickLeave: 2, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 20, completedTasks: 16 },
-    { id: 'PPS011', name: 'Myra Kapoor', email: 'myra@pps.com', role: 'Machine Learning Engineer', dept: 'AI/ML', status: 'Active', dailyWage: 1900, monthlySalary: 48000, ctc: 660000, present: 22, absent: 0, halfDay: 1, paidLeave: 2, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 15, completedTasks: 13 },
-    { id: 'PPS012', name: 'Vivaan Choudhury', email: 'vivaan@pps.com', role: 'Security Analyst', dept: 'Security', status: 'Active', dailyWage: 1500, monthlySalary: 38000, ctc: 520000, present: 26, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 8, completedTasks: 8 },
-    { id: 'PPS013', name: 'Shanaya Bhatia', email: 'shanaya@pps.com', role: 'Frontend Developer', dept: 'Engineering', status: 'Active', dailyWage: 2450, monthlySalary: 64000, ctc: 880000, present: 21, absent: 1, halfDay: 2, paidLeave: 2, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 25, completedTasks: 21 },
-    { id: 'PPS014', name: 'Arjun Mehra', email: 'arjun@pps.com', role: 'Cloud Architect', dept: 'Infrastructure', status: 'Active', dailyWage: 2900, monthlySalary: 75000, ctc: 1050000, present: 20, absent: 2, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 3, wfh: 7, totalWorking: 26, holidays: 4, assignedTasks: 12, completedTasks: 10 },
-    { id: 'PPS015', name: 'Zara Khan', email: 'zara@pps.com', role: 'Technical Writer', dept: 'Documentation', status: 'Active', dailyWage: 2000, monthlySalary: 52000, ctc: 720000, present: 22, absent: 0, halfDay: 0, paidLeave: 3, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 10, completedTasks: 10 },
-    { id: 'PPS016', name: 'Raj Mehta', email: 'raj@pps.com', role: 'Full Stack Developer', dept: 'Engineering', status: 'Active', dailyWage: 2500, monthlySalary: 65000, ctc: 900000, present: 22, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 15, completedTasks: 12 },
-    { id: 'PPS017', name: 'Neha Kapoor', email: 'neha@pps.com', role: 'HR Manager', dept: 'HR', status: 'Active', dailyWage: 2200, monthlySalary: 58000, ctc: 800000, present: 24, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 10, completedTasks: 10 }
+    { id: 'PPS001', name: 'MAN PATEL', email: 'man@pps.com', role: 'Software Developer', dept: 'Engineering', status: 'Active', dailyWage: 2500, monthlySalary: 65000, ctc: 900000, present: 22, absent: 1, halfDay: 1, paidLeave: 1, unpaidLeave: 0, sickLeave: 0, wfh: 1, totalWorking: 26, holidays: 4, assignedTasks: 25, completedTasks: 22, phone: '+91 98765 43210', location: 'Mumbai, India', joiningDate: '2024-01-15', profileImage: '' },
+    { id: 'PPS002', name: 'Ishaan Gupta', email: 'ishaan@pps.com', role: 'Backend Developer', dept: 'Engineering', status: 'Active', dailyWage: 2200, monthlySalary: 58000, ctc: 800000, present: 21, absent: 0, halfDay: 2, paidLeave: 2, unpaidLeave: 0, sickLeave: 1, wfh: 2, totalWorking: 26, holidays: 4, assignedTasks: 20, completedTasks: 18, phone: '+91 98765 43211', location: 'Delhi, India', joiningDate: '2023-06-10', profileImage: '' },
+    { id: 'PPS003', name: 'Ananya Iyer', email: 'ananya@pps.com', role: 'UI/UX Designer', dept: 'Design', status: 'Active', dailyWage: 2800, monthlySalary: 72000, ctc: 1000000, present: 23, absent: 0, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 15, completedTasks: 15, phone: '+91 98765 43212', location: 'Bangalore, India', joiningDate: '2023-03-20', profileImage: '' },
+    { id: 'PPS004', name: 'Vihaan Reddy', email: 'vihaan@pps.com', role: 'Full Stack Developer', dept: 'Engineering', status: 'Active', dailyWage: 2700, monthlySalary: 70000, ctc: 970000, present: 23, absent: 0, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 1, wfh: 1, totalWorking: 26, holidays: 4, assignedTasks: 30, completedTasks: 28, phone: '+91 98765 43213', location: 'Hyderabad, India', joiningDate: '2023-08-01', profileImage: '' },
+    { id: 'PPS005', name: 'Saanvi Malhotra', email: 'saanvi@pps.com', role: 'QA Engineer', dept: 'Quality', status: 'Active', dailyWage: 2400, monthlySalary: 62000, ctc: 860000, present: 20, absent: 2, halfDay: 1, paidLeave: 1, unpaidLeave: 1, sickLeave: 0, wfh: 3, totalWorking: 26, holidays: 4, assignedTasks: 40, completedTasks: 35, phone: '+91 98765 43214', location: 'Pune, India', joiningDate: '2023-11-05', profileImage: '' },
+    { id: 'PPS006', name: 'Advait Joshi', email: 'advait@pps.com', role: 'Devops Engineer', dept: 'Engineering', status: 'Active', dailyWage: 2300, monthlySalary: 60000, ctc: 830000, present: 24, absent: 0, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 12, completedTasks: 11, phone: '+91 98765 43215', location: 'Chennai, India', joiningDate: '2024-02-12', profileImage: '' },
+    { id: 'PPS007', name: 'Kyra Nair', email: 'kyra@pps.com', role: 'Product Manager', dept: 'Product', status: 'Active', dailyWage: 2600, monthlySalary: 68000, ctc: 940000, present: 22, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 1, totalWorking: 26, holidays: 4, assignedTasks: 10, completedTasks: 9, phone: '+91 98765 43216', location: 'Kochi, India', joiningDate: '2023-09-18', profileImage: '' },
+    { id: 'PPS008', name: 'Reyansh Verma', email: 'reyansh@pps.com', role: 'Data Scientist', dept: 'Analytics', status: 'Active', dailyWage: 2300, monthlySalary: 60000, ctc: 830000, present: 24, absent: 0, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 18, completedTasks: 17, phone: '+91 98765 43217', location: 'Noida, India', joiningDate: '2023-05-25', profileImage: '' },
+    { id: 'PPS009', name: 'Diya Saxena', email: 'diya@pps.com', role: 'Mobile App Developer', dept: 'Engineering', status: 'Active', dailyWage: 1800, monthlySalary: 45000, ctc: 620000, present: 19, absent: 3, halfDay: 2, paidLeave: 1, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 22, completedTasks: 19, phone: '+91 98765 43218', location: 'Jaipur, India', joiningDate: '2024-04-01', profileImage: '' },
+    { id: 'PPS010', name: 'Kabir Singh', email: 'kabir@pps.com', role: 'Backend Developer', dept: 'Engineering', status: 'Active', dailyWage: 2000, monthlySalary: 52000, ctc: 720000, present: 21, absent: 1, halfDay: 0, paidLeave: 2, unpaidLeave: 0, sickLeave: 2, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 20, completedTasks: 16, phone: '+91 98765 43219', location: 'Lucknow, India', joiningDate: '2023-07-14', profileImage: '' },
+    { id: 'PPS011', name: 'Myra Kapoor', email: 'myra@pps.com', role: 'Machine Learning Engineer', dept: 'AI/ML', status: 'Active', dailyWage: 1900, monthlySalary: 48000, ctc: 660000, present: 22, absent: 0, halfDay: 1, paidLeave: 2, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 15, completedTasks: 13, phone: '+91 98765 43220', location: 'Gurugram, India', joiningDate: '2023-10-22', profileImage: '' },
+    { id: 'PPS012', name: 'Vivaan Choudhury', email: 'vivaan@pps.com', role: 'Security Analyst', dept: 'Security', status: 'Active', dailyWage: 1500, monthlySalary: 38000, ctc: 520000, present: 26, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 8, completedTasks: 8, phone: '+91 98765 43221', location: 'Kolkata, India', joiningDate: '2024-03-10', profileImage: '' },
+    { id: 'PPS013', name: 'Shanaya Bhatia', email: 'shanaya@pps.com', role: 'Frontend Developer', dept: 'Engineering', status: 'Active', dailyWage: 2450, monthlySalary: 64000, ctc: 880000, present: 21, absent: 1, halfDay: 2, paidLeave: 2, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 25, completedTasks: 21, phone: '+91 98765 43222', location: 'Ahmedabad, India', joiningDate: '2023-12-01', profileImage: '' },
+    { id: 'PPS014', name: 'Arjun Mehra', email: 'arjun@pps.com', role: 'Cloud Architect', dept: 'Infrastructure', status: 'Active', dailyWage: 2900, monthlySalary: 75000, ctc: 1050000, present: 20, absent: 2, halfDay: 0, paidLeave: 1, unpaidLeave: 0, sickLeave: 3, wfh: 7, totalWorking: 26, holidays: 4, assignedTasks: 12, completedTasks: 10, phone: '+91 98765 43223', location: 'Bangalore, India', joiningDate: '2022-11-15', profileImage: '' },
+    { id: 'PPS015', name: 'Zara Khan', email: 'zara@pps.com', role: 'Technical Writer', dept: 'Documentation', status: 'Active', dailyWage: 2000, monthlySalary: 52000, ctc: 720000, present: 22, absent: 0, halfDay: 0, paidLeave: 3, unpaidLeave: 0, sickLeave: 1, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 10, completedTasks: 10, phone: '+91 98765 43224', location: 'Mumbai, India', joiningDate: '2024-01-20', profileImage: '' },
+    { id: 'PPS016', name: 'Raj Mehta', email: 'raj@pps.com', role: 'Full Stack Developer', dept: 'Engineering', status: 'Active', dailyWage: 2500, monthlySalary: 65000, ctc: 900000, present: 22, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 15, completedTasks: 12, phone: '+91 98765 43225', location: 'Delhi, India', joiningDate: '2023-04-15', profileImage: '' },
+    { id: 'PPS017', name: 'Neha Kapoor', email: 'neha@pps.com', role: 'HR Manager', dept: 'HR', status: 'Active', dailyWage: 2200, monthlySalary: 58000, ctc: 800000, present: 24, absent: 0, halfDay: 0, paidLeave: 0, unpaidLeave: 0, sickLeave: 0, wfh: 0, totalWorking: 26, holidays: 4, assignedTasks: 10, completedTasks: 10, phone: '+91 98765 43226', location: 'Pune, India', joiningDate: '2023-02-28', profileImage: '' }
 ];
 
 let employees = [];
@@ -243,9 +243,18 @@ window.showDashboardView = function (role, userName) {
 
 // --- Employee Portal Logic ---
 window.initEmployeePortal = function (userName) {
-    // Find employee or use default
-    const emp = employees.find(e => e.name === userName) || employees[0];
+    // Find employee: prefer stored ID, then name match, then fallback
+    let emp = null;
+    if (window._currentEmpId) {
+        emp = employees.find(e => e.id === window._currentEmpId);
+    }
+    if (!emp) {
+        emp = employees.find(e => e.name === userName) || employees[0];
+    }
     if (!emp) return;
+    
+    // Store stable ID for all profile functions
+    window._currentEmpId = emp.id;
 
     // 1. Dashboard & General
     const welcomeName = getEl('welcome-employee-name');
@@ -263,6 +272,10 @@ window.initEmployeePortal = function (userName) {
     const monthYearText = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
     if (monthYears) monthYears.textContent = monthYearText;
     if (monthYearsModern) monthYearsModern.textContent = monthYearText;
+    
+    // Set dynamic current date text
+    if (getEl('hero-day-text')) getEl('hero-day-text').textContent = now.toLocaleDateString('en-IN', { weekday: 'long' });
+    if (getEl('hero-date-text')) getEl('hero-date-text').textContent = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${emp.monthlySalary.toLocaleString()}`;
     if (getEl('dash-emp-leave')) getEl('dash-emp-leave').textContent = `${emp.paidLeave + emp.sickLeave + 12} Days`; // Simulated
@@ -274,7 +287,7 @@ window.initEmployeePortal = function (userName) {
     if (getEl('dash-emp-rating')) getEl('dash-emp-rating').textContent = `${ratingPct}%`;
     if (getEl('dash-emp-task-counts')) getEl('dash-emp-task-counts').textContent = `${completedTasks} / ${assignedTasks} Tasks Completed`;
 
-    // 2. Profile Details
+    // 2. Profile Details — Populate all fields
     if (getEl('prof-name')) getEl('prof-name').textContent = emp.name;
     if (getEl('prof-email')) getEl('prof-email').textContent = emp.email;
     if (getEl('prof-id')) getEl('prof-id').textContent = emp.id;
@@ -282,44 +295,170 @@ window.initEmployeePortal = function (userName) {
     if (getEl('prof-dept')) getEl('prof-dept').textContent = emp.dept;
     if (getEl('prof-name-large')) getEl('prof-name-large').textContent = emp.name;
     if (getEl('prof-role-large')) getEl('prof-role-large').textContent = emp.role;
+    if (getEl('prof-dept-large')) getEl('prof-dept-large').textContent = emp.dept;
+    if (getEl('prof-phone')) getEl('prof-phone').textContent = emp.phone || '+91 98765 43210';
+    if (getEl('prof-loc')) getEl('prof-loc').textContent = emp.location || 'Mumbai, India';
+    if (getEl('prof-joining')) getEl('prof-joining').textContent = emp.joiningDate || '2024-01-15';
+    // Employment details (locked)
+    if (getEl('prof-designation')) getEl('prof-designation').textContent = emp.role;
+    if (getEl('prof-department')) getEl('prof-department').textContent = emp.dept;
+    if (getEl('prof-ctc')) getEl('prof-ctc').textContent = `₹${(emp.ctc / 100000).toFixed(2)} LPA`;
+
+    // Reset edit mode when navigating to profile
+    const profContainer = getEl('profile-container');
+    if (profContainer && profContainer.classList.contains('edit-mode-active')) {
+        profContainer.classList.remove('edit-mode-active');
+        profContainer.querySelectorAll('.profile-edit-ui').forEach(el => el.classList.add('hidden'));
+        profContainer.querySelectorAll('.profile-view-ui').forEach(el => el.classList.remove('hidden'));
+        window._profileSnapshot = null;
+    }
+
+    // Avatar and Greeting logic
+    const hour = now.getHours();
+    let greeting = "Good morning";
+    if (hour >= 12 && hour < 17) greeting = "Good afternoon";
+    if (hour >= 17) greeting = "Good evening";
+    document.querySelectorAll('.greeting-text').forEach(el => el.textContent = greeting);
+    
+    // Check local storage for dynamic avatar overrides
+    const savedImage = localStorage.getItem('profileImage');
+    if (savedImage) {
+        emp.profileImage = savedImage;
+    }
+    
+    const initials = emp.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    
+    const setAvatar = (textId, imgId, applyBg = false) => {
+        const textEl = getEl(textId);
+        const imgEl = getEl(imgId);
+        
+        if (emp.profileImage && imgEl) {
+            imgEl.src = emp.profileImage;
+            imgEl.style.display = 'block';
+            imgEl.classList.remove('hidden');
+            if (textEl) {
+                textEl.style.display = 'none';
+                textEl.classList.add('hidden');
+            }
+        } else {
+            if (imgEl) {
+                imgEl.style.display = 'none';
+                imgEl.classList.add('hidden');
+            }
+            if (textEl) {
+                textEl.textContent = initials;
+                textEl.style.display = 'block';
+                textEl.classList.remove('hidden');
+            }
+        }
+        
+        if (applyBg && textEl && textEl.parentElement && !emp.profileImage) {
+            textEl.parentElement.style.background = 'var(--primary-light)';
+            textEl.parentElement.style.color = 'var(--primary)';
+        }
+    };
+    
+    // Update dashboard avatars
+    setAvatar('prof-avatar-text', 'prof-avatar-img');
+    setAvatar('emp-avatar-initials', 'emp-avatar-img-main');
+    
+    // If there is a top nav avatar
+    const userAvatarEl = getEl('user-avatar');
+    if (userAvatarEl) {
+        if (emp.profileImage) {
+            // Need to create an image inside or adjust
+            userAvatarEl.innerHTML = `<img src="${emp.profileImage}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        } else {
+            userAvatarEl.textContent = initials;
+        }
+    }
+    
     if (getEl('prof-avatar-large')) {
-        getEl('prof-avatar-large').textContent = emp.name.charAt(0).toUpperCase();
         getEl('prof-avatar-large').style.background = 'var(--primary-light)';
         getEl('prof-avatar-large').style.color = 'var(--primary)';
         getEl('prof-avatar-large').style.borderRadius = '50%';
     }
 
-    // 3. Attendance Simulation State — uses CHECKIN_KEY set by simulateCheckIn
-    const savedTimestamp = localStorage.getItem('pps-active-checkin');
+    // 3. Attendance Session — Daily Reset + Restore
+    const todayDateStr = new Date().toISOString().split('T')[0]; // e.g. 2026-04-12
+    const lastCheckinDate = localStorage.getItem(`pps-checkin-date-${emp.id}`);
+    
+    // Daily reset: if stored date is not today, clear the session
+    if (lastCheckinDate && lastCheckinDate !== todayDateStr) {
+        localStorage.removeItem(`pps-checkin-${emp.id}`);
+        localStorage.removeItem(`pps-checkin-timestamp-${emp.id}`);
+        localStorage.removeItem(`pps-checkin-date-${emp.id}`);
+        localStorage.removeItem(`pps-total-work-hours-ms-${emp.id}`);
+    }
+
+    const savedTimestamp = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
     const checkinBtn = getEl('btn-checkin');
     const checkoutBtn = getEl('btn-checkout');
     const timerEl = getEl('live-timer');
 
-    if (savedTimestamp) {
-        // Parse stored ms timestamp → show as readable punch-in time
+    // Check if already punched out today (has checkout record but no active session)
+    const todayRecord = JSON.parse(localStorage.getItem(`pps-attendance-today-${emp.id}`) || 'null');
+    const alreadyPunchedOut = todayRecord && todayRecord.date === todayDateStr && todayRecord.checkOut;
+
+    if (savedTimestamp && !alreadyPunchedOut) {
+        // Active session: restore punch-in state
         const punchInDate = new Date(parseInt(savedTimestamp, 10));
         const punchInTimeStr = punchInDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         if (checkinBtn) checkinBtn.disabled = true;
         if (checkoutBtn) checkoutBtn.disabled = false;
         if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = punchInTimeStr;
+        if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = '--:--';
 
-        // Resume the live elapsed timer from actual punch-in moment
         window.startLiveTimer();
+    } else if (alreadyPunchedOut) {
+        // Already punched out today: show completed state
+        if (checkinBtn) checkinBtn.disabled = true;
+        if (checkoutBtn) checkoutBtn.disabled = true;
+        if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = todayRecord.checkIn || '--:--';
+        if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = todayRecord.checkOut || '--:--';
+        
+        if (timerEl) timerEl.textContent = todayRecord.workHours || '00:00:00';
+        if (getEl('live-work-hours')) getEl('live-work-hours').textContent = todayRecord.workHours || '00:00:00';
     } else {
+        // Fresh day: no session yet
         if (checkinBtn) checkinBtn.disabled = false;
         if (checkoutBtn) checkoutBtn.disabled = true;
         if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = '--:--';
+        if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = '--:--';
         if (timerEl) timerEl.textContent = '00:00:00';
+        if (getEl('live-work-hours')) getEl('live-work-hours').textContent = '00:00:00';
+    }
+    
+    // Initialize month dropdown
+    const monthSelect = getEl('emp-att-month-filter');
+    if (monthSelect && monthSelect.options.length === 0) {
+        const nowMs = new Date();
+        for (let i = 0; i < 6; i++) {
+            const d = new Date(nowMs.getFullYear(), nowMs.getMonth() - i, 1);
+            const val = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+            const label = d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+            monthSelect.add(new Option(label, val));
+        }
+    }
+
+    // Render attendance history table for the employee
+    window.renderEmployeeAttendanceHistory(emp);
+    
+    // Add event handler globally if not present
+    if (!window.onEmpAttMonthChange) {
+        window.onEmpAttMonthChange = function() {
+            const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+                || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+            if (emp) window.renderEmployeeAttendanceHistory(emp);
+        };
     }
 
     // 4. Payslip Preview & Salary Breakdown
-    const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
+    const breakdown = window.calculateSalaryBreakdown(emp);
     if (getEl('pre-basic')) getEl('pre-basic').textContent = `₹ ${breakdown.basic.toLocaleString()}`;
     if (getEl('pre-hra')) getEl('pre-hra').textContent = `₹ ${breakdown.hra.toLocaleString()}`;
-    if (getEl('pre-edu')) getEl('pre-edu').textContent = `₹ ${breakdown.edu.toLocaleString()}`;
-    if (getEl('pre-lta')) getEl('pre-lta').textContent = `₹ ${breakdown.lta.toLocaleString()}`;
-    if (getEl('pre-special')) getEl('pre-special').textContent = `₹ ${breakdown.special.toLocaleString()}`;
+    if (getEl('pre-ot')) getEl('pre-ot').textContent = `₹ ${breakdown.overtimePay.toLocaleString()}`;
     if (getEl('pre-gross')) getEl('pre-gross').textContent = `₹ ${breakdown.gross.toLocaleString()}`;
     if (getEl('pre-pf')) getEl('pre-pf').textContent = `₹ ${breakdown.pf.toLocaleString()}`;
     if (getEl('pre-pt')) getEl('pre-pt').textContent = `₹ ${breakdown.pt.toLocaleString()}`;
@@ -328,20 +467,21 @@ window.initEmployeePortal = function (userName) {
     // Update main dashboard net salary card to be consistent
     if (getEl('dash-emp-salary')) getEl('dash-emp-salary').textContent = `₹ ${breakdown.net.toLocaleString()}`;
 
-    // 5. Payslip History Table Sync (Refined for Modern Redesign)
+    // 5. Payslip History Table Sync (6 Months Dummy Data)
     const tableBody = getEl('emp-payslips-table-body');
     if (tableBody) {
-        const months = ["February 2026", "January 2026"];
-        const dates = ["Mar 01, 2026", "Feb 01, 2026"];
+        const months = ["February 2026", "January 2026", "December 2025", "November 2025", "October 2025", "September 2025"];
+        const dates = ["Mar 01, 2026", "Feb 01, 2026", "Jan 01, 2026", "Dec 01, 2025", "Nov 01, 2025", "Oct 01, 2025"];
+        const salaries = [breakdown.net, breakdown.net - 500, breakdown.net + 1200, breakdown.net, breakdown.net - 200, breakdown.net];
 
         tableBody.innerHTML = months.map((month, i) => `
-            <tr>
-                <td class="font-medium">${month}</td>
-                <td>${dates[i]}</td>
-                <td class="font-bold text-primary text-right">₹ ${breakdown.net.toLocaleString()}</td>
-                <td class="text-center"><span class="badge badge-green">Paid</span></td>
-                <td class="text-right">
-                    <button class="payslip-view-btn" onclick="window.showPayslip('${emp.id}', '${month}')">
+            <tr style="height: 64px;">
+                <td class="font-medium" style="padding: 1rem;">${month}</td>
+                <td style="padding: 1rem;">${dates[i]}</td>
+                <td class="font-bold text-primary" style="padding: 1rem;">₹ ${salaries[i].toLocaleString()}</td>
+                <td style="padding: 1rem;"><span class="badge badge-green">Paid</span></td>
+                <td class="text-center" style="padding: 1rem;">
+                    <button class="payslip-view-btn" onclick="window.showPayslip('${emp.id}', '${month}', ${salaries[i]})">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
@@ -374,16 +514,80 @@ window.initEmployeePortal = function (userName) {
     window.renderEmployeeTasks(emp.id);
 };
 
-window.showPayslip = function (empId, month) {
-    const emp = employees.find(e => String(e.id) === String(empId)) || employees[0];
-    const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
+window.showPayslip = function (empId, month, customNet) {
+    console.log('--- Payslip Debug Start ---');
+    
+    // Check if React portal is ready
+    if (typeof window.showPayslipPreview !== 'function') {
+        console.warn('React portal not ready yet, retrying in 500ms...');
+        alert('The payslip preview is initializing. Please try again in a second.');
+        return;
+    }
 
-    // Prepare data for the iframe
+    const emp = employees.find(e => String(e.id) === String(empId)) || employees[0];
+    if (!emp) {
+        console.error('Error: Employee not found');
+        return;
+    }
+
+    const breakdown = window.calculateSalaryBreakdown(emp);
+
+    const payslipData = {
+        name: emp.name,
+        id: emp.id,
+        month: month.split(' ')[0], 
+        year: month.split(' ')[1] || new Date().getFullYear(),
+        designation: emp.role,
+        department: emp.dept,
+        bankName: emp.bankName || 'HDFC Bank',
+        accountNumber: emp.accountNumber || 'XXXXXXXX4589',
+        panNumber: emp.panNumber || 'ABCDE1234F',
+        earnings: {
+            basic: breakdown.basic,
+            hra: breakdown.hra,
+            overtime: breakdown.overtimePay,
+            conveyance: 1600,
+            medical: 1250
+        },
+        deductions: {
+            pf: breakdown.pf,
+            pt: breakdown.pt,
+            tds: breakdown.tds || 0
+        },
+        totals: {
+            gross: breakdown.gross,
+            deductions: breakdown.pf + breakdown.pt + (breakdown.tds || 0),
+            net: customNet || breakdown.net
+        }
+    };
+
+    try {
+        window.showPayslipPreview(payslipData);
+        console.log('✅ React Modal Triggered Successfully');
+    } catch (err) {
+        console.error('❌ Error triggering React modal:', err);
+        alert('Failed to show payslip preview. Check console for details.');
+    }
+    console.log('--- Payslip Debug End ---');
+};
+
+window.closePayslipModal = function() {
+    const modal = getEl('payslip-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+    }
+};
+
+window.showFullPayslip = function (empId, month) {
+    const emp = employees.find(e => String(e.id) === String(empId)) || employees[0];
+    const breakdown = window.calculateSalaryBreakdown(emp);
+
     const payload = {
         name: emp.name,
         id: emp.id,
         dept: emp.dept || 'Operations',
-        position: emp.position || 'Employee',
+        position: emp.role || 'Employee',
         period: month,
         date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
         salary: breakdown,
@@ -391,27 +595,21 @@ window.showPayslip = function (empId, month) {
         companyAddress: '123 Tech Hub, HITEC City, Hyderabad, 500081'
     };
 
-    // Store in localStorage as backup
     localStorage.setItem('pps-current-payslip', JSON.stringify(payload));
 
-    // Update Iframe
     const iframe = getEl('payslip-iframe');
     if (iframe) {
         iframe.src = 'payslip.html?t=' + Date.now();
         iframe.onload = () => {
             iframe.contentWindow.postMessage({ type: 'POPULATE_PAYSLIP', payload }, '*');
-            // Trigger scaling after a small delay to ensure rendering
             setTimeout(() => {
-                window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
+                window.autoScaleViewer('payslip-scaling-container', 'payslip-print-modal');
             }, 100);
         };
     }
 
-    getEl('payslip-modal')?.classList.remove('hidden');
-    // Also scale immediately in case iframe was already loaded
-    setTimeout(() => {
-        window.autoScaleViewer('payslip-scaling-container', 'payslip-modal');
-    }, 50);
+    getEl('payslip-print-modal')?.classList.remove('hidden');
+    getEl('payslip-print-modal').style.display = 'flex';
 };
 
 window.renderEmployeeTasks = function (empId) {
@@ -508,26 +706,90 @@ window.showPayslipFromDashboard = function () {
     setTimeout(() => window.autoScaleViewer('payslip-scaling-container', 'payslip-modal'), 50);
 };
 
-window.calculateSalaryBreakdown = function (gross) {
-    const basic = Math.round(gross * 0.5);
-    const hra = Math.round(gross * 0.2);
-    const edu = 2500;
-    const lta = 5000;
-    const special = gross - (basic + hra + edu + lta);
-    const pf = Math.min(Math.round(basic * 0.12), 1800);
-    const pt = 200;
-    const net = gross - (pf + pt);
+window.getPayrollStats = function (empId, year, month) {
+    const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const now = new Date();
+    
+    // 1. Get History
+    const history = JSON.parse(localStorage.getItem(`pps-attendance-history-${empId}`) || '[]');
+    const emp = employees.find(e => e.id === empId);
+    
+    // If no history exists, generate some sample data for stats calculation
+    let currentMonthHistory = history.filter(r => r.date.startsWith(monthStr));
+    if (currentMonthHistory.length === 0 && emp) {
+        currentMonthHistory = window.generateSampleAttendanceData(emp, year, month);
+    }
+    
+    let presentDays = 0;
+    let absentDays = 0;
+    let totalOvertimeMs = 0;
+
+    currentMonthHistory.forEach(r => {
+        if (r.status === 'Present' || r.status === 'Late') presentDays++;
+        if (r.status === 'Absent') absentDays++;
+        if (r.overtimeMs) totalOvertimeMs += r.overtimeMs;
+    });
+
+    // 2. Leave Requests Integration
+    const leaves = JSON.parse(localStorage.getItem('pps-leave-requests') || '[]');
+    const approvedMonthLeaves = leaves.filter(l => 
+        l.empId === empId && 
+        l.status === 'Approved' && 
+        l.startDate.startsWith(monthStr)
+    );
+    
+    const leaveDays = approvedMonthLeaves.length; 
 
     return {
-        gross: gross,
-        basic: basic,
-        hra: hra,
-        edu: edu,
-        lta: lta,
-        special: special,
-        pf: pf,
-        pt: pt,
-        net: net
+        presentDays,
+        absentDays,
+        leaveDays,
+        totalOvertimeMs,
+        totalOvertimeHours: totalOvertimeMs / 3600000
+    };
+};
+
+window.calculateSalaryBreakdown = function (emp, year, month) {
+    const monthlySalary = emp.monthlySalary || 65000;
+    
+    // Use current month if not provided
+    if (year === undefined || month === undefined) {
+        const now = new Date();
+        year = now.getFullYear();
+        month = now.getMonth();
+    }
+    
+    const stats = window.getPayrollStats(emp.id, year, month);
+    
+    const totalWorkingDays = 22; // Standard SaaS working month
+    const perDaySalary = Math.round(monthlySalary / totalWorkingDays);
+    const perHourSalary = Math.round(perDaySalary / 6); // 6-hour standard
+    
+    // Absent days deduction (Leave days are already factored out of present count)
+    const leaveDeduction = stats.absentDays * perDaySalary;
+    const overtimePay = Math.round(stats.totalOvertimeHours * perHourSalary * 1.5); // 1.5x Overtime Multiplier
+    
+    const gross = monthlySalary + overtimePay;
+    const net = monthlySalary - leaveDeduction + overtimePay;
+
+    return {
+        monthlySalary,
+        perDaySalary,
+        perHourSalary,
+        presentDays: stats.presentDays,
+        absentDays: stats.absentDays,
+        leaveDays: stats.leaveDays,
+        overtimeHours: stats.totalOvertimeHours.toFixed(1),
+        leaveDeduction,
+        overtimePay,
+        gross,
+        net,
+        // Compatibility fields
+        basic: Math.round(monthlySalary * 0.5),
+        hra: Math.round(monthlySalary * 0.2),
+        special: Math.round(monthlySalary * 0.3),
+        pf: Math.min(Math.round(monthlySalary * 0.12), 1800),
+        pt: 200
     };
 };
 
@@ -623,107 +885,426 @@ window.closeModal = function (modalId) {
     if (modal) modal.classList.add('hidden');
 };
 
-// KEY used to persist the punch-in timestamp across page reloads
-const CHECKIN_KEY = 'pps-active-checkin';
+// CHECKIN_KEY removed
 
 window.simulateCheckIn = function () {
-    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
-    const now = new Date();
-    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    // Save both display time and precise timestamp
-    localStorage.setItem(`pps-checkin-${emp.id}`, time);
-    localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, now.getTime());
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+        || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    if (!emp) return;
 
-    // Persist the exact punch-in moment
-    localStorage.setItem(CHECKIN_KEY, now.toString());
+    const now = new Date();
+    const todayDateStr = now.toISOString().split('T')[0];
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Prevent duplicate punch-in if already punched out today
+    const todayRecord = JSON.parse(localStorage.getItem(`pps-attendance-today-${emp.id}`) || 'null');
+    if (todayRecord && todayRecord.date === todayDateStr && todayRecord.checkOut) {
+        window.showToast('Already punched out for today. See you tomorrow!', 'info');
+        return;
+    }
+
+    // If resuming (already punched in earlier today but refreshed page), don't reset
+    const existingTimestamp = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
+    const existingDate = localStorage.getItem(`pps-checkin-date-${emp.id}`);
+    if (existingTimestamp && existingDate === todayDateStr) {
+        // Already have an active session — just resume timer
+        if (getEl('btn-checkin')) getEl('btn-checkin').disabled = true;
+        if (getEl('btn-checkout')) getEl('btn-checkout').disabled = false;
+        window.startLiveTimer();
+        window.showToast('Resuming active session...', 'info');
+        return;
+    }
+
+    // Save session data
+    localStorage.setItem(`pps-checkin-${emp.id}`, time);
+    localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, now.getTime().toString());
+    localStorage.setItem(`pps-checkin-date-${emp.id}`, todayDateStr);
+    // Reset accumulated time for fresh punch-in
+    localStorage.setItem(`pps-accumulated-ms-${emp.id}`, '0');
+
+    // Create today's attendance record
+    const record = { date: todayDateStr, checkIn: time, checkOut: null, status: 'Present', workHours: '00:00:00' };
+    localStorage.setItem(`pps-attendance-today-${emp.id}`, JSON.stringify(record));
 
     // Update UI
     if (getEl('btn-checkin')) getEl('btn-checkin').disabled = true;
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = false;
-    if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = timeStr;
+    if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = time;
+    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = '--:--';
 
-    // Show 00:00:00 immediately, then start counting
     const timerEl = getEl('live-timer');
     if (timerEl) timerEl.textContent = '00:00:00';
+    if (getEl('live-work-hours')) getEl('live-work-hours').textContent = '00:00:00';
+
+    // Reset overtime indicator
+    const otEl = getEl('overtime-indicator');
+    if (otEl) otEl.style.display = 'none';
+    const warnEl = getEl('punch-out-warning');
+    if (warnEl) warnEl.style.display = 'block';
 
     window.startLiveTimer();
-    window.showToast('Punched in at ' + timeStr, 'success');
+    window.renderEmployeeAttendanceHistory(emp);
+    window.showToast('Punched in at ' + time, 'success');
 };
 
 window.simulateCheckOut = function () {
-    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+        || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    if (!emp) return;
+
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const todayDateStr = now.toISOString().split('T')[0];
+
+    // Calculate total work time
+    const savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
+    const accumulatedMs = parseInt(localStorage.getItem(`pps-accumulated-ms-${emp.id}`) || '0');
+    let totalMs = accumulatedMs;
     
-    // Calculate and format total work hours as 00:00:00
-    let savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
     if (savedTime) {
         const startTimestamp = parseInt(savedTime);
-        const diff = Math.max(0, Date.now() - startTimestamp);
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-        const formattedTotal = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        
-        if (getEl('live-work-hours')) getEl('live-work-hours').textContent = formattedTotal;
+        totalMs += Math.max(0, now.getTime() - startTimestamp);
     }
 
-    // Clear session states
+    const SIX_HOURS_MS = 6 * 60 * 60 * 1000; // 21600000
+
+    // === 6-HOUR ENFORCEMENT ===
+    if (totalMs < SIX_HOURS_MS) {
+        const modal = document.getElementById('early-exit-block-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.style.display = '';
+        }
+        window.showToast('You must complete 6 working hours or apply for leave.', 'error');
+        return; // Block punch out
+    }
+
+    // Stop timer
+    if (window.timerInterval) {
+        clearInterval(window.timerInterval);
+        window.timerInterval = null;
+    }
+
+    // Format total work hours
+    const h = Math.floor(totalMs / 3600000);
+    const m = Math.floor((totalMs % 3600000) / 60000);
+    const s = Math.floor((totalMs % 60000) / 1000);
+    const formattedTotal = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+    // Calculate overtime
+    let overtimeMs = 0;
+    if (totalMs > SIX_HOURS_MS) {
+        overtimeMs = totalMs - SIX_HOURS_MS;
+        const otH = Math.floor(overtimeMs / 3600000);
+        const otM = Math.floor((overtimeMs % 3600000) / 60000);
+        const otLabel = getEl('overtime-label');
+        if (otLabel) otLabel.textContent = `🎉 Overtime: ${otH}h ${otM}m`;
+        const otEl = getEl('overtime-indicator');
+        if (otEl) otEl.style.display = 'block';
+    }
+
+    // Update today's attendance record with checkout
+    let todayRecord = JSON.parse(localStorage.getItem(`pps-attendance-today-${emp.id}`) || 'null');
+    if (todayRecord && todayRecord.date === todayDateStr) {
+        todayRecord.checkOut = time;
+        todayRecord.workHours = formattedTotal;
+        todayRecord.overtimeMs = overtimeMs; // Store for salary calculation integration
+        
+        // Mark as Late if checked in after 10:00 AM
+        if (todayRecord.checkIn) {
+            const parts = todayRecord.checkIn.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (parts) {
+                let hr = parseInt(parts[1]);
+                const ampm = parts[3].toUpperCase();
+                if (ampm === 'PM' && hr !== 12) hr += 12;
+                if (ampm === 'AM' && hr === 12) hr = 0;
+                if (hr >= 10) todayRecord.status = 'Late';
+            }
+        }
+        
+        localStorage.setItem(`pps-attendance-today-${emp.id}`, JSON.stringify(todayRecord));
+
+        // Save to persistent attendance history
+        let history = JSON.parse(localStorage.getItem(`pps-attendance-history-${emp.id}`) || '[]');
+        history = history.filter(r => r.date !== todayDateStr);
+        history.unshift(todayRecord);
+        localStorage.setItem(`pps-attendance-history-${emp.id}`, JSON.stringify(history));
+    }
+
+    // Store overtime separately
+    if (overtimeMs > 0) {
+        let otHistory = JSON.parse(localStorage.getItem(`pps-overtime-${emp.id}`) || '[]');
+        otHistory = otHistory.filter(r => r.date !== todayDateStr);
+        otHistory.push({ date: todayDateStr, overtimeMs: overtimeMs });
+        localStorage.setItem(`pps-overtime-${emp.id}`, JSON.stringify(otHistory));
+    }
+
+    // Clear active session (but keep today record)
     localStorage.removeItem(`pps-checkin-${emp.id}`);
     localStorage.removeItem(`pps-checkin-timestamp-${emp.id}`);
-
-    // Calculate total work time from stored punch-in
-    const savedTimestamp = localStorage.getItem(CHECKIN_KEY);
-    let totalTimeStr = '00:00:00';
-    if (savedTimestamp) {
-        const elapsed = now - parseInt(savedTimestamp, 10);
-        const h = Math.floor(elapsed / 3600000);
-        const m = Math.floor((elapsed % 3600000) / 60000);
-        const s = Math.floor((elapsed % 60000) / 1000);
-        totalTimeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-    }
-
-    // Clear persisted state
-    localStorage.removeItem(CHECKIN_KEY);
+    localStorage.removeItem(`pps-accumulated-ms-${emp.id}`);
 
     // Update UI
-    if (getEl('btn-checkin')) getEl('btn-checkin').disabled = false;
+    if (getEl('btn-checkin')) getEl('btn-checkin').disabled = true; // Can't punch in again today
     if (getEl('btn-checkout')) getEl('btn-checkout').disabled = true;
-    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = timeStr;
+    if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = time;
+    const warnEl = getEl('punch-out-warning');
+    if (warnEl) warnEl.style.display = 'none';
 
-    // Show the final total worked time on the timer display
     const timerEl = getEl('live-timer');
-    if (timerEl) timerEl.textContent = totalTimeStr;
+    if (timerEl) timerEl.textContent = formattedTotal;
+    if (getEl('live-work-hours')) getEl('live-work-hours').textContent = formattedTotal;
 
-    window.showToast(`Punched out at ${timeStr}  |  Total work time: ${totalTimeStr}`, 'info');
+    window.renderEmployeeAttendanceHistory(emp);
+    window.showToast(`Punched out at ${time}  |  Total: ${formattedTotal}`, 'info');
 };
 
 window.startLiveTimer = function () {
-    const emp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+        || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    if (!emp) return;
+
     if (window.timerInterval) clearInterval(window.timerInterval);
-    
-    // Retrieve timestamp or default to now if missing (migration)
-    let savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
+
+    const savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
     const startTimestamp = savedTime ? parseInt(savedTime) : Date.now();
     if (!savedTime) {
-        localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, startTimestamp);
+        localStorage.setItem(`pps-checkin-timestamp-${emp.id}`, startTimestamp.toString());
     }
+    const accumulatedMs = parseInt(localStorage.getItem(`pps-accumulated-ms-${emp.id}`) || '0');
+
+    const SIX_HOURS_MS = 21600000;
 
     const updateTimer = () => {
         const now = Date.now();
-        const diff = Math.max(0, now - startTimestamp);
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
+        const sessionMs = Math.max(0, now - startTimestamp);
+        const totalMs = accumulatedMs + sessionMs;
+
+        const h = Math.floor(totalMs / 3600000);
+        const m = Math.floor((totalMs % 3600000) / 60000);
+        const s = Math.floor((totalMs % 60000) / 1000);
+        const formattedTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
         const timerEl = getEl('live-timer');
-        if (timerEl) {
-            timerEl.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (timerEl) timerEl.textContent = formattedTime;
+        if (getEl('live-work-hours')) getEl('live-work-hours').textContent = formattedTime;
+
+        // 6-Hour Progress Tracker
+        if (getEl('att-req-text')) getEl('att-req-text').textContent = `Worked: ${h}h ${m}m`;
+        const percentage = Math.min((totalMs / SIX_HOURS_MS) * 100, 100);
+        const progressEl = getEl('att-req-progress');
+        if (progressEl) {
+            progressEl.style.width = `${percentage}%`;
+            if (percentage >= 100) {
+                progressEl.style.background = 'var(--green)';
+                if (getEl('att-warn-text')) {
+                    getEl('att-warn-text').textContent = '✅ Minimum 6 hours completed';
+                    getEl('att-warn-text').className = 'text-xs text-green mt-2 text-center font-bold';
+                }
+                // Hide warning, show punch out is enabled
+                const warnEl = getEl('punch-out-warning');
+                if (warnEl) warnEl.style.display = 'none';
+            } else {
+                progressEl.style.background = 'var(--orange)';
+                if (getEl('att-warn-text')) {
+                    getEl('att-warn-text').textContent = 'You must complete 6 working hours today';
+                    getEl('att-warn-text').className = 'text-xs text-muted mt-2 text-center';
+                }
+            }
+        }
+
+        // Overtime live display
+        if (totalMs > SIX_HOURS_MS) {
+            const otMs = totalMs - SIX_HOURS_MS;
+            const otH = Math.floor(otMs / 3600000);
+            const otM = Math.floor((otMs % 3600000) / 60000);
+            const otLabel = getEl('overtime-label');
+            if (otLabel) otLabel.textContent = `🎉 Overtime: ${otH}h ${otM}m`;
+            const otEl = getEl('overtime-indicator');
+            if (otEl) otEl.style.display = 'block';
+        }
+
+        // Update today's record live work hours for table
+        const todayDateStr = new Date().toISOString().split('T')[0];
+        let todayRecord = JSON.parse(localStorage.getItem(`pps-attendance-today-${emp.id}`) || 'null');
+        if (todayRecord && todayRecord.date === todayDateStr && !todayRecord.checkOut) {
+            todayRecord.workHours = formattedTime;
+            localStorage.setItem(`pps-attendance-today-${emp.id}`, JSON.stringify(todayRecord));
         }
     };
-    
-    updateTimer(); // Initial call to avoid 1-second delay
+
+    updateTimer();
     window.timerInterval = setInterval(updateTimer, 1000);
+};
+
+// --- Employee Attendance History with Sample Data ---
+window.generateSampleAttendanceData = function (emp, year, month) {
+    // Generate realistic attendance for past weekdays in the given month
+    const data = [];
+    const now = new Date();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Seed a simple hash from emp.id for consistent random per employee
+    let seed = 0;
+    for (let i = 0; i < emp.id.length; i++) seed += emp.id.charCodeAt(i);
+    const seededRandom = (day) => {
+        const x = Math.sin(seed * 9301 + day * 49297) * 49297;
+        return x - Math.floor(x);
+    };
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const date = new Date(year, month, d);
+        // Skip weekends
+        if (date.getDay() === 0 || date.getDay() === 6) continue;
+        // Skip future dates
+        if (date > now) continue;
+
+        const dateStr = date.toISOString().split('T')[0];
+        const rand = seededRandom(d);
+
+        // ~85% Present, ~5% Late, ~10% Absent
+        let status, checkIn, checkOut, workHours, overtimeMs = 0;
+        if (rand < 0.10) {
+            status = 'Absent';
+            checkIn = '--:--';
+            checkOut = '--:--';
+            workHours = '00:00:00';
+            overtimeMs = 0;
+        } else if (rand < 0.15) {
+            status = 'Late';
+            // Late: 10:00-11:30 AM check-in
+            const lateHr = 10 + Math.floor(seededRandom(d + 100) * 1.5);
+            const lateMin = Math.floor(seededRandom(d + 200) * 59);
+            checkIn = `${String(lateHr > 12 ? lateHr - 12 : lateHr).padStart(2, '0')}:${String(lateMin).padStart(2, '0')} ${lateHr >= 12 ? 'PM' : 'AM'}`;
+            // Checkout: 6:00-7:30 PM
+            const outHr = 18 + Math.floor(seededRandom(d + 300) * 1.5);
+            const outMin = Math.floor(seededRandom(d + 400) * 59);
+            checkOut = `${String(outHr > 12 ? outHr - 12 : outHr).padStart(2, '0')}:${String(outMin).padStart(2, '0')} PM`;
+            const diffMs = (outHr * 60 + outMin - lateHr * 60 - lateMin) * 60000;
+            const wh = Math.floor(diffMs / 3600000);
+            const wm = Math.floor((diffMs % 3600000) / 60000);
+            workHours = `${String(wh).padStart(2, '0')}:${String(wm).padStart(2, '0')}:00`;
+            
+            // 6-hour standard (21,600,000 ms)
+            if (diffMs > 21600000) overtimeMs = diffMs - 21600000;
+        } else {
+            status = 'Present';
+            // Normal: 8:45-9:45 AM check-in
+            const inHr = 9;
+            const inMin = Math.floor(seededRandom(d + 500) * 45);
+            checkIn = `${String(inHr).padStart(2, '0')}:${String(inMin).padStart(2, '0')} AM`;
+            // Checkout: 5:30-8:30 PM (Randomizing more overtime)
+            const outHr = 17 + Math.floor(seededRandom(d + 600) * 3);
+            const outMin = 30 + Math.floor(seededRandom(d + 700) * 29);
+            checkOut = `${String(outHr > 12 ? outHr - 12 : outHr).padStart(2, '0')}:${String(outMin).padStart(2, '0')} PM`;
+            const diffMs = (outHr * 60 + outMin - inHr * 60 - inMin) * 60000;
+            const wh = Math.floor(diffMs / 3600000);
+            const wm = Math.floor((diffMs % 3600000) / 60000);
+            workHours = `${String(wh).padStart(2, '0')}:${String(wm).padStart(2, '0')}:00`;
+            
+            if (diffMs > 21600000) overtimeMs = diffMs - 21600000;
+        }
+
+        data.push({ date: dateStr, checkIn, checkOut, status, workHours, overtimeMs });
+    }
+
+    return data.reverse(); // Most recent first
+};
+
+window.renderEmployeeAttendanceHistory = function (emp) {
+    if (!emp) return;
+    const tbody = getEl('emp-attendance-history-body');
+    if (!tbody) return;
+
+    // Determine selected month from dropdown
+    const monthSelect = document.querySelector('#employee-attendance .form-select');
+    const now = new Date();
+    let targetYear = now.getFullYear();
+    let targetMonth = now.getMonth(); // 0-indexed
+
+    if (monthSelect && monthSelect.value) {
+        const parts = monthSelect.value.split('-');
+        if (parts.length === 2) {
+            targetYear = parseInt(parts[0]);
+            targetMonth = parseInt(parts[1]);
+        }
+    }
+
+    // Get persisted real records for this month
+    const realHistory = JSON.parse(localStorage.getItem(`pps-attendance-history-${emp.id}`) || '[]');
+    
+    // Get sample data
+    const sampleData = window.generateSampleAttendanceData(emp, targetYear, targetMonth);
+    
+    // Merge: real records override sample data for the same date
+    const realDates = new Set(realHistory.map(r => r.date));
+    const monthStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`;
+    const realForMonth = realHistory.filter(r => r.date.startsWith(monthStr));
+    const sampleFiltered = sampleData.filter(r => !realDates.has(r.date));
+    
+    const allRecords = [...realForMonth, ...sampleFiltered];
+    // Sort most recent first
+    allRecords.sort((a, b) => b.date.localeCompare(a.date));
+
+    // Add today's active session (if punched in but not out) at the top
+    const todayDateStr = now.toISOString().split('T')[0];
+    const todayRecord = JSON.parse(localStorage.getItem(`pps-attendance-today-${emp.id}`) || 'null');
+    if (todayRecord && todayRecord.date === todayDateStr && todayDateStr.startsWith(monthStr)) {
+        // Remove any existing today entry and prepend fresh one
+        const filtered = allRecords.filter(r => r.date !== todayDateStr);
+        filtered.unshift(todayRecord);
+        allRecords.length = 0;
+        allRecords.push(...filtered);
+    }
+
+    // Count stats
+    let presentCount = 0, absentCount = 0, lateCount = 0;
+    allRecords.forEach(r => {
+        if (r.status === 'Present') presentCount++;
+        else if (r.status === 'Absent') absentCount++;
+        else if (r.status === 'Late') lateCount++;
+    });
+
+    // Update stat cards
+    if (getEl('emp-att-present')) getEl('emp-att-present').textContent = presentCount;
+    if (getEl('emp-att-absent')) getEl('emp-att-absent').textContent = absentCount;
+    if (getEl('emp-att-late')) getEl('emp-att-late').textContent = lateCount;
+    const total = presentCount + absentCount + lateCount;
+    const score = total > 0 ? (((presentCount + lateCount) / total) * 100).toFixed(1) : '0.0';
+    if (getEl('emp-att-score')) getEl('emp-att-score').textContent = score + '%';
+
+    // Render table rows
+    if (allRecords.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No attendance records for this month.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = allRecords.map(r => {
+        const dateObj = new Date(r.date + 'T00:00:00');
+        const dateDisplay = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        const isToday = r.date === todayDateStr;
+
+        let badgeClass = 'badge-green';
+        if (r.status === 'Absent') badgeClass = 'badge-red';
+        else if (r.status === 'Late') badgeClass = 'badge-orange';
+
+        // Format Overtime Display
+        let otDisplay = '--:--';
+        if (r.overtimeMs && r.overtimeMs > 0) {
+            const oh = Math.floor(r.overtimeMs / 3600000);
+            const om = Math.floor((r.overtimeMs % 3600000) / 60000);
+            otDisplay = `<span class="text-green font-bold">+${oh}h ${om}m</span>`;
+        }
+
+        return `<tr${isToday ? ' style="background: rgba(59,130,246,0.04);"' : ''}>
+            <td>${dateDisplay}${isToday ? ' <span class="badge badge-blue" style="font-size:0.6rem;padding:1px 5px;">TODAY</span>' : ''}</td>
+            <td>${r.checkIn || '--:--'}</td>
+            <td>${r.checkOut || '--:--'}</td>
+            <td><span class="badge ${badgeClass}">${r.status}</span></td>
+            <td>${r.workHours || '00:00:00'}</td>
+            <td>${otDisplay}</td>
+        </tr>`;
+    }).join('');
 };
 
 window.simulateLeaveSubmit = function (event) {
@@ -2587,6 +3168,20 @@ window.loadEmployees = function () {
             if (emp.dailyWage === undefined) emp.dailyWage = def.dailyWage || 2000;
             if (emp.monthlySalary === undefined) emp.monthlySalary = def.monthlySalary || 50000;
             if (emp.ctc === undefined) emp.ctc = emp.monthlySalary * 12 * 1.15;
+
+            // Profile fields migration
+            if (emp.phone === undefined) emp.phone = def.phone || '+91 98765 43210';
+            if (emp.location === undefined) emp.location = def.location || 'Mumbai, India';
+            if (emp.joiningDate === undefined) emp.joiningDate = def.joiningDate || '2024-01-15';
+            if (emp.profileImage === undefined) emp.profileImage = def.profileImage || '';
+
+            // Name/Email/Role sync: if defaults changed, update stored data
+            if (def && emp.name !== def.name && emp.email !== def.email) {
+                emp.name = def.name;
+                emp.email = def.email;
+                emp.role = def.role;
+                emp.dept = def.dept;
+            }
         });
 
         // Data Migration: Ensure IDs are strictly sequential PPS001, PPS002...
@@ -4038,6 +4633,10 @@ function initEmployeeLeaveModule() {
             const leaveTypeObj = leaveTypes.find(t => t.id === typeId) || { name: 'Unknown' };
             const appliedDate = new Date().toISOString().split('T')[0];
             const createdAt = new Date().toLocaleString();
+            
+            const durationInput = getEl('leave-duration');
+            const duration = durationInput ? durationInput.value : 'Full Day';
+            const requestType = duration === 'Early Exit' ? 'EARLY_EXIT' : 'STANDARD';
 
             leaveRequests.push({
                 id: newId,
@@ -4050,6 +4649,8 @@ function initEmployeeLeaveModule() {
                 endDate,
                 end_date: endDate,
                 reason,
+                duration,
+                requestType,
                 status: 'Pending',
                 appliedDate,
                 created_at: createdAt
@@ -4167,7 +4768,7 @@ window.renderEmployeeLeaveHistory = function (empId) {
     });
 };
 
-window.showApplyLeaveModal = function () {
+window.showApplyLeaveModal = function (options = {}) {
     const modal = getEl('apply-leave-modal');
     if (!modal) return;
 
@@ -4182,16 +4783,45 @@ window.showApplyLeaveModal = function () {
         });
     }
 
-    // Set minimum date to today for start date
     const today = new Date().toISOString().split('T')[0];
-    getEl('leave-start-date').setAttribute('min', today);
-    getEl('leave-end-date').setAttribute('min', today);
+    const startDateEl = getEl('leave-start-date');
+    const endDateEl = getEl('leave-end-date');
+    const durationEl = getEl('leave-duration');
+
+    // Reset properties
+    startDateEl.removeAttribute('readonly');
+    endDateEl.removeAttribute('readonly');
+    if (durationEl) {
+        durationEl.removeAttribute('readonly');
+        Array.from(durationEl.options).forEach(opt => opt.disabled = false);
+    }
+    
+    // Set minimum dates
+    startDateEl.setAttribute('min', today);
+    endDateEl.setAttribute('min', today);
+
+    // Apply Early Exit constraints
+    if (options.isEarlyExit) {
+        startDateEl.value = today;
+        endDateEl.value = today;
+        startDateEl.setAttribute('readonly', 'true');
+        endDateEl.setAttribute('readonly', 'true');
+        
+        if (durationEl) {
+            durationEl.value = 'Early Exit';
+            durationEl.setAttribute('readonly', 'true');
+            Array.from(durationEl.options).forEach(opt => {
+                if (opt.value !== 'Early Exit') opt.disabled = true;
+            });
+        }
+    }
 
     // Auto-update end date min based on start date selection
-    getEl('leave-start-date').addEventListener('change', (e) => {
-        getEl('leave-end-date').setAttribute('min', e.target.value);
-        if (getEl('leave-end-date').value && getEl('leave-end-date').value < e.target.value) {
-            getEl('leave-end-date').value = e.target.value;
+    startDateEl.addEventListener('change', (e) => {
+        if (options.isEarlyExit) return;
+        endDateEl.setAttribute('min', e.target.value);
+        if (endDateEl.value && endDateEl.value < e.target.value) {
+            endDateEl.value = e.target.value;
         }
     });
 
@@ -4902,6 +5532,306 @@ window.downloadReport = function (empId, reportType, format) {
         link.click();
         document.body.removeChild(link);
     }
+};
+
+// --- SaaS Profile Edit System ---
+// Snapshot for cancel/revert
+window._profileSnapshot = null;
+
+window.toggleProfileEditMode = function () {
+    const container = window.getEl('profile-container');
+    if (!container) return;
+
+    const isEditing = container.classList.contains('edit-mode-active');
+
+    if (isEditing) {
+        // --- Cancel / Exit Edit Mode ---
+        // Revert editable fields to snapshot values
+        if (window._profileSnapshot) {
+            const s = window._profileSnapshot;
+            if (getEl('prof-name-large')) getEl('prof-name-large').textContent = s.name;
+            if (getEl('prof-phone')) getEl('prof-phone').textContent = s.phone;
+            if (getEl('prof-loc')) getEl('prof-loc').textContent = s.location;
+            // Revert avatar if changed
+            const avatarImg = getEl('prof-avatar-img');
+            const avatarText = getEl('prof-avatar-text');
+            if (s.profileImage) {
+                if (avatarImg) { avatarImg.src = s.profileImage; avatarImg.classList.remove('hidden'); avatarImg.style.display = 'block'; }
+                if (avatarText) { avatarText.classList.add('hidden'); avatarText.style.display = 'none'; }
+            } else {
+                if (avatarImg) { avatarImg.classList.add('hidden'); avatarImg.style.display = 'none'; }
+                if (avatarText) { avatarText.textContent = s.initials; avatarText.classList.remove('hidden'); avatarText.style.display = 'block'; }
+            }
+        }
+        container.classList.remove('edit-mode-active');
+        container.querySelectorAll('.profile-edit-ui').forEach(el => el.classList.add('hidden'));
+        container.querySelectorAll('.profile-view-ui').forEach(el => el.classList.remove('hidden'));
+        window._profileSnapshot = null;
+    } else {
+        // --- Enter Edit Mode ---
+        // Find employee reliably by ID first, then by name, then fallback
+        let currentEmp = null;
+        if (window._currentEmpId) {
+            currentEmp = employees.find(e => e.id === window._currentEmpId);
+        }
+        if (!currentEmp) {
+            currentEmp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+        }
+        
+        // Read current displayed values as the source of truth
+        const nameText = getEl('prof-name-large') ? getEl('prof-name-large').textContent.trim() : (currentEmp ? currentEmp.name : '');
+        const phoneText = getEl('prof-phone') ? getEl('prof-phone').textContent.trim() : (currentEmp ? currentEmp.phone : '');
+        const locText = getEl('prof-loc') ? getEl('prof-loc').textContent.trim() : (currentEmp ? currentEmp.location : '');
+        const initials = nameText.split(' ').filter(n => n).map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        
+        // Store snapshot with empId for reliable lookup on save
+        window._profileSnapshot = {
+            empId: currentEmp ? currentEmp.id : null,
+            name: nameText,
+            phone: phoneText,
+            location: locText,
+            initials: initials,
+            profileImage: currentEmp ? (currentEmp.profileImage || '') : ''
+        };
+
+        container.classList.add('edit-mode-active');
+        container.querySelectorAll('.profile-view-ui').forEach(el => el.classList.add('hidden'));
+        container.querySelectorAll('.profile-edit-ui').forEach(el => el.classList.remove('hidden'));
+
+        // Pre-fill ALL editable inputs with current data (not empty)
+        if (getEl('edit-prof-name')) getEl('edit-prof-name').value = nameText || '';
+        if (getEl('edit-prof-phone')) getEl('edit-prof-phone').value = (phoneText && phoneText !== '---') ? phoneText : '';
+        if (getEl('edit-prof-loc')) getEl('edit-prof-loc').value = (locText && locText !== '---') ? locText : '';
+        
+        // Pre-fill additional editable fields if they exist
+        if (getEl('edit-prof-dob') && getEl('prof-dob')) getEl('edit-prof-dob').value = getEl('prof-dob').textContent.trim() || '';
+        if (getEl('edit-prof-gender') && getEl('prof-gender')) getEl('edit-prof-gender').value = getEl('prof-gender').textContent.trim() || '';
+        if (getEl('edit-prof-address') && getEl('prof-address')) getEl('edit-prof-address').value = getEl('prof-address').textContent.trim() || '';
+        if (getEl('edit-prof-alt-phone') && getEl('prof-alt-phone')) getEl('edit-prof-alt-phone').value = getEl('prof-alt-phone').textContent.trim() || '';
+        if (getEl('edit-prof-password')) getEl('edit-prof-password').value = '';
+        if (getEl('edit-prof-update-phone') && getEl('prof-update-phone')) getEl('edit-prof-update-phone').value = getEl('prof-update-phone').textContent.trim() || '';
+        if (getEl('edit-prof-update-address') && getEl('prof-update-address')) getEl('edit-prof-update-address').value = getEl('prof-update-address').textContent.trim() || '';
+    }
+};
+
+window.saveProfileUpdates = function () {
+    const newName = (getEl('edit-prof-name')?.value || '').trim();
+    const newPhone = (getEl('edit-prof-phone')?.value || '').trim();
+    const newLoc = (getEl('edit-prof-loc')?.value || '').trim();
+
+    // --- Clear previous errors ---
+    document.querySelectorAll('.prof-field-error').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.saas-input').forEach(el => el.classList.remove('input-error'));
+
+    // --- Validation ---
+    let hasError = false;
+
+    if (!newName) {
+        const errEl = getEl('err-prof-name');
+        const inputEl = getEl('edit-prof-name');
+        if (errEl) errEl.classList.remove('hidden');
+        if (inputEl) { inputEl.classList.add('input-error'); inputEl.focus(); }
+        hasError = true;
+    }
+
+    // Phone: allow empty, but if provided validate format (digits, spaces, +, -, at least 10 digits)
+    if (newPhone && !/^[+\d\s\-()]{10,}$/.test(newPhone)) {
+        const errEl = getEl('err-prof-phone');
+        const inputEl = getEl('edit-prof-phone');
+        if (errEl) errEl.classList.remove('hidden');
+        if (inputEl) inputEl.classList.add('input-error');
+        hasError = true;
+    }
+
+    if (hasError) {
+        window.showToast('Please fix the highlighted fields.', 'error');
+        return;
+    }
+
+    // --- Save button loading state ---
+    const saveBtn = getEl('save-profile-btn');
+    const saveBtnText = getEl('save-btn-text');
+    if (saveBtn) saveBtn.disabled = true;
+    if (saveBtnText) saveBtnText.textContent = 'Saving...';
+
+    // Simulate async save (production-ready pattern)
+    setTimeout(() => {
+        // Find employee reliably: use snapshot empId first, then _currentEmpId, then fallback
+        let targetEmp = null;
+        const snapshotId = window._profileSnapshot?.empId;
+        
+        if (snapshotId) {
+            targetEmp = employees.find(e => e.id === snapshotId);
+        }
+        if (!targetEmp && window._currentEmpId) {
+            targetEmp = employees.find(e => e.id === window._currentEmpId);
+        }
+        if (!targetEmp) {
+            targetEmp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+        }
+        if (!targetEmp) {
+            window.showToast('User session not found.', 'error');
+            if (saveBtn) saveBtn.disabled = false;
+            if (saveBtnText) saveBtnText.textContent = 'Save Changes';
+            return;
+        }
+
+        // --- Update ONLY editable fields in global state ---
+        targetEmp.name = newName;
+        targetEmp.phone = newPhone;
+        targetEmp.location = newLoc;
+        
+        // Profile image (already set by previewProfileImage, persist it)
+        const avatarImg = getEl('prof-avatar-img');
+        if (avatarImg && !avatarImg.classList.contains('hidden') && avatarImg.src && !avatarImg.src.endsWith('/')) {
+            targetEmp.profileImage = avatarImg.src;
+        }
+        // DO NOT modify: employeeId, email, department, designation, joiningDate, bankDetails
+
+        // Keep session in sync so future lookups work
+        if (window.currentUser) {
+            window.currentUser.displayName = newName;
+            localStorage.setItem('pps-user-display', newName);
+        }
+        // Store stable ID for future lookups
+        window._currentEmpId = targetEmp.id;
+
+        // Persist employees to localStorage
+        if (typeof window.saveEmployees === 'function') window.saveEmployees();
+
+        // --- Sync UI everywhere ---
+        // 1. Profile page view-mode fields
+        if (getEl('prof-name-large')) getEl('prof-name-large').textContent = newName;
+        if (getEl('prof-name')) getEl('prof-name').textContent = newName;
+        if (getEl('prof-phone')) getEl('prof-phone').textContent = newPhone || '---';
+        if (getEl('prof-loc')) getEl('prof-loc').textContent = newLoc || '---';
+
+        // 2. Profile avatar initials
+        const newInitials = newName.split(' ').filter(n => n).map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        const avatarText = getEl('prof-avatar-text');
+        if (avatarText && (!avatarImg || avatarImg.classList.contains('hidden'))) {
+            avatarText.textContent = newInitials;
+        }
+
+        // 3. Dashboard header bar (top-bar)
+        if (getEl('user-name')) getEl('user-name').textContent = newName;
+        const userAvatarEl = getEl('user-avatar');
+        if (userAvatarEl) {
+            if (targetEmp.profileImage) {
+                userAvatarEl.innerHTML = `<img src="${targetEmp.profileImage}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+            } else {
+                userAvatarEl.textContent = newName.charAt(0).toUpperCase();
+            }
+        }
+
+        // 4. Employee dashboard welcome hero
+        if (getEl('welcome-employee-name')) getEl('welcome-employee-name').textContent = newName;
+
+        // 5. Admin employee table (if admin view exists)
+        if (typeof window.renderEmployeeTable === 'function') window.renderEmployeeTable();
+        if (typeof window.updateDashboardStats === 'function') window.updateDashboardStats();
+
+        // Clear snapshot so cancel doesn't revert after save
+        window._profileSnapshot = null;
+
+        // Switch back to view mode (without reverting since snapshot is null)
+        const container = getEl('profile-container');
+        if (container) {
+            container.classList.remove('edit-mode-active');
+            container.querySelectorAll('.profile-edit-ui').forEach(el => el.classList.add('hidden'));
+            container.querySelectorAll('.profile-view-ui').forEach(el => el.classList.remove('hidden'));
+        }
+
+        // Reset save button
+        if (saveBtn) saveBtn.disabled = false;
+        if (saveBtnText) saveBtnText.textContent = 'Save Changes';
+
+        window.showToast('Profile updated successfully!', 'success');
+    }, 500); // 500ms simulated save delay for professional feel
+};
+
+window.previewProfileImage = function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const result = e.target.result;
+        
+        // 1. Immediately update profile edit preview
+        const avatarImg = getEl('prof-avatar-img');
+        const avatarText = getEl('prof-avatar-text');
+        if (avatarImg) { avatarImg.src = result; avatarImg.style.display = 'block'; avatarImg.classList.remove('hidden'); }
+        if (avatarText) { avatarText.style.display = 'none'; avatarText.classList.add('hidden'); }
+
+        // 2. Persist to localStorage directly (so it survives reloads & is available globally)
+        localStorage.setItem('profileImage', result);
+
+        // 3. Update global employee state
+        let targetEmp = employees.find(emp => emp.name === window.currentUser?.displayName) || employees[0];
+        if (targetEmp) targetEmp.profileImage = result;
+        if (typeof window.saveEmployees === 'function') window.saveEmployees();
+
+        // 4. Update Header Avatar
+        const headerAvatar = getEl('user-avatar');
+        if (headerAvatar) {
+            headerAvatar.innerHTML = `<img src="${result}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        }
+
+        // 5. Update Welcome Section Avatar
+        const welcomeImg = getEl('emp-avatar-img-main');
+        const welcomeText = getEl('emp-avatar-initials');
+        if (welcomeImg) { welcomeImg.src = result; welcomeImg.style.display = 'block'; welcomeImg.classList.remove('hidden'); }
+        if (welcomeText) { welcomeText.style.display = 'none'; welcomeText.classList.add('hidden'); }
+
+        window.showToast('Profile photo updated successfully!', 'success');
+    };
+    reader.readAsDataURL(file);
+};
+
+window.openPayslipModal = function (monthStr, netStr) {
+    const modal = document.getElementById('payslip-modal');
+    if (!modal) return;
+    
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+        || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+    if (!emp) return;
+
+    // Parse monthStr (e.g., "February 2026")
+    const parts = monthStr.split(' ');
+    const year = parseInt(parts[1]) || 2026;
+    const monthMap = { 'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5, 'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11 };
+    const month = monthMap[parts[0]] || 0;
+
+    const breakdown = window.calculateSalaryBreakdown(emp, year, month);
+
+    // Dynamically update Modal UI
+    const elMonth = document.getElementById('ps-modal-month');
+    const elName = document.getElementById('ps-modal-name');
+    const elBasic = document.getElementById('ps-modal-basic');
+    const elAllow = document.getElementById('ps-modal-allowances');
+    const elOt = document.getElementById('ps-modal-overtime');
+    const elDed = document.getElementById('ps-modal-deductions');
+    const elNet = document.getElementById('ps-modal-net');
+    
+    // Stats elements (new)
+    const elDays = document.getElementById('ps-modal-days');
+    const elOtHrs = document.getElementById('ps-modal-ot-hrs');
+
+    if (elMonth) elMonth.textContent = monthStr;
+    if (elName) elName.textContent = emp.name;
+    
+    const fmt = (v) => '₹ ' + Math.round(v || 0).toLocaleString('en-IN');
+    if (elBasic) elBasic.textContent = fmt(breakdown.monthlySalary);
+    if (elAllow) elAllow.textContent = fmt(breakdown.hra + breakdown.special);
+    if (elOt) elOt.textContent = '+ ' + fmt(breakdown.overtimePay);
+    if (elDed) elDed.textContent = '- ' + fmt(breakdown.leaveDeduction);
+    if (elNet) elNet.textContent = fmt(breakdown.net);
+    
+    if (elDays) elDays.textContent = `${breakdown.presentDays} / 22`;
+    if (elOtHrs) elOtHrs.textContent = `${breakdown.overtimeHours} hrs`;
+
+    modal.style.display = 'block';
+    modal.classList.remove('hidden');
 };
 
 // Final Safety wrapper for initialization - moved to bottom to ensure all functions are defined
