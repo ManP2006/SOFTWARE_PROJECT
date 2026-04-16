@@ -90,6 +90,233 @@ window.AuthStorage = {
     }
 };
 
+// --- Unified User Data & Session Management ---
+// Completely separates Admin and Employee storage while providing a unified API
+
+window.getUser = function() {
+    const role = localStorage.getItem('pps-role') || 'admin';
+    if (role === 'admin') {
+        try {
+            const saved = localStorage.getItem('pps-admin-user');
+            if (saved) return JSON.parse(saved);
+        } catch (e) {
+            console.warn('Failed to parse admin user from localStorage:', e);
+        }
+        return {
+            name: 'Admin User',
+            email: 'admin@pps.com',
+            phone: '',
+            address: '',
+            profileImage: ''
+        };
+    } else {
+        const empId = localStorage.getItem('pps-current-emp-id');
+        let emp = null;
+        if (typeof window.employees !== 'undefined' && window.employees) {
+            emp = window.employees.find(e => e.id === empId);
+        }
+        if (!emp) {
+            try {
+                const saved = localStorage.getItem('pps-employee-user');
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return {
+                name: 'Employee User', email: 'employee@pps.com', profileImage: ''
+            };
+        }
+        return emp;
+    }
+};
+
+window.saveUser = function(userData) {
+    const role = localStorage.getItem('pps-role') || 'admin';
+    if (role === 'admin') {
+        localStorage.setItem('pps-admin-user', JSON.stringify(userData));
+    } else {
+        localStorage.setItem('pps-employee-user', JSON.stringify(userData));
+        if (typeof window.employees !== 'undefined' && window.employees) {
+            const empId = localStorage.getItem('pps-current-emp-id');
+            const targetEmp = window.employees.find(e => e.id === empId);
+            if (targetEmp) {
+                targetEmp.name = userData.name || targetEmp.name;
+                targetEmp.phone = userData.phone || targetEmp.phone;
+                // Employees use 'location' in the default object structure instead of 'address'
+                targetEmp.location = userData.location || userData.address || targetEmp.location;
+                if (userData.profileImage) targetEmp.profileImage = userData.profileImage;
+                if (typeof window.saveEmployees === 'function') window.saveEmployees();
+            }
+        }
+    }
+};
+
+// Syncs ALL UI elements (Nav, Welcome Hero, Profile Forms, Dropdown) with current role data
+window.syncUserUI = function () {
+    const user = window.getUser();
+    const role = localStorage.getItem('pps-role') || 'admin';
+    const name = user.name || (role === 'admin' ? 'Admin User' : 'Employee');
+    const initials = name.split(' ').filter(n => n).map(n => n[0]).join('').toUpperCase().substring(0, 2) || 'A';
+    const profileImg = user.profileImage || '';
+
+    // Helper: set avatar (text or image)
+    const setAvatarPair = (textEl, imgEl) => {
+        if (profileImg) {
+            if (imgEl) { imgEl.src = profileImg; imgEl.style.display = 'block'; imgEl.classList.remove('hidden'); }
+            if (textEl) { textEl.style.display = 'none'; textEl.classList.add('hidden'); }
+        } else {
+            if (imgEl) { imgEl.style.display = 'none'; imgEl.classList.add('hidden'); }
+            if (textEl) { textEl.textContent = initials; textEl.style.display = 'block'; textEl.classList.remove('hidden'); }
+        }
+    };
+
+    // 1. Top nav bar
+    const userNameEl = getEl('user-name');
+    const userAvatarEl = getEl('user-avatar');
+    if (userNameEl) userNameEl.textContent = name;
+    if (userAvatarEl) {
+        if (profileImg) {
+            userAvatarEl.innerHTML = `<img src="${profileImg}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        } else {
+            userAvatarEl.textContent = initials;
+        }
+    }
+
+    // 2. Profile Dropdown
+    const dropdownAvatarText = getEl('dropdown-avatar');
+    if (dropdownAvatarText && !profileImg) {
+        dropdownAvatarText.textContent = name.charAt(0).toUpperCase();
+    }
+    const dropdownAvatarImg = getEl('dropdown-avatar-img'); // (Optional check if we added an img to dropdown)
+    const dropdownUserName = getEl('dropdown-user-name');
+    if (dropdownUserName) dropdownUserName.textContent = name;
+    const dropdownUserRole = getEl('dropdown-user-role');
+    if (dropdownUserRole) dropdownUserRole.textContent = role === 'admin' ? 'Administrator' : 'Employee';
+
+    // Dynamic formatted date for welcome hero cards
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    if (getEl('admin-hero-date-text')) getEl('admin-hero-date-text').textContent = formattedDate;
+    if (getEl('emp-hero-date-text')) getEl('emp-hero-date-text').textContent = formattedDate;
+
+    if (role === 'admin') {
+        // Admin Welcome section
+        if (getEl('welcome-user')) getEl('welcome-user').textContent = name;
+        const roleBadge = getEl('welcome-role-badge');
+        if (roleBadge) roleBadge.textContent = 'Administrator';
+        setAvatarPair(getEl('admin-welcome-avatar-text'), getEl('admin-welcome-avatar-img'));
+
+        // Admin profile page
+        if (getEl('admin-prof-display-name')) getEl('admin-prof-display-name').textContent = name;
+        if (getEl('admin-prof-display-email')) getEl('admin-prof-display-email').textContent = user.email || '';
+        setAvatarPair(getEl('admin-prof-avatar-text'), getEl('admin-prof-avatar-img'));
+
+        // Admin profile edit form
+        if (getEl('admin-edit-name')) getEl('admin-edit-name').value = name;
+        if (getEl('admin-edit-email')) getEl('admin-edit-email').value = user.email || '';
+        if (getEl('admin-edit-phone')) getEl('admin-edit-phone').value = user.phone || '';
+        if (getEl('admin-edit-address')) getEl('admin-edit-address').value = user.address || '';
+        if (getEl('admin-edit-dob')) getEl('admin-edit-dob').value = user.dob || '';
+        if (getEl('admin-edit-gender')) getEl('admin-edit-gender').value = user.gender || '';
+        
+    } else {
+        // Employee Dashboard Welcome Hero
+        if (getEl('welcome-employee-name')) getEl('welcome-employee-name').textContent = name;
+        
+        // Employee Profile static display inside edit page
+        if (getEl('prof-name-large')) getEl('prof-name-large').textContent = name;
+        if (getEl('prof-name')) getEl('prof-name').textContent = name;
+        if (getEl('prof-phone')) getEl('prof-phone').textContent = user.phone || '---';
+        if (getEl('prof-loc')) getEl('prof-loc').textContent = user.location || user.address || '---';
+        
+        // Sync avatars across pages
+        setAvatarPair(getEl('prof-avatar-text'), getEl('prof-avatar-img'));
+        setAvatarPair(getEl('emp-avatar-initials'), getEl('emp-avatar-img-main'));
+    }
+
+    // Keep currentUser in sync
+    if (window.currentUser) {
+        window.currentUser.displayName = name;
+    }
+};
+
+// Admin UI action hooks (save UI interaction)
+window.saveAdminProfile = function () {
+    const name = (getEl('admin-edit-name')?.value || '').trim();
+    const email = (getEl('admin-edit-email')?.value || '').trim();
+    const phone = (getEl('admin-edit-phone')?.value || '').trim();
+    const address = (getEl('admin-edit-address')?.value || '').trim();
+    const dob = (getEl('admin-edit-dob')?.value || '').trim();
+    const gender = (getEl('admin-edit-gender')?.value || '').trim();
+
+    if (!name) {
+        window.showToast('Name cannot be empty.', 'error');
+        getEl('admin-edit-name')?.focus();
+        return;
+    }
+
+    const btn = getEl('admin-save-profile-btn');
+    const btnText = getEl('admin-save-btn-text');
+    if (btn) btn.disabled = true;
+    if (btnText) btnText.textContent = 'Saving...';
+
+    setTimeout(() => {
+        const profile = window.getUser();
+        profile.name = name;
+        profile.email = email;
+        profile.phone = phone;
+        profile.address = address;
+        profile.dob = dob;
+        profile.gender = gender;
+
+        window.saveUser(profile);
+        window.syncUserUI();
+
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = 'Save Changes';
+        window.showToast('Profile updated successfully!', 'success');
+    }, 400);
+};
+
+window.previewAdminPhoto = function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        // Compress image using canvas before storing to avoid localStorage QuotaExceededError
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_SIZE = 300;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_SIZE) { height = Math.round(height *= MAX_SIZE / width); width = MAX_SIZE; }
+            } else {
+                if (height > MAX_SIZE) { width = Math.round(width *= MAX_SIZE / height); height = MAX_SIZE; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const result = canvas.toDataURL('image/jpeg', 0.8);
+            try {
+                const profile = window.getUser();
+                profile.profileImage = result;
+                window.saveUser(profile);
+                window.syncUserUI();
+                window.showToast('Profile photo updated!', 'success');
+            } catch (err) {
+                window.showToast('Failed to save image. It may still be too large.', 'error');
+                console.error(err);
+            }
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
 // --- Attendance Live Timer System ---
 // simulateCheckIn, simulateCheckOut, and startLiveTimer are defined further below
 // after the employees array is available.
@@ -162,6 +389,9 @@ window.handleLogout = function () {
             // 2. Clear runtime state
             window.currentUser = null;
             if (window.timerInterval) clearInterval(window.timerInterval);
+            window._currentEmpId = null;
+            localStorage.removeItem('pps-role');
+            localStorage.removeItem('pps-current-emp-id');
 
             // 3. Close modal & redirect to landing
             closeModal();
@@ -213,11 +443,6 @@ window.showDashboardView = function (role, userName) {
 
     window.currentUser = { role: role, displayName: userName };
     localStorage.setItem('pps-role', role);
-    localStorage.setItem('pps-user-display', userName);
-    const userNameEl = getEl('user-name');
-    const userAvatarEl = getEl('user-avatar');
-    if (userNameEl) userNameEl.textContent = userName;
-    if (userAvatarEl) userAvatarEl.textContent = userName.charAt(0).toUpperCase();
 
     const adminNav = getEl('admin-nav');
     const employeeNav = getEl('employee-nav');
@@ -225,9 +450,19 @@ window.showDashboardView = function (role, userName) {
     if (role === 'admin') {
         if (adminNav) adminNav.style.display = 'flex';
         if (employeeNav) employeeNav.style.display = 'none';
+
+        // Save/update admin profile in localStorage from login data
+        const profile = window.getUser();
+        profile.name = userName;
+        // Capture email from auth form if available (first-time login)
+        const loginEmail = getEl('email')?.value?.trim();
+        if (loginEmail) profile.email = loginEmail;
+        // Use the new saveUser utility
+        window.saveUser(profile);
+
+        // Sync all UI visually
+        window.syncUserUI();
         window.showView('admin-overview');
-        const welcomeUser = getEl('welcome-user');
-        if (welcomeUser) welcomeUser.textContent = userName;
     } else {
         if (adminNav) adminNav.style.display = 'none';
         if (employeeNav) employeeNav.style.display = 'flex';
@@ -243,18 +478,25 @@ window.showDashboardView = function (role, userName) {
 
 // --- Employee Portal Logic ---
 window.initEmployeePortal = function (userName) {
-    // Find employee: prefer stored ID, then name match, then fallback
+    // Find employee: prefer runtime ID, then localStorage ID, then name match, then fallback
     let emp = null;
     if (window._currentEmpId) {
         emp = employees.find(e => e.id === window._currentEmpId);
+    }
+    if (!emp) {
+        const storedEmpId = localStorage.getItem('pps-current-emp-id');
+        if (storedEmpId) {
+            emp = employees.find(e => e.id === storedEmpId);
+        }
     }
     if (!emp) {
         emp = employees.find(e => e.name === userName) || employees[0];
     }
     if (!emp) return;
     
-    // Store stable ID for all profile functions
+    // Store stable ID for all profile functions (runtime + persistent)
     window._currentEmpId = emp.id;
+    localStorage.setItem('pps-current-emp-id', emp.id);
 
     // 1. Dashboard & General
     const welcomeName = getEl('welcome-employee-name');
@@ -1384,6 +1626,9 @@ window.showView = function (viewId) {
         if (window.renderPayrollTable) window.renderPayrollTable();
     } else if (viewId === 'admin-leave') {
         if (window.initAdminLeaveModule) window.initAdminLeaveModule();
+    } else if (viewId === 'admin-profile') {
+        // Sync admin profile UI whenever navigating to profile page
+        if (window.syncAdminProfileUI) window.syncAdminProfileUI();
     }
 
     if (viewId === 'shared-settings') {
@@ -1604,6 +1849,12 @@ function initApp() {
         window.loadPayrolls();
         window.initPayrollModule();
         window.initAttendanceModule();
+        
+        // --- Sync Admin Profile on Init ---
+        const role = localStorage.getItem('pps-role');
+        if (role === 'admin') {
+            window.syncAdminProfileUI();
+        }
     } catch (err) {
         console.error('Initialization Error:', err);
     }
@@ -1991,13 +2242,97 @@ function initApp() {
         });
     }
 
-    // --- ISSUE 1 FIX: Wire up Logout Button (Top-Right) ---
-    const logoutBtn = getEl('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.handleLogout();
+    // --- Profile Dropdown System ---
+    const profileTrigger = getEl('profile-menu-trigger');
+    const profileDropdown = getEl('profile-dropdown');
+    const profileWrapper = getEl('profile-menu-wrapper');
+
+    if (profileTrigger && profileDropdown && profileWrapper) {
+        // Toggle dropdown open/close
+        profileTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = profileWrapper.classList.contains('open');
+
+            if (isOpen) {
+                profileDropdown.classList.remove('visible');
+                profileWrapper.classList.remove('open');
+            } else {
+                // Sync dropdown data with current user
+                const userName = getEl('user-name')?.textContent || 'User';
+                const userAvatar = getEl('user-avatar');
+                const dropdownName = getEl('dropdown-user-name');
+                const dropdownAvatar = getEl('dropdown-avatar');
+                const dropdownRole = getEl('dropdown-user-role');
+
+                if (dropdownName) dropdownName.textContent = userName;
+                if (dropdownRole) dropdownRole.textContent = (window.currentUser?.role === 'admin') ? 'Administrator' : 'Employee';
+                if (dropdownAvatar) {
+                    if (userAvatar && userAvatar.querySelector('img')) {
+                        dropdownAvatar.innerHTML = userAvatar.querySelector('img').outerHTML;
+                    } else {
+                        dropdownAvatar.textContent = userName.charAt(0).toUpperCase();
+                    }
+                }
+
+                profileDropdown.classList.remove('hidden');
+                // Force reflow for animation
+                profileDropdown.offsetHeight;
+                profileDropdown.classList.add('visible');
+                profileWrapper.classList.add('open');
+            }
         });
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!profileWrapper.contains(e.target) && profileWrapper.classList.contains('open')) {
+                profileDropdown.classList.remove('visible');
+                profileWrapper.classList.remove('open');
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && profileWrapper.classList.contains('open')) {
+                profileDropdown.classList.remove('visible');
+                profileWrapper.classList.remove('open');
+            }
+        });
+
+        // "My Profile" button
+        const dropdownProfile = getEl('dropdown-my-profile');
+        if (dropdownProfile) {
+            dropdownProfile.addEventListener('click', () => {
+                const role = window.currentUser?.role || localStorage.getItem('pps-role');
+                if (role === 'admin') {
+                    window.showView('admin-profile');
+                } else {
+                    window.showView('employee-profile');
+                }
+                profileDropdown.classList.remove('visible');
+                profileWrapper.classList.remove('open');
+            });
+        }
+
+        // "Settings" button
+        const dropdownSettings = getEl('dropdown-settings');
+        if (dropdownSettings) {
+            dropdownSettings.addEventListener('click', () => {
+                window.showView('shared-settings');
+                profileDropdown.classList.remove('visible');
+                profileWrapper.classList.remove('open');
+            });
+        }
+
+        // "Sign Out" button
+        const dropdownLogout = getEl('dropdown-logout');
+        if (dropdownLogout) {
+            dropdownLogout.addEventListener('click', (e) => {
+                e.preventDefault();
+                profileDropdown.classList.remove('visible');
+                profileWrapper.classList.remove('open');
+                window.handleLogout();
+            });
+        }
     }
 
     // Wire all sidebar .btn-logout links to use confirmation flow
@@ -2089,14 +2424,17 @@ function initApp() {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const dateString = now.toLocaleDateString('en-IN', options);
 
-        // Populate the new inline date text spans
+        // New welcome hero card date elements
+        const adminHeroDate = document.getElementById('admin-hero-date-text');
+        if (adminHeroDate) adminHeroDate.textContent = dateString;
+        const empHeroDate = document.getElementById('emp-hero-date-text');
+        if (empHeroDate) empHeroDate.textContent = dateString;
+
+        // Legacy date elements (backwards compat)
         const adminDateText = document.getElementById('dashboard-date-admin-text');
         if (adminDateText) adminDateText.textContent = dateString;
-
         const emplDate = document.getElementById('dashboard-date-empl');
         if (emplDate) emplDate.textContent = dateString;
-
-        // Legacy header date element (if still present)
         const headerDate = document.getElementById('current-header-date');
         if (headerDate) headerDate.textContent = dateString;
     }
@@ -3175,13 +3513,9 @@ window.loadEmployees = function () {
             if (emp.joiningDate === undefined) emp.joiningDate = def.joiningDate || '2024-01-15';
             if (emp.profileImage === undefined) emp.profileImage = def.profileImage || '';
 
-            // Name/Email/Role sync: if defaults changed, update stored data
-            if (def && emp.name !== def.name && emp.email !== def.email) {
-                emp.name = def.name;
-                emp.email = def.email;
-                emp.role = def.role;
-                emp.dept = def.dept;
-            }
+            // NOTE: Do NOT overwrite name/email/role/dept from defaults here.
+            // The user may have edited these fields via the profile page.
+            // Saved data in localStorage is the source of truth.
         });
 
         // Data Migration: Ensure IDs are strictly sequential PPS001, PPS002...
@@ -5688,46 +6022,22 @@ window.saveProfileUpdates = function () {
         }
         // DO NOT modify: employeeId, email, department, designation, joiningDate, bankDetails
 
-        // Keep session in sync so future lookups work
-        if (window.currentUser) {
-            window.currentUser.displayName = newName;
-            localStorage.setItem('pps-user-display', newName);
-        }
+        // Use unified saveUser
+        window.saveUser({
+            name: newName,
+            phone: newPhone,
+            location: newLoc,
+            profileImage: targetEmp.profileImage
+        });
+
         // Store stable ID for future lookups
         window._currentEmpId = targetEmp.id;
+        localStorage.setItem('pps-current-emp-id', targetEmp.id);
 
-        // Persist employees to localStorage
-        if (typeof window.saveEmployees === 'function') window.saveEmployees();
+        // --- Sync UI everywhere using unified UI sync ---
+        window.syncUserUI();
 
-        // --- Sync UI everywhere ---
-        // 1. Profile page view-mode fields
-        if (getEl('prof-name-large')) getEl('prof-name-large').textContent = newName;
-        if (getEl('prof-name')) getEl('prof-name').textContent = newName;
-        if (getEl('prof-phone')) getEl('prof-phone').textContent = newPhone || '---';
-        if (getEl('prof-loc')) getEl('prof-loc').textContent = newLoc || '---';
-
-        // 2. Profile avatar initials
-        const newInitials = newName.split(' ').filter(n => n).map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        const avatarText = getEl('prof-avatar-text');
-        if (avatarText && (!avatarImg || avatarImg.classList.contains('hidden'))) {
-            avatarText.textContent = newInitials;
-        }
-
-        // 3. Dashboard header bar (top-bar)
-        if (getEl('user-name')) getEl('user-name').textContent = newName;
-        const userAvatarEl = getEl('user-avatar');
-        if (userAvatarEl) {
-            if (targetEmp.profileImage) {
-                userAvatarEl.innerHTML = `<img src="${targetEmp.profileImage}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-            } else {
-                userAvatarEl.textContent = newName.charAt(0).toUpperCase();
-            }
-        }
-
-        // 4. Employee dashboard welcome hero
-        if (getEl('welcome-employee-name')) getEl('welcome-employee-name').textContent = newName;
-
-        // 5. Admin employee table (if admin view exists)
+        // Admin employee table (if admin view exists)
         if (typeof window.renderEmployeeTable === 'function') window.renderEmployeeTable();
         if (typeof window.updateDashboardStats === 'function') window.updateDashboardStats();
 
@@ -5753,37 +6063,46 @@ window.saveProfileUpdates = function () {
 window.previewProfileImage = function (event) {
     const file = event.target.files[0];
     if (!file) return;
+    
     const reader = new FileReader();
     reader.onload = function (e) {
-        const result = e.target.result;
-        
-        // 1. Immediately update profile edit preview
-        const avatarImg = getEl('prof-avatar-img');
-        const avatarText = getEl('prof-avatar-text');
-        if (avatarImg) { avatarImg.src = result; avatarImg.style.display = 'block'; avatarImg.classList.remove('hidden'); }
-        if (avatarText) { avatarText.style.display = 'none'; avatarText.classList.add('hidden'); }
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_SIZE = 300;
+            let width = img.width;
+            let height = img.height;
 
-        // 2. Persist to localStorage directly (so it survives reloads & is available globally)
-        localStorage.setItem('profileImage', result);
+            if (width > height) {
+                if (width > MAX_SIZE) { height = Math.round(height *= MAX_SIZE / width); width = MAX_SIZE; }
+            } else {
+                if (height > MAX_SIZE) { width = Math.round(width *= MAX_SIZE / height); height = MAX_SIZE; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const result = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // 1. Immediately update profile edit preview
+            const avatarImg = getEl('prof-avatar-img');
+            const avatarText = getEl('prof-avatar-text');
+            if (avatarImg) { avatarImg.src = result; avatarImg.style.display = 'block'; avatarImg.classList.remove('hidden'); }
+            if (avatarText) { avatarText.style.display = 'none'; avatarText.classList.add('hidden'); }
 
-        // 3. Update global employee state
-        let targetEmp = employees.find(emp => emp.name === window.currentUser?.displayName) || employees[0];
-        if (targetEmp) targetEmp.profileImage = result;
-        if (typeof window.saveEmployees === 'function') window.saveEmployees();
-
-        // 4. Update Header Avatar
-        const headerAvatar = getEl('user-avatar');
-        if (headerAvatar) {
-            headerAvatar.innerHTML = `<img src="${result}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-        }
-
-        // 5. Update Welcome Section Avatar
-        const welcomeImg = getEl('emp-avatar-img-main');
-        const welcomeText = getEl('emp-avatar-initials');
-        if (welcomeImg) { welcomeImg.src = result; welcomeImg.style.display = 'block'; welcomeImg.classList.remove('hidden'); }
-        if (welcomeText) { welcomeText.style.display = 'none'; welcomeText.classList.add('hidden'); }
-
-        window.showToast('Profile photo updated successfully!', 'success');
+            try {
+                // 2. Use unified saveUser to persist correctly
+                window.saveUser({ profileImage: result });
+                // 3. Sync UI everywhere
+                window.syncUserUI();
+                window.showToast('Profile photo updated successfully!', 'success');
+            } catch (err) {
+                window.showToast('Storage quota exceeded. Could not save photo.', 'error');
+                console.error(err);
+            }
+        };
+        img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 };
