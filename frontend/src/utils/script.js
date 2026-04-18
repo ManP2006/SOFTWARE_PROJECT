@@ -93,7 +93,7 @@ window.AuthStorage = {
 // --- Unified User Data & Session Management ---
 // Completely separates Admin and Employee storage while providing a unified API
 
-window.getUser = function() {
+window.getUser = function () {
     const role = localStorage.getItem('pps-role') || 'admin';
     if (role === 'admin') {
         try {
@@ -119,7 +119,7 @@ window.getUser = function() {
             try {
                 const saved = localStorage.getItem('pps-employee-user');
                 if (saved) return JSON.parse(saved);
-            } catch(e) {}
+            } catch (e) { }
             return {
                 name: 'Employee User', email: 'employee@pps.com', profileImage: ''
             };
@@ -128,7 +128,7 @@ window.getUser = function() {
     }
 };
 
-window.saveUser = function(userData) {
+window.saveUser = function (userData) {
     const role = localStorage.getItem('pps-role') || 'admin';
     if (role === 'admin') {
         localStorage.setItem('pps-admin-user', JSON.stringify(userData));
@@ -216,17 +216,17 @@ window.syncUserUI = function () {
         if (getEl('admin-edit-address')) getEl('admin-edit-address').value = user.address || '';
         if (getEl('admin-edit-dob')) getEl('admin-edit-dob').value = user.dob || '';
         if (getEl('admin-edit-gender')) getEl('admin-edit-gender').value = user.gender || '';
-        
+
     } else {
         // Employee Dashboard Welcome Hero
         if (getEl('welcome-employee-name')) getEl('welcome-employee-name').textContent = name;
-        
+
         // Employee Profile static display inside edit page
         if (getEl('prof-name-large')) getEl('prof-name-large').textContent = name;
         if (getEl('prof-name')) getEl('prof-name').textContent = name;
         if (getEl('prof-phone')) getEl('prof-phone').textContent = user.phone || '---';
         if (getEl('prof-loc')) getEl('prof-loc').textContent = user.location || user.address || '---';
-        
+
         // Sync avatars across pages
         setAvatarPair(getEl('prof-avatar-text'), getEl('prof-avatar-img'));
         setAvatarPair(getEl('emp-avatar-initials'), getEl('emp-avatar-img-main'));
@@ -284,7 +284,7 @@ window.previewAdminPhoto = function (event) {
     reader.onload = function (e) {
         // Compress image using canvas before storing to avoid localStorage QuotaExceededError
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
             const canvas = document.createElement('canvas');
             const MAX_SIZE = 300;
             let width = img.width;
@@ -299,7 +299,7 @@ window.previewAdminPhoto = function (event) {
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            
+
             const result = canvas.toDataURL('image/jpeg', 0.8);
             try {
                 const profile = window.getUser();
@@ -493,7 +493,7 @@ window.initEmployeePortal = function (userName) {
         emp = employees.find(e => e.name === userName) || employees[0];
     }
     if (!emp) return;
-    
+
     // Store stable ID for all profile functions (runtime + persistent)
     window._currentEmpId = emp.id;
     localStorage.setItem('pps-current-emp-id', emp.id);
@@ -514,7 +514,7 @@ window.initEmployeePortal = function (userName) {
     const monthYearText = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase();
     if (monthYears) monthYears.textContent = monthYearText;
     if (monthYearsModern) monthYearsModern.textContent = monthYearText;
-    
+
     // Set dynamic current date text
     if (getEl('hero-day-text')) getEl('hero-day-text').textContent = now.toLocaleDateString('en-IN', { weekday: 'long' });
     if (getEl('hero-date-text')) getEl('hero-date-text').textContent = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -561,19 +561,19 @@ window.initEmployeePortal = function (userName) {
     if (hour >= 12 && hour < 17) greeting = "Good afternoon";
     if (hour >= 17) greeting = "Good evening";
     document.querySelectorAll('.greeting-text').forEach(el => el.textContent = greeting);
-    
+
     // Check local storage for dynamic avatar overrides
     const savedImage = localStorage.getItem('profileImage');
     if (savedImage) {
         emp.profileImage = savedImage;
     }
-    
+
     const initials = emp.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-    
+
     const setAvatar = (textId, imgId, applyBg = false) => {
         const textEl = getEl(textId);
         const imgEl = getEl(imgId);
-        
+
         if (emp.profileImage && imgEl) {
             imgEl.src = emp.profileImage;
             imgEl.style.display = 'block';
@@ -593,17 +593,17 @@ window.initEmployeePortal = function (userName) {
                 textEl.classList.remove('hidden');
             }
         }
-        
+
         if (applyBg && textEl && textEl.parentElement && !emp.profileImage) {
             textEl.parentElement.style.background = 'var(--primary-light)';
             textEl.parentElement.style.color = 'var(--primary)';
         }
     };
-    
+
     // Update dashboard avatars
     setAvatar('prof-avatar-text', 'prof-avatar-img');
     setAvatar('emp-avatar-initials', 'emp-avatar-img-main');
-    
+
     // If there is a top nav avatar
     const userAvatarEl = getEl('user-avatar');
     if (userAvatarEl) {
@@ -614,7 +614,7 @@ window.initEmployeePortal = function (userName) {
             userAvatarEl.textContent = initials;
         }
     }
-    
+
     if (getEl('prof-avatar-large')) {
         getEl('prof-avatar-large').style.background = 'var(--primary-light)';
         getEl('prof-avatar-large').style.color = 'var(--primary)';
@@ -624,7 +624,7 @@ window.initEmployeePortal = function (userName) {
     // 3. Attendance Session — Daily Reset + Restore
     const todayDateStr = new Date().toISOString().split('T')[0]; // e.g. 2026-04-12
     const lastCheckinDate = localStorage.getItem(`pps-checkin-date-${emp.id}`);
-    
+
     // Daily reset: if stored date is not today, clear the session
     if (lastCheckinDate && lastCheckinDate !== todayDateStr) {
         localStorage.removeItem(`pps-checkin-${emp.id}`);
@@ -659,7 +659,7 @@ window.initEmployeePortal = function (userName) {
         if (checkoutBtn) checkoutBtn.disabled = true;
         if (getEl('live-checkin-time')) getEl('live-checkin-time').textContent = todayRecord.checkIn || '--:--';
         if (getEl('live-checkout-time')) getEl('live-checkout-time').textContent = todayRecord.checkOut || '--:--';
-        
+
         if (timerEl) timerEl.textContent = todayRecord.workHours || '00:00:00';
         if (getEl('live-work-hours')) getEl('live-work-hours').textContent = todayRecord.workHours || '00:00:00';
     } else {
@@ -671,7 +671,7 @@ window.initEmployeePortal = function (userName) {
         if (timerEl) timerEl.textContent = '00:00:00';
         if (getEl('live-work-hours')) getEl('live-work-hours').textContent = '00:00:00';
     }
-    
+
     // Initialize month dropdown
     const monthSelect = getEl('emp-att-month-filter');
     if (monthSelect && monthSelect.options.length === 0) {
@@ -686,11 +686,11 @@ window.initEmployeePortal = function (userName) {
 
     // Render attendance history table for the employee
     window.renderEmployeeAttendanceHistory(emp);
-    
+
     // Add event handler globally if not present
     if (!window.onEmpAttMonthChange) {
-        window.onEmpAttMonthChange = function() {
-            const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+        window.onEmpAttMonthChange = function () {
+            const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
                 || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
             if (emp) window.renderEmployeeAttendanceHistory(emp);
         };
@@ -758,7 +758,7 @@ window.initEmployeePortal = function (userName) {
 
 window.showPayslip = function (empId, month, customNet) {
     console.log('--- Payslip Debug Start ---');
-    
+
     // Check if React portal is ready
     if (typeof window.showPayslipPreview !== 'function') {
         console.warn('React portal not ready yet, retrying in 500ms...');
@@ -777,7 +777,7 @@ window.showPayslip = function (empId, month, customNet) {
     const payslipData = {
         name: emp.name,
         id: emp.id,
-        month: month.split(' ')[0], 
+        month: month.split(' ')[0],
         year: month.split(' ')[1] || new Date().getFullYear(),
         designation: emp.role,
         department: emp.dept,
@@ -813,7 +813,7 @@ window.showPayslip = function (empId, month, customNet) {
     console.log('--- Payslip Debug End ---');
 };
 
-window.closePayslipModal = function() {
+window.closePayslipModal = function () {
     const modal = getEl('payslip-modal');
     if (modal) {
         modal.style.display = 'none';
@@ -951,17 +951,17 @@ window.showPayslipFromDashboard = function () {
 window.getPayrollStats = function (empId, year, month) {
     const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
     const now = new Date();
-    
+
     // 1. Get History
     const history = JSON.parse(localStorage.getItem(`pps-attendance-history-${empId}`) || '[]');
     const emp = employees.find(e => e.id === empId);
-    
+
     // If no history exists, generate some sample data for stats calculation
     let currentMonthHistory = history.filter(r => r.date.startsWith(monthStr));
     if (currentMonthHistory.length === 0 && emp) {
         currentMonthHistory = window.generateSampleAttendanceData(emp, year, month);
     }
-    
+
     let presentDays = 0;
     let absentDays = 0;
     let totalOvertimeMs = 0;
@@ -974,13 +974,13 @@ window.getPayrollStats = function (empId, year, month) {
 
     // 2. Leave Requests Integration
     const leaves = JSON.parse(localStorage.getItem('pps-leave-requests') || '[]');
-    const approvedMonthLeaves = leaves.filter(l => 
-        l.empId === empId && 
-        l.status === 'Approved' && 
+    const approvedMonthLeaves = leaves.filter(l =>
+        l.empId === empId &&
+        l.status === 'Approved' &&
         l.startDate.startsWith(monthStr)
     );
-    
-    const leaveDays = approvedMonthLeaves.length; 
+
+    const leaveDays = approvedMonthLeaves.length;
 
     return {
         presentDays,
@@ -993,24 +993,24 @@ window.getPayrollStats = function (empId, year, month) {
 
 window.calculateSalaryBreakdown = function (emp, year, month) {
     const monthlySalary = emp.monthlySalary || 65000;
-    
+
     // Use current month if not provided
     if (year === undefined || month === undefined) {
         const now = new Date();
         year = now.getFullYear();
         month = now.getMonth();
     }
-    
+
     const stats = window.getPayrollStats(emp.id, year, month);
-    
+
     const totalWorkingDays = 22; // Standard SaaS working month
     const perDaySalary = Math.round(monthlySalary / totalWorkingDays);
     const perHourSalary = Math.round(perDaySalary / 6); // 6-hour standard
-    
+
     // Absent days deduction (Leave days are already factored out of present count)
     const leaveDeduction = stats.absentDays * perDaySalary;
     const overtimePay = Math.round(stats.totalOvertimeHours * perHourSalary * 1.5); // 1.5x Overtime Multiplier
-    
+
     const gross = monthlySalary + overtimePay;
     const net = monthlySalary - leaveDeduction + overtimePay;
 
@@ -1130,7 +1130,7 @@ window.closeModal = function (modalId) {
 // CHECKIN_KEY removed
 
 window.simulateCheckIn = function () {
-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
         || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
     if (!emp) return;
 
@@ -1190,7 +1190,7 @@ window.simulateCheckIn = function () {
 };
 
 window.simulateCheckOut = function () {
-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
         || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
     if (!emp) return;
 
@@ -1202,7 +1202,7 @@ window.simulateCheckOut = function () {
     const savedTime = localStorage.getItem(`pps-checkin-timestamp-${emp.id}`);
     const accumulatedMs = parseInt(localStorage.getItem(`pps-accumulated-ms-${emp.id}`) || '0');
     let totalMs = accumulatedMs;
-    
+
     if (savedTime) {
         const startTimestamp = parseInt(savedTime);
         totalMs += Math.max(0, now.getTime() - startTimestamp);
@@ -1251,7 +1251,7 @@ window.simulateCheckOut = function () {
         todayRecord.checkOut = time;
         todayRecord.workHours = formattedTotal;
         todayRecord.overtimeMs = overtimeMs; // Store for salary calculation integration
-        
+
         // Mark as Late if checked in after 10:00 AM
         if (todayRecord.checkIn) {
             const parts = todayRecord.checkIn.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -1263,7 +1263,7 @@ window.simulateCheckOut = function () {
                 if (hr >= 10) todayRecord.status = 'Late';
             }
         }
-        
+
         localStorage.setItem(`pps-attendance-today-${emp.id}`, JSON.stringify(todayRecord));
 
         // Save to persistent attendance history
@@ -1302,7 +1302,7 @@ window.simulateCheckOut = function () {
 };
 
 window.startLiveTimer = function () {
-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
         || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
     if (!emp) return;
 
@@ -1385,7 +1385,7 @@ window.generateSampleAttendanceData = function (emp, year, month) {
     const data = [];
     const now = new Date();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     // Seed a simple hash from emp.id for consistent random per employee
     let seed = 0;
     for (let i = 0; i < emp.id.length; i++) seed += emp.id.charCodeAt(i);
@@ -1426,7 +1426,7 @@ window.generateSampleAttendanceData = function (emp, year, month) {
             const wh = Math.floor(diffMs / 3600000);
             const wm = Math.floor((diffMs % 3600000) / 60000);
             workHours = `${String(wh).padStart(2, '0')}:${String(wm).padStart(2, '0')}:00`;
-            
+
             // 6-hour standard (21,600,000 ms)
             if (diffMs > 21600000) overtimeMs = diffMs - 21600000;
         } else {
@@ -1443,7 +1443,7 @@ window.generateSampleAttendanceData = function (emp, year, month) {
             const wh = Math.floor(diffMs / 3600000);
             const wm = Math.floor((diffMs % 3600000) / 60000);
             workHours = `${String(wh).padStart(2, '0')}:${String(wm).padStart(2, '0')}:00`;
-            
+
             if (diffMs > 21600000) overtimeMs = diffMs - 21600000;
         }
 
@@ -1474,16 +1474,16 @@ window.renderEmployeeAttendanceHistory = function (emp) {
 
     // Get persisted real records for this month
     const realHistory = JSON.parse(localStorage.getItem(`pps-attendance-history-${emp.id}`) || '[]');
-    
+
     // Get sample data
     const sampleData = window.generateSampleAttendanceData(emp, targetYear, targetMonth);
-    
+
     // Merge: real records override sample data for the same date
     const realDates = new Set(realHistory.map(r => r.date));
     const monthStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`;
     const realForMonth = realHistory.filter(r => r.date.startsWith(monthStr));
     const sampleFiltered = sampleData.filter(r => !realDates.has(r.date));
-    
+
     const allRecords = [...realForMonth, ...sampleFiltered];
     // Sort most recent first
     allRecords.sort((a, b) => b.date.localeCompare(a.date));
@@ -1849,7 +1849,7 @@ function initApp() {
         window.loadPayrolls();
         window.initPayrollModule();
         window.initAttendanceModule();
-        
+
         // --- Sync Admin Profile on Init ---
         const role = localStorage.getItem('pps-role');
         if (role === 'admin') {
@@ -3157,9 +3157,9 @@ window.showPayslip = function (empId, month) {
     // Show professional feedback
     window.showToast('Generating secure payslip preview...', 'info');
 
-    // Synthetic record if missing
+    // Synthetic record if missing — pass the employee object (not a number)
     if (!p) {
-        const breakdown = window.calculateSalaryBreakdown(emp.monthlySalary);
+        const breakdown = window.calculateSalaryBreakdown(emp);
         p = {
             empName: emp.name,
             empId: emp.id,
@@ -3171,45 +3171,91 @@ window.showPayslip = function (empId, month) {
         };
     }
 
-    const companyName = localStorage.getItem('pps-company-name') || 'XYZ Private Limited';
+    const companyName = localStorage.getItem('pps-company-name') || 'Prime Payroll Solution';
     const companyAddress = localStorage.getItem('pps-company-address') || '123 Tech Hub, HITEC City, Hyderabad, 500081';
 
-    // Map data for payslip.html
+    // --- USE ACTUAL PAYROLL RECORD VALUES (matches the payroll table exactly) ---
+    const grossVal = p.gross || 0;
+    const basicVal = p.basic || Math.round(grossVal * 0.5);
+    const allowVal = p.allowances || Math.round(grossVal * 0.4);
+    const bonusVal = p.bonus || 0;
+
+    // Derive individual earnings from the record's basic + allowances
+    const hraVal = Math.round(basicVal * 0.4);
+    const eduVal = 2500;
+    const ltaVal = Math.round(basicVal * 0.1);
+    const conveyance = 1600;
+    const entertainmentVal = 1500;
+    const personalAllowance = allowVal - hraVal - eduVal - ltaVal - conveyance - entertainmentVal;
+
+    // Deductions — use ONLY values from the payroll record so line items sum to the total
+    const tdsVal = p.tds || 0;
+    const otherDed = p.otherDeductions || 0;
+    const totalDeductions = p.totalDeductions || 0;
+    const netVal = p.net || (grossVal - totalDeductions);
+
+    // Build payslip data — pass pre-calculated values so Payslip.jsx uses them directly
     const payslipData = {
         name: p.empName,
         id: p.empId,
         position: p.empRole || (emp ? emp.role : 'Professional'),
-        dept: emp ? (emp.dept || 'Engineering') : 'Engineering',
+        department: emp ? (emp.dept || 'Engineering') : 'Engineering',
         period: p.financialYear ? `${p.month} | ${p.financialYear}` : p.month,
-        date: p.dateFormatted,
         companyName: companyName,
         companyAddress: companyAddress,
-        salary: {
-            basic: p.basic,
-            hra: p.hra || Math.round(p.basic * 0.4),
-            edu: p.edu || 2500,
-            lta: p.lta || 5000,
-            special: p.special || (p.bonus || 0),
-            pf: p.pf || Math.round(p.basic * 0.12),
-            pt: p.pt || 200
-        }
+        // Payment context
+        bankName: emp ? (emp.bankName || 'HDFC Bank') : 'HDFC Bank',
+        accountNumber: emp ? (emp.accountNumber || 'XXXX XXXX ' + String(emp.id).replace(/\D/g, '').slice(-4).padStart(4, '0')) : 'XXXX XXXX 0000',
+        paymentDate: p.dateFormatted || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+        // Pre-calculated earnings (matches payroll table's gross)
+        calculatedEarnings: {
+            basic: basicVal,
+            hra: hraVal,
+            educationAllowance: eduVal,
+            lta: ltaVal,
+            personalAllowance: Math.max(personalAllowance, 0),
+            entertainmentReimbursement: entertainmentVal,
+            conveyance: conveyance,
+            bonus: bonusVal,
+            grossTotal: grossVal
+        },
+        calculatedDeductions: {
+            tds: tdsVal,
+            pf: 0,
+            esi: 0,
+            professionalTax: 0,
+            otherDeductions: otherDed,
+            loans: 0,
+            perquisites: 0,
+            totalDeductions: totalDeductions
+        },
+        netSalary: netVal,
+        // Trigger Payslip.jsx (A4 template) — boolean flag instead of CTC
+        useA4Template: true
     };
 
-    // Store for payslip.html to consume
+    // Also keep legacy localStorage for payslip.html iframe fallback
     localStorage.setItem('pps-current-payslip', JSON.stringify(payslipData));
 
-    // Update iframe and show modal
-    const iframe = getEl('payslip-iframe');
-    if (iframe) {
-        iframe.src = 'payslip.html?t=' + Date.now();
+    // Use the React PayslipModal via bridge if available, else fall back to iframe modal
+    if (typeof window.openPayslipSystemModal === 'function') {
+        setTimeout(() => {
+            window.openPayslipSystemModal(payslipData);
+            window.showToast('Payslip generated successfully.', 'success');
+        }, 300);
+    } else {
+        // Fallback: iframe-based modal
+        const iframe = getEl('payslip-iframe');
+        if (iframe) {
+            iframe.src = 'payslip.html?t=' + Date.now();
+        }
+        setTimeout(() => {
+            getEl('payslip-print-modal')?.classList.remove('hidden');
+            getEl('payslip-print-modal') && (getEl('payslip-print-modal').style.display = 'flex');
+            window.autoScalePayslip();
+            window.showToast('Payslip generated successfully.', 'success');
+        }, 400);
     }
-
-    // Small delay to feel more professional and allow iframe to start loading
-    setTimeout(() => {
-        getEl('payslip-modal')?.classList.remove('hidden');
-        window.autoScalePayslip();
-        window.showToast('Payslip generated successfully.', 'success');
-    }, 400);
 };
 
 window.autoScalePayslip = function () {
@@ -4967,7 +5013,7 @@ function initEmployeeLeaveModule() {
             const leaveTypeObj = leaveTypes.find(t => t.id === typeId) || { name: 'Unknown' };
             const appliedDate = new Date().toISOString().split('T')[0];
             const createdAt = new Date().toLocaleString();
-            
+
             const durationInput = getEl('leave-duration');
             const duration = durationInput ? durationInput.value : 'Full Day';
             const requestType = duration === 'Early Exit' ? 'EARLY_EXIT' : 'STANDARD';
@@ -5129,7 +5175,7 @@ window.showApplyLeaveModal = function (options = {}) {
         durationEl.removeAttribute('readonly');
         Array.from(durationEl.options).forEach(opt => opt.disabled = false);
     }
-    
+
     // Set minimum dates
     startDateEl.setAttribute('min', today);
     endDateEl.setAttribute('min', today);
@@ -5140,7 +5186,7 @@ window.showApplyLeaveModal = function (options = {}) {
         endDateEl.value = today;
         startDateEl.setAttribute('readonly', 'true');
         endDateEl.setAttribute('readonly', 'true');
-        
+
         if (durationEl) {
             durationEl.value = 'Early Exit';
             durationEl.setAttribute('readonly', 'true');
@@ -5911,13 +5957,13 @@ window.toggleProfileEditMode = function () {
         if (!currentEmp) {
             currentEmp = employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
         }
-        
+
         // Read current displayed values as the source of truth
         const nameText = getEl('prof-name-large') ? getEl('prof-name-large').textContent.trim() : (currentEmp ? currentEmp.name : '');
         const phoneText = getEl('prof-phone') ? getEl('prof-phone').textContent.trim() : (currentEmp ? currentEmp.phone : '');
         const locText = getEl('prof-loc') ? getEl('prof-loc').textContent.trim() : (currentEmp ? currentEmp.location : '');
         const initials = nameText.split(' ').filter(n => n).map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        
+
         // Store snapshot with empId for reliable lookup on save
         window._profileSnapshot = {
             empId: currentEmp ? currentEmp.id : null,
@@ -5936,7 +5982,7 @@ window.toggleProfileEditMode = function () {
         if (getEl('edit-prof-name')) getEl('edit-prof-name').value = nameText || '';
         if (getEl('edit-prof-phone')) getEl('edit-prof-phone').value = (phoneText && phoneText !== '---') ? phoneText : '';
         if (getEl('edit-prof-loc')) getEl('edit-prof-loc').value = (locText && locText !== '---') ? locText : '';
-        
+
         // Pre-fill additional editable fields if they exist
         if (getEl('edit-prof-dob') && getEl('prof-dob')) getEl('edit-prof-dob').value = getEl('prof-dob').textContent.trim() || '';
         if (getEl('edit-prof-gender') && getEl('prof-gender')) getEl('edit-prof-gender').value = getEl('prof-gender').textContent.trim() || '';
@@ -5993,7 +6039,7 @@ window.saveProfileUpdates = function () {
         // Find employee reliably: use snapshot empId first, then _currentEmpId, then fallback
         let targetEmp = null;
         const snapshotId = window._profileSnapshot?.empId;
-        
+
         if (snapshotId) {
             targetEmp = employees.find(e => e.id === snapshotId);
         }
@@ -6014,7 +6060,7 @@ window.saveProfileUpdates = function () {
         targetEmp.name = newName;
         targetEmp.phone = newPhone;
         targetEmp.location = newLoc;
-        
+
         // Profile image (already set by previewProfileImage, persist it)
         const avatarImg = getEl('prof-avatar-img');
         if (avatarImg && !avatarImg.classList.contains('hidden') && avatarImg.src && !avatarImg.src.endsWith('/')) {
@@ -6063,11 +6109,11 @@ window.saveProfileUpdates = function () {
 window.previewProfileImage = function (event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
     reader.onload = function (e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
             const canvas = document.createElement('canvas');
             const MAX_SIZE = 300;
             let width = img.width;
@@ -6082,9 +6128,9 @@ window.previewProfileImage = function (event) {
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            
+
             const result = canvas.toDataURL('image/jpeg', 0.8);
-            
+
             // 1. Immediately update profile edit preview
             const avatarImg = getEl('prof-avatar-img');
             const avatarText = getEl('prof-avatar-text');
@@ -6108,22 +6154,83 @@ window.previewProfileImage = function (event) {
 };
 
 window.openPayslipModal = function (monthStr, netStr) {
-    const modal = document.getElementById('payslip-modal');
-    if (!modal) return;
-    
-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
         || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
     if (!emp) return;
 
-    // Parse monthStr (e.g., "February 2026")
-    const parts = monthStr.split(' ');
-    const year = parseInt(parts[1]) || 2026;
-    const monthMap = { 'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5, 'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11 };
-    const month = monthMap[parts[0]] || 0;
+    // If React modal bridge is available, use the A4 payslip with matching salary values
+    if (typeof window.openPayslipSystemModal === 'function') {
+        const companyName = localStorage.getItem('pps-company-name') || 'Prime Payroll Solution';
+        const companyAddress = localStorage.getItem('pps-company-address') || '123 Tech Hub, HITEC City, Hyderabad, 500081';
 
-    const breakdown = window.calculateSalaryBreakdown(emp, year, month);
+        // Parse month to get breakdown
+        const parts = monthStr.split(' ');
+        const year = parseInt(parts[1]) || 2026;
+        const monthMap = { 'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5, 'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11 };
+        const month = monthMap[parts[0]] || 0;
+        const breakdown = window.calculateSalaryBreakdown(emp, year, month);
 
-    // Dynamically update Modal UI
+        // Use same formula as payroll generation for consistency
+        const basicVal = Math.round(emp.monthlySalary * 0.5);
+        const allowVal = Math.round(emp.monthlySalary * 0.4);
+        const bonusVal = Math.round(emp.monthlySalary * 0.1);
+        const grossVal = basicVal + allowVal + bonusVal;
+        const hraVal = Math.round(basicVal * 0.4);
+        const tdsVal = grossVal > 50000 ? Math.round(grossVal * 0.10) : (grossVal > 30000 ? Math.round(grossVal * 0.05) : 0);
+        
+        // Match the payroll record logic: only TDS + attendance/leave deductions are part of totalDeductions
+        const otherDed = breakdown.leaveDeduction || 0;
+        const totalDed = tdsVal + otherDed;
+
+        window.openPayslipSystemModal({
+            name: emp.name,
+            id: emp.id,
+            position: emp.role,
+            department: emp.dept || 'Engineering',
+            period: monthStr,
+            companyName: companyName,
+            companyAddress: companyAddress,
+            bankName: emp.bankName || 'HDFC Bank',
+            accountNumber: emp.accountNumber || 'XXXX XXXX ' + String(emp.id).replace(/\D/g, '').slice(-4).padStart(4, '0'),
+            paymentDate: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+            calculatedEarnings: {
+                basic: basicVal,
+                hra: hraVal,
+                educationAllowance: 2500,
+                lta: Math.round(basicVal * 0.1),
+                personalAllowance: Math.max(allowVal - hraVal - 2500 - Math.round(basicVal * 0.1) - 1600 - 1500, 0),
+                entertainmentReimbursement: 1500,
+                conveyance: 1600,
+                bonus: bonusVal,
+                grossTotal: grossVal
+            },
+            calculatedDeductions: {
+                tds: tdsVal,
+                pf: 0,
+                esi: 0,
+                professionalTax: 0,
+                otherDeductions: otherDed,
+                loans: 0,
+                perquisites: 0,
+                totalDeductions: totalDed
+            },
+            netSalary: grossVal - totalDed,
+            useA4Template: true
+        });
+        return;
+    }
+
+    // Fallback: old DOM-based modal
+    const modal = document.getElementById('payslip-modal');
+    if (!modal) return;
+
+    const parts2 = monthStr.split(' ');
+    const year2 = parseInt(parts2[1]) || 2026;
+    const monthMap2 = { 'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5, 'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11 };
+    const month2 = monthMap2[parts2[0]] || 0;
+
+    const breakdown2 = window.calculateSalaryBreakdown(emp, year2, month2);
+
     const elMonth = document.getElementById('ps-modal-month');
     const elName = document.getElementById('ps-modal-name');
     const elBasic = document.getElementById('ps-modal-basic');
@@ -6131,23 +6238,21 @@ window.openPayslipModal = function (monthStr, netStr) {
     const elOt = document.getElementById('ps-modal-overtime');
     const elDed = document.getElementById('ps-modal-deductions');
     const elNet = document.getElementById('ps-modal-net');
-    
-    // Stats elements (new)
     const elDays = document.getElementById('ps-modal-days');
     const elOtHrs = document.getElementById('ps-modal-ot-hrs');
 
     if (elMonth) elMonth.textContent = monthStr;
     if (elName) elName.textContent = emp.name;
-    
+
     const fmt = (v) => '₹ ' + Math.round(v || 0).toLocaleString('en-IN');
-    if (elBasic) elBasic.textContent = fmt(breakdown.monthlySalary);
-    if (elAllow) elAllow.textContent = fmt(breakdown.hra + breakdown.special);
-    if (elOt) elOt.textContent = '+ ' + fmt(breakdown.overtimePay);
-    if (elDed) elDed.textContent = '- ' + fmt(breakdown.leaveDeduction);
-    if (elNet) elNet.textContent = fmt(breakdown.net);
-    
-    if (elDays) elDays.textContent = `${breakdown.presentDays} / 22`;
-    if (elOtHrs) elOtHrs.textContent = `${breakdown.overtimeHours} hrs`;
+    if (elBasic) elBasic.textContent = fmt(breakdown2.monthlySalary);
+    if (elAllow) elAllow.textContent = fmt(breakdown2.hra + breakdown2.special);
+    if (elOt) elOt.textContent = '+ ' + fmt(breakdown2.overtimePay);
+    if (elDed) elDed.textContent = '- ' + fmt(breakdown2.leaveDeduction);
+    if (elNet) elNet.textContent = fmt(breakdown2.net);
+
+    if (elDays) elDays.textContent = `${breakdown2.presentDays} / 22`;
+    if (elOtHrs) elOtHrs.textContent = `${breakdown2.overtimeHours} hrs`;
 
     modal.style.display = 'block';
     modal.classList.remove('hidden');

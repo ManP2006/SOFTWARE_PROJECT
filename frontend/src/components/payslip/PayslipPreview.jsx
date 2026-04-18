@@ -1,7 +1,5 @@
-import React from 'react';
-
 // --- Utility: Currency Formatter ---
-export const formatCurrency = (val) => {
+window.formatCurrency = function(val) {
     return new Intl.NumberFormat('en-IN', {
         style: 'currency',
         currency: 'INR',
@@ -9,8 +7,10 @@ export const formatCurrency = (val) => {
     }).format(val || 0);
 };
 
-export default function PayslipPreview({ data }) {
+window.PayslipPreview = function PayslipPreview({ data }) {
     if (!data) return null;
+
+    const formatCurrency = window.formatCurrency;
 
     // Auto Calculations
     const grossIncome = data.earnings.reduce((sum, item) => sum + item.amount, 0);
@@ -138,4 +138,4 @@ export default function PayslipPreview({ data }) {
             </p>
         </div>
     );
-}
+};
