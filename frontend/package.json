@@ -1,0 +1,14 @@
+{
+  "name": "pps-frontend",
+  "version": "1.0.0",
+  "description": "Payroll system frontend",
+  "scripts": {
+    "dev": "live-server --port=3000 --entry-file=public/index.html ."
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "puppeteer": "^25.0.2"
+  }
+}
