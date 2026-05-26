@@ -1,0 +1,19 @@
+{
+  "pages": {
+    "/dashboard/attendance/page": [
+      "static/chunks/ff1a16fafef87110.js",
+      "static/chunks/6a7993b07cb97bb3.js",
+      "static/chunks/6ce2fc401c2e2b7e.css",
+      "static/chunks/ab829368f598f4f8.js",
+      "static/chunks/e6f0414a31aa896e.js",
+      "static/chunks/41203565ba90c3e8.js",
+      "static/chunks/67e2b30f8732ee1b.js",
+      "static/chunks/20ba8cffd2948dcc.js",
+      "static/chunks/91adb7bdb9870c6a.js",
+      "static/chunks/3b6b2abbcd7a158f.js",
+      "static/chunks/ad485e1ef0aa584e.js",
+      "static/chunks/7b7f1bf3900a5477.js",
+      "static/chunks/turbopack-ea602528d896e90c.js"
+    ]
+  }
+}

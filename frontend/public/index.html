@@ -9,14 +9,9 @@
         content="Streamline salary processing, automate tax calculations, and manage employee payments with our comprehensive payroll solution.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<<<<<<< Updated upstream
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../src/styles/global.css?v=15">
-=======
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../src/styles/global.css?v=16">
->>>>>>> Stashed changes
+    <link rel="stylesheet" href="../src/styles/global.css?direct">
     <!-- Tailwind CSS for React Components -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -233,14 +228,14 @@
 
                 <form class="auth-form-body" onsubmit="event.preventDefault();">
                     <div id="admin-user-group" class="form-group">
-                        <label for="admin-user" class="form-label">Admin User</label>
-                        <input type="text" id="admin-user" class="form-input" placeholder="Full Name" required>
+                        <label for="admin-user" class="form-label">Display Name <span style="font-weight:400;opacity:0.6;">(optional)</span></label>
+                        <input type="text" id="admin-user" class="form-input" placeholder="Your name (optional)">
                         <span class="form-helper">This name will appear inside the dashboard.</span>
                     </div>
 
                     <div id="employee-name-group" class="form-group" style="display:none;">
-                        <label for="employee-name" class="form-label">Full Name</label>
-                        <input type="text" id="employee-name" class="form-input" placeholder="Your Full Name" required>
+                        <label for="employee-name" class="form-label">Display Name <span style="font-weight:400;opacity:0.6;">(optional)</span></label>
+                        <input type="text" id="employee-name" class="form-input" placeholder="Your name (optional)">
                     </div>
 
                     <div class="form-group">
@@ -263,6 +258,13 @@
                     </div>
 
                     <button type="submit" id="auth-submit-btn" class="submit-btn">Sign In</button>
+
+                    <!-- Demo Credentials Hint -->
+                    <div id="demo-credentials-hint" style="margin-top:1rem; padding:0.75rem 1rem; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.2); border-radius:8px; font-size:0.8rem; color:var(--text-muted, #64748b); line-height:1.6;">
+                        <strong style="color:var(--text-secondary, #475569); display:block; margin-bottom:0.3rem;">🔑 Demo Credentials</strong>
+                        <span id="demo-admin-hint"><b>Admin:</b> man@pps.com &nbsp;|&nbsp; MAN@1234</span>
+                        <span id="demo-emp-hint" style="display:none;"><b>Employee:</b> manpatel@pps.com &nbsp;|&nbsp; man@1234</span>
+                    </div>
 
                     <div class="auth-divider">
                         <span>or continue with</span>
@@ -4655,13 +4657,9 @@
     <script src="../src/features/payslip/services/payslipService.js"></script>
 
     <!-- React Components & Portal Bundle (Professional System) -->
-<<<<<<< Updated upstream
-    <script type="text/babel" src="../src/components/payslip/PayslipPreview.jsx"></script>
-    <script type="text/babel" src="../src/components/payslip/Payslip.jsx"></script>
-    <script type="text/babel" src="../src/components/payslip/PayslipModal.jsx"></script>
-=======
+    <script type="text/babel" src="../src/features/payslip/components/PayslipPreview.jsx"></script>
+    <script type="text/babel" src="../src/features/payslip/components/Payslip.jsx"></script>
     <script type="text/babel" src="../src/features/payslip/components/PayslipModal.jsx"></script>
->>>>>>> Stashed changes
     <script type="text/babel" src="../src/App.jsx"></script>
     <script type="text/babel" src="../src/main.jsx"></script>
 

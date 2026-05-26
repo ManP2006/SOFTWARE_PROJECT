@@ -779,13 +779,8 @@ window.showEmployeePayslip = function (empId, month, customNet, customYear) {
     const payslipData = {
         name: emp.name,
         id: emp.id,
-<<<<<<< Updated upstream:frontend/src/utils/script.js
         month: month.split(' ')[0],
         year: month.split(' ')[1] || new Date().getFullYear(),
-=======
-        month: monthStr.includes(' ') ? monthStr.split(' ')[0] : monthStr, 
-        year: customYear || (monthStr.includes(' ') ? monthStr.split(' ')[1] : new Date().getFullYear()),
->>>>>>> Stashed changes:frontend/src/utils/helpers.js
         designation: emp.role,
         department: emp.dept,
         bankName: emp.bankName || 'HDFC Bank',
@@ -1137,13 +1132,8 @@ window.closeModal = function (modalId) {
 
 // CHECKIN_KEY removed
 
-<<<<<<< Updated upstream:frontend/src/utils/script.js
-window.simulateCheckIn = function () {
-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
-=======
 window.simulateCheckIn = async function () {
-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
         || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
     if (!emp) return;
 
@@ -1165,7 +1155,6 @@ window.simulateCheckIn = async function () {
     }
 };
 
-<<<<<<< Updated upstream:frontend/src/utils/script.js
 window.simulateCheckOut = function () {
     const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
         || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
@@ -1223,6 +1212,7 @@ window.simulateCheckOut = function () {
     }
 
     // Update today's attendance record with checkout
+    try {
     let todayRecord = JSON.parse(localStorage.getItem(`pps-attendance-today-${emp.id}`) || 'null');
     if (todayRecord && todayRecord.date === todayDateStr) {
         todayRecord.checkOut = time;
@@ -1238,22 +1228,6 @@ window.simulateCheckOut = function () {
                 if (ampm === 'PM' && hr !== 12) hr += 12;
                 if (ampm === 'AM' && hr === 12) hr = 0;
                 if (hr >= 10) todayRecord.status = 'Late';
-=======
-window.simulateCheckOut = async function () {
-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
-        || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
-    if (!emp) return;
-
-    try {
-        const response = await window.apiClient.post('/attendance/checkout', { employeeId: emp.id });
-        if (response && response.success) {
-            window.showToast('Checked out successfully', 'info');
-            
-            // Stop timer if running
-            if (window.timerInterval) {
-                clearInterval(window.timerInterval);
-                window.timerInterval = null;
->>>>>>> Stashed changes:frontend/src/utils/helpers.js
             }
 
             // Re-render UI
@@ -1261,8 +1235,9 @@ window.simulateCheckOut = async function () {
             
             if (window.selectEmployee) window.selectEmployee(emp);
         } else {
-            throw new Error(response?.message || 'Failed to check out');
+            throw new Error('No check-in time recorded. Cannot check out.');
         }
+    }
     } catch (err) {
         // Handle 6-hour minimum working hours error
         if (err.message && err.message.includes('6 working hours')) {
@@ -1275,7 +1250,6 @@ window.simulateCheckOut = async function () {
         } else {
             window.showToast(err.message || 'Check-out failed', 'error');
         }
-<<<<<<< Updated upstream:frontend/src/utils/script.js
 
         localStorage.setItem(`pps-attendance-today-${emp.id}`, JSON.stringify(todayRecord));
 
@@ -1284,8 +1258,6 @@ window.simulateCheckOut = async function () {
         history = history.filter(r => r.date !== todayDateStr);
         history.unshift(todayRecord);
         localStorage.setItem(`pps-attendance-history-${emp.id}`, JSON.stringify(history));
-=======
->>>>>>> Stashed changes:frontend/src/utils/helpers.js
     }
 };
 
@@ -1460,7 +1432,6 @@ window.renderEmployeeAttendanceHistory = async function (emp) {
         }
     }
 
-<<<<<<< Updated upstream:frontend/src/utils/script.js
     // Get persisted real records for this month
     const realHistory = JSON.parse(localStorage.getItem(`pps-attendance-history-${emp.id}`) || '[]');
 
@@ -1476,9 +1447,6 @@ window.renderEmployeeAttendanceHistory = async function (emp) {
     const allRecords = [...realForMonth, ...sampleFiltered];
     // Sort most recent first
     allRecords.sort((a, b) => b.date.localeCompare(a.date));
-=======
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-muted"><div class="spinner"></div> Loading attendance...</td></tr>';
->>>>>>> Stashed changes:frontend/src/utils/helpers.js
 
     try {
         const response = await window.apiClient.get(`/attendance?employeeId=${emp.id}&month=${targetMonth}&year=${targetYear}`);
@@ -1906,7 +1874,6 @@ window.updatePayrollAnalytics = function () {
 // --- Initialization ---
 function initApp() {
     try {
-<<<<<<< Updated upstream:frontend/src/utils/script.js
         window.loadEmployees();
         window.loadPayrolls();
         window.initPayrollModule();
@@ -1916,29 +1883,6 @@ function initApp() {
         const role = localStorage.getItem('pps-role');
         if (role === 'admin') {
             window.syncAdminProfileUI();
-=======
-        // Check for existing session and auto-restore
-        const savedRole = localStorage.getItem('pps-role');
-        const savedToken = localStorage.getItem('pps-auth-token');
-        const savedName = localStorage.getItem('pps-user-name');
-        
-        if (savedRole && savedToken && savedName) {
-            console.log('[PPS] Restoring session for:', savedName, '(', savedRole, ')');
-            // Load all data from API first, then show dashboard
-            window.loadAllModuleData().then(() => {
-                window.showDashboardView(savedRole, savedName);
-                console.log('[PPS] Session restored successfully');
-            }).catch(err => {
-                console.error('[PPS] Session restore failed, clearing session:', err);
-                localStorage.removeItem('pps-auth-token');
-                localStorage.removeItem('pps-role');
-                localStorage.removeItem('pps-user-name');
-                window.showLandingView();
-            });
-        } else {
-            // No saved session — show landing page
-            window.showLandingView();
->>>>>>> Stashed changes:frontend/src/utils/helpers.js
         }
     } catch (err) {
         console.error('Initialization Error:', err);
@@ -2053,6 +1997,11 @@ function initApp() {
             if (adminGroup) adminGroup.style.display = 'none';
             if (empGroup) empGroup.style.display = 'flex';
             if (authView) authView.setAttribute('data-current-role', 'employee');
+            // Toggle demo credentials hint
+            const adminHint = getEl('demo-admin-hint');
+            const empHint = getEl('demo-emp-hint');
+            if (adminHint) adminHint.style.display = 'none';
+            if (empHint) empHint.style.display = 'inline';
         } else {
             if (authTitle) authTitle.textContent = 'Admin Sign In';
             if (authSubtitle) authSubtitle.textContent = 'Access your account to manage payroll.';
@@ -2060,6 +2009,11 @@ function initApp() {
             if (adminGroup) adminGroup.style.display = 'flex';
             if (empGroup) empGroup.style.display = 'none';
             if (authView) authView.setAttribute('data-current-role', 'admin');
+            // Toggle demo credentials hint
+            const adminHint = getEl('demo-admin-hint');
+            const empHint = getEl('demo-emp-hint');
+            if (adminHint) adminHint.style.display = 'inline';
+            if (empHint) empHint.style.display = 'none';
         }
 
         if (modal) modal.classList.add('hidden');
@@ -2078,16 +2032,16 @@ function initApp() {
         const password = getEl('password')?.value.trim();
         const rememberMe = getEl('remember-me')?.checked;
 
-        let name = '';
+        let formName = '';
         if (role === 'employee') {
-            name = getEl('employee-name')?.value.trim();
+            formName = getEl('employee-name')?.value.trim();
         } else {
-            name = getEl('admin-user')?.value.trim();
+            formName = getEl('admin-user')?.value.trim();
         }
 
-        // Strict Validation
-        if (!name || !email || !password) {
-            window.showToast('Please fill in all fields to sign in.', 'warning');
+        // Only email and password are required — name is optional display preference
+        if (!email || !password) {
+            window.showToast('Please enter your email and password to sign in.', 'warning');
             return;
         }
 
@@ -2110,8 +2064,8 @@ function initApp() {
                     localStorage.setItem('pps-auth-token', token);
                 }
                 
-                // Use server-returned name if available, fallback to form input
-                const displayName = user?.name || name;
+                // Server-returned name is always authoritative; fall back to form input, then email prefix
+                const displayName = user?.name || formName || email.split('@')[0];
                 
                 // 3. Store session info for page refresh restoration
                 localStorage.setItem('pps-role', role);
@@ -3387,20 +3341,7 @@ window.showPayslip = function (empId, month) {
             window.showToast('Payslip generated successfully.', 'success');
         }, 400);
     }
-<<<<<<< Updated upstream:frontend/src/utils/script.js
-=======
 
-    // Small delay to feel more professional and allow iframe to start loading
-    setTimeout(() => {
-        const modal = getEl('payslip-modal');
-        if (modal) {
-            modal.classList.remove('hidden');
-            modal.style.display = 'flex';
-        }
-        window.autoScalePayslip();
-        window.showToast('Payslip generated successfully.', 'success');
-    }, 400);
->>>>>>> Stashed changes:frontend/src/utils/helpers.js
 };
 
 window.autoScalePayslip = function () {
@@ -5341,14 +5282,11 @@ function initEmployeeLeaveModule() {
                 return;
             }
 
-<<<<<<< Updated upstream:frontend/src/utils/script.js
             const newId = 'LR' + String(leaveRequests.length + 1).padStart(4, '0');
             const leaveTypeObj = leaveTypes.find(t => t.id === typeId) || { name: 'Unknown' };
             const appliedDate = new Date().toISOString().split('T')[0];
             const createdAt = new Date().toLocaleString();
 
-=======
->>>>>>> Stashed changes:frontend/src/utils/helpers.js
             const durationInput = getEl('leave-duration');
             const duration = durationInput ? durationInput.value : 'Full Day';
             const requestType = duration === 'Early Exit' ? 'EARLY_EXIT' : 'STANDARD';

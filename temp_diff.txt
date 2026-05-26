@@ -1,0 +1,298 @@
+diff --git a/frontend/public/index.html b/frontend/public/index.html
+index d56b101..0afc790 100644
+--- a/frontend/public/index.html
++++ b/frontend/public/index.html
+@@ -9,14 +9,9 @@
+         content="Streamline salary processing, automate tax calculations, and manage employee payments with our comprehensive payroll solution.">
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+-<<<<<<< Updated upstream
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+         rel="stylesheet">
+     <link rel="stylesheet" href="../src/styles/global.css?v=15">
+-=======
+-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+-    <link rel="stylesheet" href="../src/styles/global.css?v=16">
+->>>>>>> Stashed changes
+     <!-- Tailwind CSS for React Components -->
+     <script src="https://cdn.tailwindcss.com"></script>
+     <script>
+@@ -233,14 +228,14 @@
+ 
+                 <form class="auth-form-body" onsubmit="event.preventDefault();">
+                     <div id="admin-user-group" class="form-group">
+-                        <label for="admin-user" class="form-label">Admin User</label>
+-                        <input type="text" id="admin-user" class="form-input" placeholder="Full Name" required>
++                        <label for="admin-user" class="form-label">Display Name <span style="font-weight:400;opacity:0.6;">(optional)</span></label>
++                        <input type="text" id="admin-user" class="form-input" placeholder="Your name (optional)">
+                         <span class="form-helper">This name will appear inside the dashboard.</span>
+                     </div>
+ 
+                     <div id="employee-name-group" class="form-group" style="display:none;">
+-                        <label for="employee-name" class="form-label">Full Name</label>
+-                        <input type="text" id="employee-name" class="form-input" placeholder="Your Full Name" required>
++                        <label for="employee-name" class="form-label">Display Name <span style="font-weight:400;opacity:0.6;">(optional)</span></label>
++                        <input type="text" id="employee-name" class="form-input" placeholder="Your name (optional)">
+                     </div>
+ 
+                     <div class="form-group">
+@@ -264,6 +259,13 @@
+ 
+                     <button type="submit" id="auth-submit-btn" class="submit-btn">Sign In</button>
+ 
++                    <!-- Demo Credentials Hint -->
++                    <div id="demo-credentials-hint" style="margin-top:1rem; padding:0.75rem 1rem; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.2); border-radius:8px; font-size:0.8rem; color:var(--text-muted, #64748b); line-height:1.6;">
++                        <strong style="color:var(--text-secondary, #475569); display:block; margin-bottom:0.3rem;">🔑 Demo Credentials</strong>
++                        <span id="demo-admin-hint"><b>Admin:</b> man@pps.com &nbsp;|&nbsp; MAN@1234</span>
++                        <span id="demo-emp-hint" style="display:none;"><b>Employee:</b> manpatel@pps.com &nbsp;|&nbsp; man@1234</span>
++                    </div>
++
+                     <div class="auth-divider">
+                         <span>or continue with</span>
+                     </div>
+@@ -4655,13 +4657,9 @@
+     <script src="../src/features/payslip/services/payslipService.js"></script>
+ 
+     <!-- React Components & Portal Bundle (Professional System) -->
+-<<<<<<< Updated upstream
+-    <script type="text/babel" src="../src/components/payslip/PayslipPreview.jsx"></script>
+-    <script type="text/babel" src="../src/components/payslip/Payslip.jsx"></script>
+-    <script type="text/babel" src="../src/components/payslip/PayslipModal.jsx"></script>
+-=======
++    <script type="text/babel" src="../src/features/payslip/components/PayslipPreview.jsx"></script>
++    <script type="text/babel" src="../src/features/payslip/components/Payslip.jsx"></script>
+     <script type="text/babel" src="../src/features/payslip/components/PayslipModal.jsx"></script>
+->>>>>>> Stashed changes
+     <script type="text/babel" src="../src/App.jsx"></script>
+     <script type="text/babel" src="../src/main.jsx"></script>
+ 
+diff --git a/frontend/src/utils/helpers.js b/frontend/src/utils/helpers.js
+index 4081ed8..60654ad 100644
+--- a/frontend/src/utils/helpers.js
++++ b/frontend/src/utils/helpers.js
+@@ -779,13 +779,8 @@ window.showEmployeePayslip = function (empId, month, customNet, customYear) {
+     const payslipData = {
+         name: emp.name,
+         id: emp.id,
+-<<<<<<< Updated upstream:frontend/src/utils/script.js
+         month: month.split(' ')[0],
+         year: month.split(' ')[1] || new Date().getFullYear(),
+-=======
+-        month: monthStr.includes(' ') ? monthStr.split(' ')[0] : monthStr, 
+-        year: customYear || (monthStr.includes(' ') ? monthStr.split(' ')[1] : new Date().getFullYear()),
+->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+         designation: emp.role,
+         department: emp.dept,
+         bankName: emp.bankName || 'HDFC Bank',
+@@ -1137,13 +1132,8 @@ window.closeModal = function (modalId) {
+ 
+ // CHECKIN_KEY removed
+ 
+-<<<<<<< Updated upstream:frontend/src/utils/script.js
+ window.simulateCheckIn = function () {
+     const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
+-=======
+-window.simulateCheckIn = async function () {
+-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+         || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+     if (!emp) return;
+ 
+@@ -1165,7 +1155,6 @@ window.simulateCheckIn = async function () {
+     }
+ };
+ 
+-<<<<<<< Updated upstream:frontend/src/utils/script.js
+ window.simulateCheckOut = function () {
+     const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null)
+         || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+@@ -1238,22 +1227,6 @@ window.simulateCheckOut = function () {
+                 if (ampm === 'PM' && hr !== 12) hr += 12;
+                 if (ampm === 'AM' && hr === 12) hr = 0;
+                 if (hr >= 10) todayRecord.status = 'Late';
+-=======
+-window.simulateCheckOut = async function () {
+-    const emp = (window._currentEmpId ? employees.find(e => e.id === window._currentEmpId) : null) 
+-        || employees.find(e => e.name === window.currentUser?.displayName) || employees[0];
+-    if (!emp) return;
+-
+-    try {
+-        const response = await window.apiClient.post('/attendance/checkout', { employeeId: emp.id });
+-        if (response && response.success) {
+-            window.showToast('Checked out successfully', 'info');
+-            
+-            // Stop timer if running
+-            if (window.timerInterval) {
+-                clearInterval(window.timerInterval);
+-                window.timerInterval = null;
+->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+             }
+ 
+             // Re-render UI
+@@ -1275,7 +1248,6 @@ window.simulateCheckOut = async function () {
+         } else {
+             window.showToast(err.message || 'Check-out failed', 'error');
+         }
+-<<<<<<< Updated upstream:frontend/src/utils/script.js
+ 
+         localStorage.setItem(`pps-attendance-today-${emp.id}`, JSON.stringify(todayRecord));
+ 
+@@ -1284,8 +1256,6 @@ window.simulateCheckOut = async function () {
+         history = history.filter(r => r.date !== todayDateStr);
+         history.unshift(todayRecord);
+         localStorage.setItem(`pps-attendance-history-${emp.id}`, JSON.stringify(history));
+-=======
+->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+     }
+ };
+ 
+@@ -1460,7 +1430,6 @@ window.renderEmployeeAttendanceHistory = async function (emp) {
+         }
+     }
+ 
+-<<<<<<< Updated upstream:frontend/src/utils/script.js
+     // Get persisted real records for this month
+     const realHistory = JSON.parse(localStorage.getItem(`pps-attendance-history-${emp.id}`) || '[]');
+ 
+@@ -1476,9 +1445,6 @@ window.renderEmployeeAttendanceHistory = async function (emp) {
+     const allRecords = [...realForMonth, ...sampleFiltered];
+     // Sort most recent first
+     allRecords.sort((a, b) => b.date.localeCompare(a.date));
+-=======
+-    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-muted"><div class="spinner"></div> Loading attendance...</td></tr>';
+->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+ 
+     try {
+         const response = await window.apiClient.get(`/attendance?employeeId=${emp.id}&month=${targetMonth}&year=${targetYear}`);
+@@ -1906,7 +1872,6 @@ window.updatePayrollAnalytics = function () {
+ // --- Initialization ---
+ function initApp() {
+     try {
+-<<<<<<< Updated upstream:frontend/src/utils/script.js
+         window.loadEmployees();
+         window.loadPayrolls();
+         window.initPayrollModule();
+@@ -1916,29 +1881,6 @@ function initApp() {
+         const role = localStorage.getItem('pps-role');
+         if (role === 'admin') {
+             window.syncAdminProfileUI();
+-=======
+-        // Check for existing session and auto-restore
+-        const savedRole = localStorage.getItem('pps-role');
+-        const savedToken = localStorage.getItem('pps-auth-token');
+-        const savedName = localStorage.getItem('pps-user-name');
+-        
+-        if (savedRole && savedToken && savedName) {
+-            console.log('[PPS] Restoring session for:', savedName, '(', savedRole, ')');
+-            // Load all data from API first, then show dashboard
+-            window.loadAllModuleData().then(() => {
+-                window.showDashboardView(savedRole, savedName);
+-                console.log('[PPS] Session restored successfully');
+-            }).catch(err => {
+-                console.error('[PPS] Session restore failed, clearing session:', err);
+-                localStorage.removeItem('pps-auth-token');
+-                localStorage.removeItem('pps-role');
+-                localStorage.removeItem('pps-user-name');
+-                window.showLandingView();
+-            });
+-        } else {
+-            // No saved session — show landing page
+-            window.showLandingView();
+->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+         }
+     } catch (err) {
+         console.error('Initialization Error:', err);
+@@ -2053,6 +1995,11 @@ function initApp() {
+             if (adminGroup) adminGroup.style.display = 'none';
+             if (empGroup) empGroup.style.display = 'flex';
+             if (authView) authView.setAttribute('data-current-role', 'employee');
++            // Toggle demo credentials hint
++            const adminHint = getEl('demo-admin-hint');
++            const empHint = getEl('demo-emp-hint');
++            if (adminHint) adminHint.style.display = 'none';
++            if (empHint) empHint.style.display = 'inline';
+         } else {
+             if (authTitle) authTitle.textContent = 'Admin Sign In';
+             if (authSubtitle) authSubtitle.textContent = 'Access your account to manage payroll.';
+@@ -2060,6 +2007,11 @@ function initApp() {
+             if (adminGroup) adminGroup.style.display = 'flex';
+             if (empGroup) empGroup.style.display = 'none';
+             if (authView) authView.setAttribute('data-current-role', 'admin');
++            // Toggle demo credentials hint
++            const adminHint = getEl('demo-admin-hint');
++            const empHint = getEl('demo-emp-hint');
++            if (adminHint) adminHint.style.display = 'inline';
++            if (empHint) empHint.style.display = 'none';
+         }
+ 
+         if (modal) modal.classList.add('hidden');
+@@ -2078,16 +2030,16 @@ function initApp() {
+         const password = getEl('password')?.value.trim();
+         const rememberMe = getEl('remember-me')?.checked;
+ 
+-        let name = '';
++        let formName = '';
+         if (role === 'employee') {
+-            name = getEl('employee-name')?.value.trim();
++            formName = getEl('employee-name')?.value.trim();
+         } else {
+-            name = getEl('admin-user')?.value.trim();
++            formName = getEl('admin-user')?.value.trim();
+         }
+ 
+-        // Strict Validation
+-        if (!name || !email || !password) {
+-            window.showToast('Please fill in all fields to sign in.', 'warning');
++        // Only email and password are required — name is optional display preference
++        if (!email || !password) {
++            window.showToast('Please enter your email and password to sign in.', 'warning');
+             return;
+         }
+ 
+@@ -2110,8 +2062,8 @@ function initApp() {
+                     localStorage.setItem('pps-auth-token', token);
+                 }
+                 
+-                // Use server-returned name if available, fallback to form input
+-                const displayName = user?.name || name;
++                // Server-returned name is always authoritative; fall back to form input, then email prefix
++                const displayName = user?.name || formName || email.split('@')[0];
+                 
+                 // 3. Store session info for page refresh restoration
+                 localStorage.setItem('pps-role', role);
+@@ -3387,20 +3339,7 @@ window.showPayslip = function (empId, month) {
+             window.showToast('Payslip generated successfully.', 'success');
+         }, 400);
+     }
+-<<<<<<< Updated upstream:frontend/src/utils/script.js
+-=======
+ 
+-    // Small delay to feel more professional and allow iframe to start loading
+-    setTimeout(() => {
+-        const modal = getEl('payslip-modal');
+-        if (modal) {
+-            modal.classList.remove('hidden');
+-            modal.style.display = 'flex';
+-        }
+-        window.autoScalePayslip();
+-        window.showToast('Payslip generated successfully.', 'success');
+-    }, 400);
+->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+ };
+ 
+ window.autoScalePayslip = function () {
+@@ -5341,14 +5280,11 @@ function initEmployeeLeaveModule() {
+                 return;
+             }
+ 
+-<<<<<<< Updated upstream:frontend/src/utils/script.js
+             const newId = 'LR' + String(leaveRequests.length + 1).padStart(4, '0');
+             const leaveTypeObj = leaveTypes.find(t => t.id === typeId) || { name: 'Unknown' };
+             const appliedDate = new Date().toISOString().split('T')[0];
+             const createdAt = new Date().toLocaleString();
+ 
+-=======
+->>>>>>> Stashed changes:frontend/src/utils/helpers.js
+             const durationInput = getEl('leave-duration');
+             const duration = durationInput ? durationInput.value : 'Full Day';
+             const requestType = duration === 'Early Exit' ? 'EARLY_EXIT' : 'STANDARD';
